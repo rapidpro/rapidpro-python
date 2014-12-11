@@ -42,7 +42,7 @@ class TembaClient(object):
         if group_uuids is not None:
             params['group_uuids'] = group_uuids
 
-        return self._get_single('contacts', **params)
+        return self._get_all('contacts', **params)
 
     def get_flow(self, uuid):
         return self._get_single('flows', uuid=uuid)
