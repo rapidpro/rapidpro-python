@@ -56,6 +56,29 @@ class TembaClientTest(unittest.TestCase):
             self.assertEqual(contacts[0].uuid, "bfff9984-38f4-4e59-998d-3663ec3c650d")
             self.assertEqual(contacts[0].modified_on, datetime.datetime(2014, 10, 1, 6, 54, 9, 817000, pytz.utc))
 
+    @patch('requests.models.Response', MockResponse)
+    def test_get_group(self):
+        with patch('requests.get') as mock_get:
+            # check single contact response
+            mock_get.return_value = MockResponse(200, self._read_json('groups_1'))
+            group = self.client.get_group('1234')
+
+            self.assertEqual(group.name, "The A-Team")
+            self.assertEqual(group.uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
+            self.assertEqual(group.size, 4)
+
+    @patch('requests.models.Response', MockResponse)
+    def test_get_groups(self):
+        with patch('requests.get') as mock_get:
+            # check single contact response
+            mock_get.return_value = MockResponse(200, self._read_json('groups_2'))
+            groups = self.client.get_groups()
+
+            self.assertEqual(len(groups), 2)
+            self.assertEqual(groups[0].name, "The A-Team")
+            self.assertEqual(groups[0].uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
+            self.assertEqual(groups[0].size, 4)
+
     def _read_json(self, filename):
         handle = open('test_files/%s.json' % filename)
         contents = unicode(handle.read())

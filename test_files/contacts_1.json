@@ -1,5 +1,5 @@
 {
-    "count": 2,
+    "count": 1,
     "next": null,
     "previous": null,
     "results": [
@@ -19,7 +19,7 @@
             "modified_on": "2014-10-01T06:54:09.817Z",
             "phone": "+250700000002",
             "groups": [
-                "A-Team"
+                "The A-Team"
             ]
         }
     ]

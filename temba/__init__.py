@@ -2,21 +2,7 @@ from __future__ import unicode_literals
 
 import requests
 
-from .utils import DictStruct
-
-TYPE_CONTACT = 'Contact'
-TYPE_CONTACT_GROUP = 'ContactGroup'
-
-TYPE_DATETIME_FIELDS = {
-    TYPE_CONTACT: ('modified_on',)
-}
-
-
-def _unmarshall(item_type, obj_or_list):
-    if isinstance(obj_or_list, list):
-        return [_unmarshall(item_type, item) for item in obj_or_list]
-    else:
-        return DictStruct(item_type, obj_or_list, TYPE_DATETIME_FIELDS[item_type])
+from .types import Contact, ContactGroup, Flow, FlowRun
 
 
 class TembaException(Exception):
@@ -45,10 +31,10 @@ class TembaClient(object):
 
     def create_contact(self, name, urns, fields, group_uuids):
         payload = {'name': name, 'urns': urns, 'fields': fields, 'group_uuids': group_uuids}
-        return self._create_single('contacts', payload)
+        return Contact.deserialize(self._create_single('contacts', payload))
 
     def get_contact(self, uuid):
-        return _unmarshall(TYPE_CONTACT, self._get_single('contacts', uuid=uuid))
+        return Contact.deserialize(self._get_single('contacts', uuid=uuid))
 
     def get_contacts(self, name=None, group_uuids=None):
         params = {}
@@ -57,22 +43,22 @@ class TembaClient(object):
         if group_uuids is not None:
             params['group_uuids'] = group_uuids
 
-        return _unmarshall(TYPE_CONTACT, self._get_all('contacts', **params))
+        return Contact.deserialize_list(self._get_all('contacts', **params))
 
     def get_flow(self, uuid):
-        return self._get_single('flows', uuid=uuid)
+        return Flow.deserialize(self._get_single('flows', uuid=uuid))
 
     def get_flows(self):
-        return self._get_all('flows')
+        return Flow.deserialize_list(self._get_all('flows'))
 
     def get_group(self, uuid):
-        return self._get_single('groups', uuid=uuid)
+        return ContactGroup.deserialize(self._get_single('groups', uuid=uuid))
 
     def get_groups(self):
-        return self._get_all('groups')
+        return ContactGroup.deserialize_list(self._get_all('groups'))
 
     def get_run(self, uuid):
-        return self._get_single('runs', uuid=uuid)
+        return FlowRun.deserialize(self._get_single('runs', uuid=uuid))
 
     def get_runs(self, flow_uuid=None, group_uuids=None):
         params = {}
@@ -81,7 +67,7 @@ class TembaClient(object):
         if group_uuids is not None:
             params['group_uuids'] = group_uuids
 
-        return self._get_all('runs', **params)
+        return FlowRun.deserialize_list(self._get_all('runs', **params))
 
     def _create_single(self, endpoint, **params):
         """
