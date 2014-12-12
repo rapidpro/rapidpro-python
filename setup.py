@@ -10,4 +10,6 @@ setup(
     url='https://github.com/rapidpro',
     packages=['temba'],
     install_requires=['requests'],
+    test_suite='nose.collector',
+    tests_require=['nose'],
 )

@@ -1,7 +1,22 @@
 from __future__ import unicode_literals
 
 import requests
-import time
+
+from .utils import DictStruct
+
+TYPE_CONTACT = 'Contact'
+TYPE_CONTACT_GROUP = 'ContactGroup'
+
+TYPE_DATETIME_FIELDS = {
+    TYPE_CONTACT: ('modified_on',)
+}
+
+
+def _unmarshall(item_type, obj_or_list):
+    if isinstance(obj_or_list, list):
+        return [_unmarshall(item_type, item) for item in obj_or_list]
+    else:
+        return DictStruct(item_type, obj_or_list, TYPE_DATETIME_FIELDS[item_type])
 
 
 class TembaException(Exception):
@@ -29,11 +44,11 @@ class TembaClient(object):
         self.token = token
 
     def create_contact(self, name, urns, fields, group_uuids):
-        payload = dict(name=name, urns=urns, fields=fields, group_uuids=group_uuids)
+        payload = {'name': name, 'urns': urns, 'fields': fields, 'group_uuids': group_uuids}
         return self._create_single('contacts', payload)
 
     def get_contact(self, uuid):
-        return self._get_single('contacts', uuid=uuid)
+        return _unmarshall(TYPE_CONTACT, self._get_single('contacts', uuid=uuid))
 
     def get_contacts(self, name=None, group_uuids=None):
         params = {}
@@ -42,7 +57,7 @@ class TembaClient(object):
         if group_uuids is not None:
             params['group_uuids'] = group_uuids
 
-        return self._get_all('contacts', **params)
+        return _unmarshall(TYPE_CONTACT, self._get_all('contacts', **params))
 
     def get_flow(self, uuid):
         return self._get_single('flows', uuid=uuid)
