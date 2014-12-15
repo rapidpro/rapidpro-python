@@ -2,19 +2,7 @@ from __future__ import unicode_literals
 
 import requests
 
-from .types import Contact, ContactGroup, Flow, FlowRun
-
-
-class TembaException(Exception):
-    def __init__(self, msg, caused_by=None):
-        self.msg = msg
-        self.caused_by = caused_by
-
-    def __unicode__(self):
-        text = self.msg
-        if self.caused_by:
-            text += "\ncaused by:\n%s" % self.caused_by
-        return text
+from .types import TembaException, Contact, ContactGroup, Flow, FlowRun
 
 
 class TembaClient(object):
