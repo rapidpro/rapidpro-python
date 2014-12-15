@@ -20,7 +20,7 @@ class TembaType(object):
     """
     Base class for types returned by the Temba API
     """
-    DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
+    DATETIME_FORMATS = '%Y-%m-%dT%H:%M:%S.%fZ', '%Y-%m-%dT%H:%M:%SZ'
 
     @classmethod
     def deserialize(cls, item):
@@ -61,7 +61,12 @@ class TembaType(object):
         if not value:
             return None
 
-        return datetime.datetime.strptime(value, cls.DATETIME_FORMAT).replace(tzinfo=pytz.utc)
+        if '.' in value:
+            datetime_format = '%Y-%m-%dT%H:%M:%S.%fZ'
+        else:
+            datetime_format = '%Y-%m-%dT%H:%M:%SZ'
+
+        return datetime.datetime.strptime(value, datetime_format).replace(tzinfo=pytz.utc)
 
     class Meta:
         fields = ()
@@ -74,7 +79,7 @@ class Contact(TembaType):
         datetime_fields = ('modified_on',)
 
 
-class ContactGroup(TembaType):
+class Group(TembaType):
     class Meta:
         fields = ('uuid', 'name', 'size')
 
@@ -91,20 +96,26 @@ class Flow(TembaType):
         nested_list_fields = {'rulesets': FlowRuleSet}
 
 
-class FlowRunValueSet(TembaType):
+class RunValueSet(TembaType):
     class Meta:
         fields = ('node', 'category', 'text', 'rule_value', 'value', 'label', 'time')
         datetime_fields = ('time',)
 
 
-class FlowRunStep(TembaType):
+class RunStep(TembaType):
     class Meta:
         fields = ('node', 'text', 'value', 'type', 'arrived_on', 'left_on')
         datetime_fields = ('arrived_on', 'left_on')
 
 
-class FlowRun(TembaType):
+class Run(TembaType):
     class Meta:
         fields = ('uuid', 'flow_uuid', 'contact', 'steps', 'values', 'created_on')
         datetime_fields = ('created_on',)
-        nested_list_fields = {'steps': FlowRunStep, 'values': FlowRunValueSet}
+        nested_list_fields = {'steps': RunStep, 'values': RunValueSet}
+
+
+class Message(TembaType):
+    class Meta:
+        fields = ('contact', 'urn', 'status', 'type', 'labels', 'direction', 'text', 'created_on', 'delivered_on', 'sent_on')
+        datetime_fields = ('created_on', 'delivered_on', 'sent_on')

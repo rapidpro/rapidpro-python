@@ -152,6 +152,14 @@ class TembaClientTest(unittest.TestCase):
             mock_get.return_value = MockResponse(200, _read_json('groups_multiple'))
             self.assertRaises(TembaException, self.client.get_group, '9ec96b73-78c3-4029-ba86-5279c92996fc')
 
+    def test_get_messages(self):
+        with patch('requests.get') as mock_get:
+            # check no params
+            mock_get.return_value = MockResponse(200, _read_json('messages_multiple'))
+            messages = self.client.get_messages()
+            self.assertEqual(len(messages), 2)
+            self.assertEqual(messages[0].text, "Hello \u0633.")
+
     def assert_request(self, mock, endpoint, params):
         """
         Asserts that a request was made to the given endpoint with the given parameters

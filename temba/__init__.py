@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 import requests
 
-from .types import TembaException, Contact, ContactGroup, Flow, FlowRun
+from .types import TembaException, Contact, Group, Flow, Message, Run
 
 
 class TembaClient(object):
@@ -40,26 +40,33 @@ class TembaClient(object):
         return Flow.deserialize_list(self._get_all('flows'))
 
     def get_group(self, uuid):
-        return ContactGroup.deserialize(self._get_single('groups', uuid=uuid))
+        return Group.deserialize(self._get_single('groups', uuid=uuid))
 
     def get_groups(self, name=None):
         params = {}
         if name is not None:
             params['name'] = name
 
-        return ContactGroup.deserialize_list(self._get_all('groups', **params))
+        return Group.deserialize_list(self._get_all('groups', **params))
+
+    def get_messages(self, contact=None):
+        params = {}
+        if contact:
+            params['contact'] = contact
+
+        return Message.deserialize_list(self._get_all('messages', **params))
 
     def get_run(self, uuid):
-        return FlowRun.deserialize(self._get_single('runs', uuid=uuid))
+        return Run.deserialize(self._get_single('runs', uuid=uuid))
 
     def get_runs(self, flow_uuid=None, group_uuids=None):
         params = {}
-        if flow_uuid is not None:
+        if flow_uuid:
             params['flow_uuid'] = flow_uuid
         if group_uuids is not None:
             params['group_uuids'] = group_uuids
 
-        return FlowRun.deserialize_list(self._get_all('runs', **params))
+        return Run.deserialize_list(self._get_all('runs', **params))
 
     def _create_single(self, endpoint, **params):
         """
