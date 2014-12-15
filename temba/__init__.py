@@ -54,8 +54,12 @@ class TembaClient(object):
     def get_group(self, uuid):
         return ContactGroup.deserialize(self._get_single('groups', uuid=uuid))
 
-    def get_groups(self):
-        return ContactGroup.deserialize_list(self._get_all('groups'))
+    def get_groups(self, name=None):
+        params = {}
+        if name is not None:
+            params['name'] = name
+
+        return ContactGroup.deserialize_list(self._get_all('groups', **params))
 
     def get_run(self, uuid):
         return FlowRun.deserialize(self._get_single('runs', uuid=uuid))

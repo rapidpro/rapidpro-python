@@ -19,10 +19,15 @@ class TembaType(object):
         instance = cls()
 
         for field in fields:
+            if not field in item:
+                raise ValueError("Serialized %s item is missing field '%s'" % (cls.__name__, field))
+
+            field_value = item[field]
+
             if field in datetime_fields:
-                setattr(instance, field, parse_datetime(item[field]))
+                setattr(instance, field, parse_datetime(field_value))
             else:
-                setattr(instance, field, item[field])
+                setattr(instance, field, field_value)
 
         return instance
 

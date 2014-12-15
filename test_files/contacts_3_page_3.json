@@ -1,0 +1,20 @@
+{
+    "count": 1,
+    "next": null,
+    "previous": "https://example.com/api/v1/contacts?page=2",
+    "results": [
+        {
+            "uuid": "bfff9984-38f4-4e59-998d-000000000021",
+            "name": "Contact #21",
+            "language": null,
+            "group_uuids": [],
+            "urns": [
+                "tel:+250700000021"
+            ],
+            "fields": {},
+            "modified_on": "2014-10-01T06:54:09.817Z",
+            "phone": "+250700000021",
+            "groups": []
+        }
+    ]
+}

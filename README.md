@@ -11,5 +11,6 @@ If you don't know your API token then visit the [API Explorer](http://rapidpro.i
 ```python
 from temba import TembaClient
 client = TembaClient('rapidpro.io', <YOUR-API-TOKEN>)
-print client.get_contacts()
+for contact in client.get_contacts():
+    print contact.name
 ```
