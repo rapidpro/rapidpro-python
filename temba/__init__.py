@@ -77,8 +77,7 @@ class TembaClient(object):
 
     def _get_single(self, endpoint, **params):
         """
-        Gets a single result from the given endpoint. Return none if there are no results and throws an exception if
-        there are multiple results.
+        Gets a single result from the given endpoint. Throws an exception if there are no or multiple results.
         """
         url = '%s/%s.json' % (self.root_url, endpoint)
 
@@ -88,7 +87,7 @@ class TembaClient(object):
         if num_results > 1:
             raise TembaException("Request for single object returned %d objects" % num_results)
         elif num_results == 0:
-            return None
+            raise TembaException("Request for single object returned no objects")
         else:
             return response['results'][0]
 

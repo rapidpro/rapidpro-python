@@ -45,6 +45,10 @@ class TembaClientTest(unittest.TestCase):
             self.assertEqual(contact.language, None)
             self.assertEqual(contact.modified_on, datetime.datetime(2014, 10, 1, 6, 54, 9, 817000, pytz.utc))
 
+            # check empty response
+            mock_get.return_value = MockResponse(200, _read_json('empty'))
+            self.assertRaises(TembaException, self.client.get_contact, 'xyz')
+
             # check multiple item response
             mock_get.return_value = MockResponse(200, _read_json('contacts_multiple'))
             self.assertRaises(TembaException, self.client.get_contact, 'bfff9984-38f4-4e59-998d-3663ec3c650d')
@@ -86,6 +90,10 @@ class TembaClientTest(unittest.TestCase):
             self.assertEqual(flow.rulesets[0].label, "Rule 1")
             self.assertEqual(flow.created_on, datetime.datetime(2014, 12, 11, 13, 47, 55, 288000, pytz.utc))
 
+            # check empty response
+            mock_get.return_value = MockResponse(200, _read_json('empty'))
+            self.assertRaises(TembaException, self.client.get_flow, 'xyz')
+
             # check multiple item response
             mock_get.return_value = MockResponse(200, _read_json('flows_multiple'))
             self.assertRaises(TembaException, self.client.get_flow, 'a68567fa-ad95-45fc-b5f7-3ce90ebbd46d')
@@ -106,6 +114,10 @@ class TembaClientTest(unittest.TestCase):
             self.assertEqual(group.uuid, '04a4752b-0f49-480e-ae60-3a3f2bea485c')
             self.assertEqual(group.name, "The A-Team")
             self.assertEqual(group.size, 4)
+
+            # check empty response
+            mock_get.return_value = MockResponse(200, _read_json('empty'))
+            self.assertRaises(TembaException, self.client.get_group, 'xyz')
 
             # check multiple item response
             mock_get.return_value = MockResponse(200, _read_json('groups_multiple'))
@@ -147,6 +159,10 @@ class TembaClientTest(unittest.TestCase):
             self.assertEqual(run.values[0].label, "Response 1")
             self.assertEqual(run.values[0].time, datetime.datetime(2014, 12, 12, 22, 34, 36, 978000, pytz.utc))
             self.assertEqual(run.created_on, datetime.datetime(2014, 12, 12, 22, 56, 58, 917000, pytz.utc))
+
+            # check empty response
+            mock_get.return_value = MockResponse(200, _read_json('empty'))
+            self.assertRaises(TembaException, self.client.get_run, 'xyz')
 
             # check multiple item response
             mock_get.return_value = MockResponse(200, _read_json('groups_multiple'))
