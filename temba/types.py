@@ -84,6 +84,11 @@ class Group(TembaType):
         fields = ('uuid', 'name', 'size')
 
 
+class Field(TembaType):
+    class Meta:
+        fields = ('key', 'label', 'value_type')
+
+
 class FlowRuleSet(TembaType):
     class Meta:
         fields = ('node', 'label')

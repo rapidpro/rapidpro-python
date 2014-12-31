@@ -1,0 +1,12 @@
+{
+    "count": 1,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "key": "chat_name",
+            "label": "Chat Name",
+            "value_type": "T"
+        }
+    ]
+}

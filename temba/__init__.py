@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 import requests
 
-from .types import TembaException, Contact, Group, Flow, Message, Run
+from .types import TembaException, Contact, Group, Field, Flow, Message, Run
 
 
 class TembaClient(object):
@@ -18,13 +18,22 @@ class TembaClient(object):
         self.token = token
 
     def create_contact(self, name, urns, fields, group_uuids):
+        """
+        Creates a new contact
+        """
         payload = {'name': name, 'urns': urns, 'fields': fields, 'group_uuids': group_uuids}
         return Contact.deserialize(self._create_single('contacts', payload))
 
     def get_contact(self, uuid):
+        """
+        Gets a single contact by its UUID
+        """
         return Contact.deserialize(self._get_single('contacts', uuid=uuid))
 
     def get_contacts(self, name=None, group_uuids=None):
+        """
+        Gets all matching contacts
+        """
         params = {}
         if name is not None:
             params['name'] = name
@@ -33,16 +42,40 @@ class TembaClient(object):
 
         return Contact.deserialize_list(self._get_all('contacts', **params))
 
+    def get_field(self, key):
+        """
+        Gets a single contact field by its key
+        """
+        return Field.deserialize(self._get_single('fields', key=key))
+
+    def get_fields(self):
+        """
+        Gets all fields
+        """
+        return Field.deserialize_list(self._get_all('fields'))
+
     def get_flow(self, uuid):
+        """
+        Gets a single flow by its UUID
+        """
         return Flow.deserialize(self._get_single('flows', uuid=uuid))
 
     def get_flows(self):
+        """
+        Gets all flows
+        """
         return Flow.deserialize_list(self._get_all('flows'))
 
     def get_group(self, uuid):
+        """
+        Gets a single flow by its UUID
+        """
         return Group.deserialize(self._get_single('groups', uuid=uuid))
 
     def get_groups(self, name=None):
+        """
+        Gets all matching groups
+        """
         params = {}
         if name is not None:
             params['name'] = name
@@ -50,6 +83,9 @@ class TembaClient(object):
         return Group.deserialize_list(self._get_all('groups', **params))
 
     def get_messages(self, contact=None):
+        """
+        Gets all matching messages
+        """
         params = {}
         if contact:
             params['contact'] = contact
@@ -57,9 +93,15 @@ class TembaClient(object):
         return Message.deserialize_list(self._get_all('messages', **params))
 
     def get_run(self, uuid):
+        """
+        Gets a single flow run by its UUID
+        """
         return Run.deserialize(self._get_single('runs', uuid=uuid))
 
     def get_runs(self, flow_uuid=None, group_uuids=None):
+        """
+        Gets all matching flow runs
+        """
         params = {}
         if flow_uuid:
             params['flow_uuid'] = flow_uuid
@@ -133,9 +175,6 @@ class TembaClient(object):
             raise TembaException("Request error", ex)
 
     def _headers(self):
-        """
-        Gets HTTP headers
-        """
         return {'Content-type': 'application/json',
                 'Accept': 'application/json',
                 'Authorization': 'Token %s' % self.token}
