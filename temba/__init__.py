@@ -22,7 +22,7 @@ class TembaClient(object):
         Creates a new contact
         """
         payload = {'name': name, 'urns': urns, 'fields': fields, 'group_uuids': group_uuids}
-        return Contact.deserialize(self._create_single('contacts', payload))
+        return Contact.deserialize(self._create_single('contacts', **payload))
 
     def get_contact(self, uuid):
         """
@@ -115,15 +115,19 @@ class TembaClient(object):
         Creates a single item at the given endpoint, which returns the new item
         """
         url = '%s/%s.json' % (self.root_url, endpoint)
-        return self._post(url, **params)
+        return self._read_single(self._post(url, **params))
 
     def _get_single(self, endpoint, **params):
         """
         Gets a single result from the given endpoint. Throws an exception if there are no or multiple results.
         """
         url = '%s/%s.json' % (self.root_url, endpoint)
+        return self._read_single(self._get(url, **params))
 
-        response = self._get(url, **params)
+    def _read_single(self, response):
+        """
+        Extracts a single item from a response, throwing an exception if there are no or multiple results.
+        """
         num_results = len(response['results'])
 
         if num_results > 1:

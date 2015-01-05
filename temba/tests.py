@@ -32,6 +32,20 @@ class TembaClientTest(unittest.TestCase):
     def setUp(self):
         self.client = TembaClient('example.com', '1234567890')
 
+    @patch('requests.post')
+    def test_create_contact(self, mock_post, mock_get):
+        mock_post.return_value = MockResponse(200, _read_json('contacts_single'))
+        contact = self.client.create_contact("John Smith", ['tel:+250700000001'],
+                                             {'nickname': "Hannibal"}, ['04a4752b-0f49-480e-ae60-3a3f2bea485c'])
+
+        self.assertEqual(contact.uuid, 'bfff9984-38f4-4e59-998d-3663ec3c650d')
+        self.assertEqual(contact.name, "John Smith")
+        self.assertEqual(contact.urns, ['tel:+250700000001'])
+        self.assertEqual(contact.group_uuids, ['04a4752b-0f49-480e-ae60-3a3f2bea485c'])
+        self.assertEqual(contact.fields, {'nickname': 'Hannibal'})
+        self.assertEqual(contact.language, None)
+        self.assertEqual(contact.modified_on, datetime.datetime(2014, 10, 1, 6, 54, 9, 817000, pytz.utc))
+
     def test_get_contact(self, mock_get):
         # check single item response
         mock_get.return_value = MockResponse(200, _read_json('contacts_single'))

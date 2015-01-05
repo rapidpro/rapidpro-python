@@ -15,6 +15,9 @@ class TembaException(Exception):
             text += "\ncaused by:\n%s" % self.caused_by
         return text
 
+    def __str__(self):
+        return str(self.__unicode__())
+
 
 class TembaType(object):
     """
