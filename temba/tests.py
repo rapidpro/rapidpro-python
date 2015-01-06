@@ -12,15 +12,23 @@ from . import TembaClient, TembaException
 
 class MockResponse(object):
     """
-    Mock HTTP response with a status code and some content
+    Mock response object with a status code and some content
     """
     def __init__(self, status_code, content=''):
         self.content = content
         self.status_code = status_code
 
     def raise_for_status(self):
-        if self.status_code != 200:
-            raise requests.HTTPError("Server returned %d" % self.status_code, response=self)
+        http_error_msg = ''
+
+        if 400 <= self.status_code < 500:
+            http_error_msg = '%s Client Error: ...' % self.status_code
+
+        elif 500 <= self.status_code < 600:
+            http_error_msg = '%s Server Error: ...' % self.status_code
+
+        if http_error_msg:
+            raise requests.HTTPError(http_error_msg, response=self)
 
     def json(self, **kwargs):
         return json.loads(self.content)
@@ -46,6 +54,16 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(contact.fields, {'nickname': 'Triple A'})
         self.assertEqual(contact.language, None)
         self.assertEqual(contact.modified_on, datetime.datetime(2014, 10, 1, 6, 54, 9, 817000, pytz.utc))
+
+    @patch('requests.delete')
+    def test_delete_contact(self, mock_delete, mock_get):
+        # check deleting an existing contact
+        mock_delete.return_value = MockResponse(204, '')
+        self.client.delete_contact('bfff9984-38f4-4e59-998d-3663ec3c650d')
+
+        # check deleting a non-existent contact
+        mock_delete.return_value = MockResponse(404, 'NOT FOUND')
+        self.assertRaises(TembaException, self.client.delete_contact, 'bfff9984-38f4-4e59-998d-3663ec3c650d')
 
     def test_get_contact(self, mock_get):
         # check single item response

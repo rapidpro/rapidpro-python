@@ -61,6 +61,13 @@ class AbstractTembaClient(object):
         url = '%s/%s.json' % (self.root_url, endpoint)
         return self._request('post', url, data=payload)
 
+    def _delete(self, endpoint, **params):
+        """
+        DELETEs to the given endpoint which won't return anything
+        """
+        url = '%s/%s.json' % (self.root_url, endpoint)
+        return self._request('delete', url, params=params)
+
     def _request(self, method, url, data=None, params=None):
         """
         Makes a GET or POST request to the given URL and returns the parsed JSON
@@ -69,14 +76,18 @@ class AbstractTembaClient(object):
                    'Accept': 'application/json',
                    'Authorization': 'Token %s' % self.token}
         try:
-            if method == 'post':
-                if self.debug:
-                    print "POST %s %s" % (url, json.dumps(data))
-                response = requests.post(url, data=json.dumps(data), headers=headers)
-            elif method == 'get':
+            if method == 'get':
                 if self.debug:
                     print "GET %s %s" % (url, json.dumps(params))
                 response = requests.get(url, params=params, headers=headers)
+            elif method == 'post':
+                if self.debug:
+                    print "POST %s %s" % (url, json.dumps(data))
+                response = requests.post(url, data=json.dumps(data), headers=headers)
+            elif method == 'delete':
+                if self.debug:
+                    print "DELETE %s %s" % (url, json.dumps(params))
+                response = requests.delete(url, params=params, headers=headers)
             else:
                 raise ValueError("Unsupported HTTP method")
 
@@ -84,7 +95,8 @@ class AbstractTembaClient(object):
                 print " -> %s" % response.content
 
             response.raise_for_status()
-            return response.json()
+
+            return response.json() if response.content else None
         except requests.HTTPError, ex:
             raise TembaException("Request error", ex)
 
@@ -106,6 +118,12 @@ class TembaClient(AbstractTembaClient):
         """
         payload = {'uuid': uuid, 'name': name, 'urns': urns, 'fields': fields, 'group_uuids': group_uuids}
         return Contact.deserialize(self._post_single('contacts', payload))
+
+    def delete_contact(self, uuid):
+        """
+        Updates an existing contact
+        """
+        self._delete('contacts', uuid=uuid)
 
     def get_contact(self, uuid):
         """
