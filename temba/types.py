@@ -6,16 +6,18 @@ import requests
 
 
 class TembaException(Exception):
+    """
+    Exception class for all errors from client methods
+    """
     def __init__(self, msg, caused_by=None):
         self.msg = msg
         self.caused_by = caused_by
 
-        if isinstance(caused_by, requests.HTTPError):
-            # if response was 400, we may have a useful validation error
-            if caused_by.response.status_code == 400:
-                msg = self._extract_errors(caused_by.response)
-                if msg:
-                    self.caused_by = msg
+        # if error was caused by a HTTP 400 response, we may have a useful validation error
+        if isinstance(caused_by, requests.HTTPError) and caused_by.response.status_code == 400:
+            msg = self._extract_errors(caused_by.response)
+            if msg:
+                self.caused_by = msg
 
     @staticmethod
     def _extract_errors(response):

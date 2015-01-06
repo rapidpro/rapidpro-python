@@ -4,12 +4,12 @@ import json
 import requests
 
 from abc import ABCMeta
-from .types import TembaException, Contact, Group, Field, Flow, Message, Run
+from .types import TembaException, TembaType, Contact, Group, Field, Flow, Message, Run
 
 
 class AbstractTembaClient(object):
     """
-    Abtract and version agnostic base class for Temba clients
+    Abstract and version agnostic base client class
     """
     __metaclass__ = ABCMeta
 
@@ -22,16 +22,9 @@ class AbstractTembaClient(object):
         self.token = token
         self.debug = debug
 
-    def _create_single(self, endpoint, payload):
-        """
-        Creates a single item at the given endpoint, which returns the new item
-        """
-        url = '%s/%s.json' % (self.root_url, endpoint)
-        return self._request('post', url, data=payload)
-
     def _get_single(self, endpoint, **params):
         """
-        Gets a single result from the given endpoint. Throws an exception if there are no or multiple results.
+        GETs a single result from the given endpoint. Throws an exception if there are no or multiple results.
         """
         url = '%s/%s.json' % (self.root_url, endpoint)
         response = self._request('get', url, params=params)
@@ -47,7 +40,7 @@ class AbstractTembaClient(object):
 
     def _get_all(self, endpoint, **params):
         """
-        Gets all results from the given endpoint
+        GETs all results from the given endpoint
         """
         num_requests = 0
         results = []
@@ -60,6 +53,13 @@ class AbstractTembaClient(object):
             url = response['next']
 
         return results
+
+    def _post_single(self, endpoint, payload):
+        """
+        POSTs to the given endpoint which must return a single item
+        """
+        url = '%s/%s.json' % (self.root_url, endpoint)
+        return self._request('post', url, data=payload)
 
     def _request(self, method, url, data=None, params=None):
         """
@@ -98,7 +98,14 @@ class TembaClient(AbstractTembaClient):
         Creates a new contact
         """
         payload = {'name': name, 'urns': urns, 'fields': fields, 'group_uuids': group_uuids}
-        return Contact.deserialize(self._create_single('contacts', payload))
+        return Contact.deserialize(self._post_single('contacts', payload))
+
+    def update_contact(self, uuid, name, urns, fields, group_uuids):
+        """
+        Updates an existing contact
+        """
+        payload = {'uuid': uuid, 'name': name, 'urns': urns, 'fields': fields, 'group_uuids': group_uuids}
+        return Contact.deserialize(self._post_single('contacts', payload))
 
     def get_contact(self, uuid):
         """
@@ -157,6 +164,12 @@ class TembaClient(AbstractTembaClient):
             params['name'] = name
 
         return Group.deserialize_list(self._get_all('groups', **params))
+
+    def get_message(self, _id):
+        """
+        Gets a single message by its id
+        """
+        return Message.deserialize(self._get_single('messages', id=_id))
 
     def get_messages(self, contact=None):
         """

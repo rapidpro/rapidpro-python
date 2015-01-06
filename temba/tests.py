@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import datetime
 import json
 import pytz
+import requests
 import unittest
 
 from mock import patch
@@ -19,7 +20,7 @@ class MockResponse(object):
 
     def raise_for_status(self):
         if self.status_code != 200:
-            raise Exception("Server returned %d" % self.status_code)
+            raise requests.HTTPError("Server returned %d" % self.status_code, response=self)
 
     def json(self, **kwargs):
         return json.loads(self.content)
@@ -34,15 +35,15 @@ class TembaClientTest(unittest.TestCase):
 
     @patch('requests.post')
     def test_create_contact(self, mock_post, mock_get):
-        mock_post.return_value = MockResponse(200, _read_json('contacts_single'))
-        contact = self.client.create_contact("John Smith", ['tel:+250700000001'],
-                                             {'nickname': "Hannibal"}, ['04a4752b-0f49-480e-ae60-3a3f2bea485c'])
+        mock_post.return_value = MockResponse(200, _read_json('contacts_created'))
+        contact = self.client.create_contact("Amy Amanda Allen", ['tel:+250700000005'],
+                                             {'nickname': "Triple A"}, ['04a4752b-0f49-480e-ae60-3a3f2bea485c'])
 
         self.assertEqual(contact.uuid, 'bfff9984-38f4-4e59-998d-3663ec3c650d')
-        self.assertEqual(contact.name, "John Smith")
-        self.assertEqual(contact.urns, ['tel:+250700000001'])
+        self.assertEqual(contact.name, "Amy Amanda Allen")
+        self.assertEqual(contact.urns, ['tel:+250700000005'])
         self.assertEqual(contact.group_uuids, ['04a4752b-0f49-480e-ae60-3a3f2bea485c'])
-        self.assertEqual(contact.fields, {'nickname': 'Hannibal'})
+        self.assertEqual(contact.fields, {'nickname': 'Triple A'})
         self.assertEqual(contact.language, None)
         self.assertEqual(contact.modified_on, datetime.datetime(2014, 10, 1, 6, 54, 9, 817000, pytz.utc))
 
@@ -198,12 +199,26 @@ class TembaClientTest(unittest.TestCase):
         mock_get.return_value = MockResponse(200, _read_json('groups_multiple'))
         self.assertRaises(TembaException, self.client.get_group, '9ec96b73-78c3-4029-ba86-5279c92996fc')
 
+    def test_get_message(self, mock_get):
+        # check single item response
+        mock_get.return_value = MockResponse(200, _read_json('messages_single'))
+        message = self.client.get_message(13441143)
+        self.assertEqual(message.contact, "92fc2eee-a19a-4589-81b6-1366d2b1cb12")
+        self.assertEqual(message.urn, "tel:+250700000001")
+        self.assertEqual(message.status, 'H')
+        self.assertEqual(message.type, 'F')
+        self.assertEqual(message.labels, [])
+        self.assertEqual(message.direction, 'I')
+        self.assertEqual(message.text, "Hello \u0633.")
+        self.assertEqual(message.created_on, datetime.datetime(2014, 12, 12, 13, 34, 44, 0, pytz.utc))
+        self.assertEqual(message.sent_on, None)
+        self.assertEqual(message.delivered_on, datetime.datetime(2014, 12, 12, 13, 35, 12, 861000, pytz.utc))
+
     def test_get_messages(self, mock_get):
         # check no params
         mock_get.return_value = MockResponse(200, _read_json('messages_multiple'))
         messages = self.client.get_messages()
         self.assertEqual(len(messages), 2)
-        self.assertEqual(messages[0].text, "Hello \u0633.")
 
     def assert_request(self, mock, endpoint, params):
         """
@@ -214,6 +229,13 @@ class TembaClientTest(unittest.TestCase):
                                          'Authorization': 'Token 1234567890',
                                          'Accept': u'application/json'},
                                 params=params)
+
+
+@patch('requests.models.Response', MockResponse)
+class TembaExceptionTest(unittest.TestCase):
+    def test_extract_errors(self):
+        response = MockResponse(400, '{"field_1": ["Error #1, "Error #2"], "field_2": ["Error #1, "Error #3"]}')
+
 
 
 def _read_json(filename):
