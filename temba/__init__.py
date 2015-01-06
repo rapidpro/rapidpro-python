@@ -59,7 +59,7 @@ class AbstractTembaClient(object):
         POSTs to the given endpoint which must return a single item
         """
         url = '%s/%s.json' % (self.root_url, endpoint)
-        return self._request('post', url, data=payload)
+        return self._request('post', url, body=payload)
 
     def _delete(self, endpoint, **params):
         """
@@ -68,28 +68,25 @@ class AbstractTembaClient(object):
         url = '%s/%s.json' % (self.root_url, endpoint)
         return self._request('delete', url, params=params)
 
-    def _request(self, method, url, data=None, params=None):
+    def _request(self, method, url, body=None, params=None):
         """
         Makes a GET or POST request to the given URL and returns the parsed JSON
         """
         headers = {'Content-type': 'application/json',
                    'Accept': 'application/json',
                    'Authorization': 'Token %s' % self.token}
+
+        if self.debug:
+            print "%s %s %s" % (method.upper(), url, json.dumps(params if params else body))
+
         try:
-            if method == 'get':
-                if self.debug:
-                    print "GET %s %s" % (url, json.dumps(params))
-                response = requests.get(url, params=params, headers=headers)
-            elif method == 'post':
-                if self.debug:
-                    print "POST %s %s" % (url, json.dumps(data))
-                response = requests.post(url, data=json.dumps(data), headers=headers)
-            elif method == 'delete':
-                if self.debug:
-                    print "DELETE %s %s" % (url, json.dumps(params))
-                response = requests.delete(url, params=params, headers=headers)
-            else:
-                raise ValueError("Unsupported HTTP method")
+            args = {'headers': headers}
+            if body:
+                args['data'] = json.dumps(body)
+            if params:
+                args['params'] = params
+
+            response = requests.request(method, url, params=params, headers=headers)
 
             if self.debug:
                 print " -> %s" % response.content
