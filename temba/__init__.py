@@ -86,7 +86,7 @@ class AbstractTembaClient(object):
             if params:
                 args['params'] = params
 
-            response = requests.request(method, url, params=params, headers=headers)
+            response = requests.request(method, url, **args)
 
             if self.debug:
                 print " -> %s" % response.content
