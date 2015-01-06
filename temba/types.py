@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import datetime
 import pytz
+import requests
 
 
 class TembaException(Exception):
@@ -9,11 +10,30 @@ class TembaException(Exception):
         self.msg = msg
         self.caused_by = caused_by
 
+        if isinstance(caused_by, requests.HTTPError):
+            # if response was 400, we may have a useful validation error
+            if caused_by.response.status_code == 400:
+                msg = self._extract_errors(caused_by.response)
+                if msg:
+                    self.caused_by = msg
+
+    @staticmethod
+    def _extract_errors(response):
+        try:
+            errors = response.json()
+            msgs = []
+            for field, field_errors in errors.iteritems():
+                for error in field_errors:
+                    msgs.append(error)
+            return ". ".join(msgs)
+        except Exception:
+            return None
+
     def __unicode__(self):
-        text = self.msg
         if self.caused_by:
-            text += "\ncaused by:\n%s" % self.caused_by
-        return text
+            return "%s. Caused by: %s" % (self.msg, self.caused_by)
+        else:
+            return self.msg
 
     def __str__(self):
         return str(self.__unicode__())
