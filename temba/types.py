@@ -55,25 +55,32 @@ class TembaType(object):
         instance = cls()
 
         for field in fields:
-            if not field in item:
+            # if attr name is different to json obj property, field is a tuple
+            if isinstance(field, tuple):
+                field_source = field[0]
+                field_attr = field[1]
+            else:
+                field_source = field_attr = field
+
+            if not field_source in item:
                 raise TembaException("Serialized %s item is missing field '%s'" % (cls.__name__, field))
 
-            field_value = item[field]
+            field_value = item[field_source]
 
             # parse datetime fields
-            if field in datetime_fields:
+            if field_attr in datetime_fields:
                 field_value = cls._parse_datetime(field_value)
 
             # parse nested list type fields
-            if field in nested_list_fields:
-                nested_list_type = nested_list_fields[field]
+            if field_attr in nested_list_fields:
+                nested_list_type = nested_list_fields[field_attr]
 
                 if not isinstance(field_value, list):
                     raise TembaException("Value for nested list field '%s' is not a list" % field)
 
                 field_value = nested_list_type.deserialize_list(field_value)
 
-            setattr(instance, field, field_value)
+            setattr(instance, field_attr, field_value)
 
         return instance
 
@@ -98,9 +105,14 @@ class TembaType(object):
         datetime_fields = ()
 
 
+class Broadcast(TembaType):
+    class Meta:
+        fields = ('messages',)
+
+
 class Contact(TembaType):
     class Meta:
-        fields = ('uuid', 'name', 'urns', 'group_uuids', 'fields', 'language', 'modified_on')
+        fields = ('uuid', 'name', 'urns', ('group_uuids', 'groups'), 'fields', 'language', 'modified_on')
         datetime_fields = ('modified_on',)
 
 
@@ -126,6 +138,12 @@ class Flow(TembaType):
         nested_list_fields = {'rulesets': FlowRuleSet}
 
 
+class Message(TembaType):
+    class Meta:
+        fields = ('contact', 'urn', 'status', 'type', 'labels', 'direction', 'text', 'created_on', 'delivered_on', 'sent_on')
+        datetime_fields = ('created_on', 'delivered_on', 'sent_on')
+
+
 class RunValueSet(TembaType):
     class Meta:
         fields = ('node', 'category', 'text', 'rule_value', 'value', 'label', 'time')
@@ -140,12 +158,6 @@ class RunStep(TembaType):
 
 class Run(TembaType):
     class Meta:
-        fields = ('uuid', 'flow_uuid', 'contact', 'steps', 'values', 'created_on')
+        fields = ('uuid', ('flow_uuid', 'flow'), 'contact', 'steps', 'values', 'created_on')
         datetime_fields = ('created_on',)
         nested_list_fields = {'steps': RunStep, 'values': RunValueSet}
-
-
-class Message(TembaType):
-    class Meta:
-        fields = ('contact', 'urn', 'status', 'type', 'labels', 'direction', 'text', 'created_on', 'delivered_on', 'sent_on')
-        datetime_fields = ('created_on', 'delivered_on', 'sent_on')

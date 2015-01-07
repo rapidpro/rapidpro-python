@@ -4,7 +4,7 @@ import json
 import requests
 
 from abc import ABCMeta
-from .types import TembaException, TembaType, Contact, Group, Field, Flow, Message, Run
+from .types import TembaException, TembaType, Broadcast, Contact, Group, Field, Flow, Message, Run
 
 
 class AbstractTembaClient(object):
@@ -22,7 +22,7 @@ class AbstractTembaClient(object):
         self.token = token
         self.debug = debug
 
-    def _get_single(self, endpoint, **params):
+    def _get_single(self, endpoint, params):
         """
         GETs a single result from the given endpoint. Throws an exception if there are no or multiple results.
         """
@@ -38,7 +38,7 @@ class AbstractTembaClient(object):
         else:
             return response['results'][0]
 
-    def _get_all(self, endpoint, **params):
+    def _get_all(self, endpoint, params):
         """
         GETs all results from the given endpoint
         """
@@ -61,7 +61,7 @@ class AbstractTembaClient(object):
         url = '%s/%s.json' % (self.root_url, endpoint)
         return self._request('post', url, body=payload)
 
-    def _delete(self, endpoint, **params):
+    def _delete(self, endpoint, params):
         """
         DELETEs to the given endpoint which won't return anything
         """
@@ -97,119 +97,127 @@ class AbstractTembaClient(object):
         except requests.HTTPError, ex:
             raise TembaException("Request error", ex)
 
+    def _build_params(self, **kwargs):
+        """
+        Helper method to pack non-None keyword arguments and convert Temba objects to UUIDs
+        """
+        params = {}
+        for kwarg, value in kwargs.iteritems():
+            if value is None:
+                continue
+            else:
+                params[kwarg] = self._serialize_param(value)
+        return params
+
+    def _serialize_param(self, value):
+        if isinstance(value, list) or isinstance(value, tuple):
+            serialized = []
+            for item in value:
+                serialized.append(self._serialize_param(item))
+            return serialized
+        elif isinstance(value, TembaType) and hasattr(value, 'uuid'):
+            return value.uuid
+        else:
+            return value
+
 
 class TembaClient(AbstractTembaClient):
     """
     Client for the Temba API v1
     """
-    def create_contact(self, name, urns, fields, group_uuids):
+    def create_contact(self, name, urns, fields, groups):
         """
         Creates a new contact
         """
-        payload = {'name': name, 'urns': urns, 'fields': fields, 'group_uuids': group_uuids}
-        return Contact.deserialize(self._post_single('contacts', payload))
+        params = self._build_params(name=name, urns=urns, fields=fields, group_uuids=groups)
+        return Contact.deserialize(self._post_single('contacts', params))
 
-    def update_contact(self, uuid, name, urns, fields, group_uuids):
+    def update_contact(self, uuid, name, urns, fields, groups):
         """
         Updates an existing contact
         """
-        payload = {'uuid': uuid, 'name': name, 'urns': urns, 'fields': fields, 'group_uuids': group_uuids}
-        return Contact.deserialize(self._post_single('contacts', payload))
+        params = self._build_params(uuid=uuid, name=name, urns=urns, fields=fields, group_uuids=groups)
+        return Contact.deserialize(self._post_single('contacts', params))
 
     def delete_contact(self, uuid):
         """
         Updates an existing contact
         """
-        self._delete('contacts', uuid=uuid)
+        self._delete('contacts', {'uuid': uuid})
 
     def get_contact(self, uuid):
         """
         Gets a single contact by its UUID
         """
-        return Contact.deserialize(self._get_single('contacts', uuid=uuid))
+        return Contact.deserialize(self._get_single('contacts', {'uuid': uuid}))
 
-    def get_contacts(self, name=None, group_uuids=None):
+    def get_contacts(self, name=None, groups=None):
         """
         Gets all matching contacts
         """
-        params = {}
-        if name is not None:
-            params['name'] = name
-        if group_uuids is not None:
-            params['group_uuids'] = group_uuids
-
-        return Contact.deserialize_list(self._get_all('contacts', **params))
+        params = self._build_params(name=name, group_uuids=groups)
+        return Contact.deserialize_list(self._get_all('contacts', params))
 
     def get_field(self, key):
         """
         Gets a single contact field by its key
         """
-        return Field.deserialize(self._get_single('fields', key=key))
+        return Field.deserialize(self._get_single('fields', {'key': key}))
 
     def get_fields(self):
         """
         Gets all fields
         """
-        return Field.deserialize_list(self._get_all('fields'))
+        return Field.deserialize_list(self._get_all('fields', {}))
 
     def get_flow(self, uuid):
         """
         Gets a single flow by its UUID
         """
-        return Flow.deserialize(self._get_single('flows', uuid=uuid))
+        return Flow.deserialize(self._get_single('flows', {'uuid': uuid}))
 
     def get_flows(self):
         """
         Gets all flows
         """
-        return Flow.deserialize_list(self._get_all('flows'))
+        return Flow.deserialize_list(self._get_all('flows', {}))
 
     def get_group(self, uuid):
         """
         Gets a single flow by its UUID
         """
-        return Group.deserialize(self._get_single('groups', uuid=uuid))
+        return Group.deserialize(self._get_single('groups', {'uuid': uuid}))
 
     def get_groups(self, name=None):
         """
         Gets all matching groups
         """
-        params = {}
-        if name is not None:
-            params['name'] = name
-
-        return Group.deserialize_list(self._get_all('groups', **params))
-
-    def get_message(self, _id):
-        """
-        Gets a single message by its id
-        """
-        return Message.deserialize(self._get_single('messages', id=_id))
+        params = self._build_params(name=name)
+        return Group.deserialize_list(self._get_all('groups', params))
 
     def get_messages(self, contact=None):
         """
         Gets all matching messages
         """
-        params = {}
-        if contact:
-            params['contact'] = contact
+        params = self._build_params(contact=contact)
+        return Message.deserialize_list(self._get_all('messages', params))
 
-        return Message.deserialize_list(self._get_all('messages', **params))
-
-    def get_run(self, uuid):
+    def send_message(self, text, urns=None, contacts=None, groups=None):
         """
-        Gets a single flow run by its UUID
+        Sends a message to the given URNs, contact UUIDs or group UUIDs
         """
-        return Run.deserialize(self._get_single('runs', uuid=uuid))
+        params = self._build_params(text=text, urn=urns, contact=contacts, group=groups)
+        return Broadcast.deserialize(self._post_single('messages', params))
 
-    def get_runs(self, flow_uuid=None, group_uuids=None):
+    def get_run(self, _id):
+        """
+        Gets a single flow run by its id
+        """
+        return Run.deserialize(self._get_single('runs', {'run': _id}))
+
+    def get_runs(self, flow=None, groups=None):
         """
         Gets all matching flow runs
         """
-        params = {}
-        if flow_uuid:
-            params['flow_uuid'] = flow_uuid
-        if group_uuids is not None:
-            params['group_uuids'] = group_uuids
-
-        return Run.deserialize_list(self._get_all('runs', **params))
+        params = self._build_params(flow_uuid=flow, group_uuids=groups)
+        return Run.deserialize_list(self._get_all('runs', params))

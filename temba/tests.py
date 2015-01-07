@@ -7,7 +7,7 @@ import requests
 import unittest
 
 from mock import patch
-from . import TembaClient, TembaException
+from . import TembaClient, TembaException, Group
 
 
 class MockResponse(object):
@@ -46,10 +46,16 @@ class TembaClientTest(unittest.TestCase):
         contact = self.client.create_contact("Amy Amanda Allen", ['tel:+250700000005'],
                                              {'nickname': "Triple A"}, ['04a4752b-0f49-480e-ae60-3a3f2bea485c'])
 
+        expected_body = json.dumps({'name': "Amy Amanda Allen",
+                                    'urns': ['tel:+250700000005'],
+                                    'fields': {'nickname': "Triple A"},
+                                    'group_uuids': ['04a4752b-0f49-480e-ae60-3a3f2bea485c']})
+        self.assert_request(mock_request, 'post', 'contacts', data=expected_body)
+
         self.assertEqual(contact.uuid, 'bfff9984-38f4-4e59-998d-3663ec3c650d')
         self.assertEqual(contact.name, "Amy Amanda Allen")
         self.assertEqual(contact.urns, ['tel:+250700000005'])
-        self.assertEqual(contact.group_uuids, ['04a4752b-0f49-480e-ae60-3a3f2bea485c'])
+        self.assertEqual(contact.groups, ['04a4752b-0f49-480e-ae60-3a3f2bea485c'])
         self.assertEqual(contact.fields, {'nickname': 'Triple A'})
         self.assertEqual(contact.language, None)
         self.assertEqual(contact.modified_on, datetime.datetime(2014, 10, 1, 6, 54, 9, 817000, pytz.utc))
@@ -58,6 +64,8 @@ class TembaClientTest(unittest.TestCase):
         # check deleting an existing contact
         mock_request.return_value = MockResponse(204, '')
         self.client.delete_contact('bfff9984-38f4-4e59-998d-3663ec3c650d')
+
+        self.assert_request(mock_request, 'delete', 'contacts', params={'uuid': 'bfff9984-38f4-4e59-998d-3663ec3c650d'})
 
         # check deleting a non-existent contact
         mock_request.return_value = MockResponse(404, 'NOT FOUND')
@@ -68,10 +76,12 @@ class TembaClientTest(unittest.TestCase):
         mock_request.return_value = MockResponse(200, _read_json('contacts_single'))
         contact = self.client.get_contact('bfff9984-38f4-4e59-998d-3663ec3c650d')
 
+        self.assert_request(mock_request, 'get', 'contacts', params={'uuid': 'bfff9984-38f4-4e59-998d-3663ec3c650d'})
+
         self.assertEqual(contact.uuid, 'bfff9984-38f4-4e59-998d-3663ec3c650d')
         self.assertEqual(contact.name, "John Smith")
         self.assertEqual(contact.urns, ['tel:+250700000001'])
-        self.assertEqual(contact.group_uuids, ['04a4752b-0f49-480e-ae60-3a3f2bea485c'])
+        self.assertEqual(contact.groups, ['04a4752b-0f49-480e-ae60-3a3f2bea485c'])
         self.assertEqual(contact.fields, {'nickname': 'Hannibal'})
         self.assertEqual(contact.language, None)
         self.assertEqual(contact.modified_on, datetime.datetime(2014, 10, 1, 6, 54, 9, 817000, pytz.utc))
@@ -88,13 +98,24 @@ class TembaClientTest(unittest.TestCase):
         # check no params
         mock_request.return_value = MockResponse(200, _read_json('contacts_multiple'))
         contacts = self.client.get_contacts()
+
+        self.assert_request(mock_request, 'get', 'contacts')
+
         self.assertEqual(len(contacts), 4)
         self.assertEqual(contacts[0].uuid, "bfff9984-38f4-4e59-998d-3663ec3c650d")
 
         # check filtering by group_uuids
         mock_request.return_value = MockResponse(200, _read_json('contacts_multiple'))
-        self.client.get_contacts(group_uuids=["abc"])
+        self.client.get_contacts(groups=["abc"])
+
         self.assert_request(mock_request, 'get', 'contacts', params={'group_uuids': ["abc"]})
+
+        # check filtering by group object
+        group1 = Group.deserialize({'name': "A-Team", 'uuid': 'xyz', 'size': 4})
+        mock_request.return_value = MockResponse(200, _read_json('contacts_multiple'))
+        self.client.get_contacts(groups=[group1])
+
+        self.assert_request(mock_request, 'get', 'contacts', params={'group_uuids': ["xyz"]})
 
         # check multiple pages
         mock_request.side_effect = (MockResponse(200, _read_json('contacts_multipage_1')),
@@ -107,6 +128,9 @@ class TembaClientTest(unittest.TestCase):
         # check single item response
         mock_request.return_value = MockResponse(200, _read_json('fields_single'))
         field = self.client.get_field('chat_name')
+
+        self.assert_request(mock_request, 'get', 'fields', params={'key': 'chat_name'})
+
         self.assertEqual(field.label, "Chat Name")
         self.assertEqual(field.value_type, 'T')
 
@@ -122,6 +146,9 @@ class TembaClientTest(unittest.TestCase):
         # check no params
         mock_request.return_value = MockResponse(200, _read_json('fields_multiple'))
         fields = self.client.get_fields()
+
+        self.assert_request(mock_request, 'get', 'fields')
+
         self.assertEqual(len(fields), 2)
         self.assertEqual(fields[0].key, 'chat_name')
 
@@ -129,6 +156,9 @@ class TembaClientTest(unittest.TestCase):
         # check single item response
         mock_request.return_value = MockResponse(200, _read_json('flows_single'))
         flow = self.client.get_flow('a68567fa-ad95-45fc-b5f7-3ce90ebbd46d')
+
+        self.assert_request(mock_request, 'get', 'flows', params={'uuid': 'a68567fa-ad95-45fc-b5f7-3ce90ebbd46d'})
+
         self.assertEqual(flow.uuid, 'a68567fa-ad95-45fc-b5f7-3ce90ebbd46d')
         self.assertEqual(flow.name, "Ping")
         self.assertEqual(flow.archived, False)
@@ -153,6 +183,9 @@ class TembaClientTest(unittest.TestCase):
         # check no params
         mock_request.return_value = MockResponse(200, _read_json('flows_multiple'))
         flows = self.client.get_flows()
+
+        self.assert_request(mock_request, 'get', 'flows')
+
         self.assertEqual(len(flows), 2)
         self.assertEqual(flows[0].uuid, 'a68567fa-ad95-45fc-b5f7-3ce90ebbd46d')
 
@@ -160,6 +193,9 @@ class TembaClientTest(unittest.TestCase):
         # check single item response
         mock_request.return_value = MockResponse(200, _read_json('groups_single'))
         group = self.client.get_group('04a4752b-0f49-480e-ae60-3a3f2bea485c')
+
+        self.assert_request(mock_request, 'get', 'groups', params={'uuid': '04a4752b-0f49-480e-ae60-3a3f2bea485c'})
+
         self.assertEqual(group.uuid, '04a4752b-0f49-480e-ae60-3a3f2bea485c')
         self.assertEqual(group.name, "The A-Team")
         self.assertEqual(group.size, 4)
@@ -176,6 +212,9 @@ class TembaClientTest(unittest.TestCase):
         # check no params
         mock_request.return_value = MockResponse(200, _read_json('groups_multiple'))
         groups = self.client.get_groups()
+
+        self.assert_request(mock_request, 'get', 'groups')
+
         self.assertEqual(len(groups), 2)
         self.assertEqual(groups[0].uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
 
@@ -183,12 +222,38 @@ class TembaClientTest(unittest.TestCase):
         self.client.get_groups(name="A-Team")
         self.assert_request(mock_request, 'get', 'groups', params={'name': 'A-Team'})
 
+    def test_get_messages(self, mock_request):
+        # check no params
+        mock_request.return_value = MockResponse(200, _read_json('messages_multiple'))
+        messages = self.client.get_messages()
+
+        self.assert_request(mock_request, 'get', 'messages')
+
+        self.assertEqual(len(messages), 2)
+
+        # check by contact
+        self.client.get_messages(contact='123')
+        self.assert_request(mock_request, 'get', 'messages', params={'contact': '123'})
+
+    def test_send_message(self, mock_request):
+        # check by group UUID
+        mock_request.return_value = MockResponse(200, _read_json('broadcast_created'))
+        broadcast = self.client.send_message("Howdy", groups=['04a4752b-0f49-480e-ae60-3a3f2bea485c'])
+
+        expected_body = json.dumps({'text': "Howdy", 'group': ['04a4752b-0f49-480e-ae60-3a3f2bea485c']})
+        self.assert_request(mock_request, 'post', 'messages', data=expected_body)
+
+        self.assertEqual(len(broadcast.messages), 2)
+
     def test_get_run(self, mock_request):
         # check single item response
         mock_request.return_value = MockResponse(200, _read_json('runs_single'))
-        run = self.client.get_run('9ec96b73-78c3-4029-ba86-5279c92996fc')
+        run = self.client.get_run(123)
+
+        self.assert_request(mock_request, 'get', 'runs', params={'run': 123})
+
         self.assertEqual(run.uuid, '9ec96b73-78c3-4029-ba86-5279c92996fc')
-        self.assertEqual(run.flow_uuid, 'a68567fa-ad95-45fc-b5f7-3ce90ebbd46d')
+        self.assertEqual(run.flow, 'a68567fa-ad95-45fc-b5f7-3ce90ebbd46d')
         self.assertEqual(run.contact, '3597f744-fc7a-4709-9cb4-4db24c484f45')
         self.assertEqual(len(run.steps), 1)
         self.assertEqual(run.steps[0].node, 'e16ff762-6051-4940-964a-9b2efcb670ca')
@@ -215,36 +280,14 @@ class TembaClientTest(unittest.TestCase):
         mock_request.return_value = MockResponse(200, _read_json('groups_multiple'))
         self.assertRaises(TembaException, self.client.get_group, '9ec96b73-78c3-4029-ba86-5279c92996fc')
 
-    def test_get_message(self, mock_request):
-        # check single item response
-        mock_request.return_value = MockResponse(200, _read_json('messages_single'))
-        message = self.client.get_message(13441143)
-        self.assertEqual(message.contact, "92fc2eee-a19a-4589-81b6-1366d2b1cb12")
-        self.assertEqual(message.urn, "tel:+250700000001")
-        self.assertEqual(message.status, 'H')
-        self.assertEqual(message.type, 'F')
-        self.assertEqual(message.labels, [])
-        self.assertEqual(message.direction, 'I')
-        self.assertEqual(message.text, "Hello \u0633.")
-        self.assertEqual(message.created_on, datetime.datetime(2014, 12, 12, 13, 34, 44, 0, pytz.utc))
-        self.assertEqual(message.sent_on, None)
-        self.assertEqual(message.delivered_on, datetime.datetime(2014, 12, 12, 13, 35, 12, 861000, pytz.utc))
-
-    def test_get_messages(self, mock_request):
-        # check no params
-        mock_request.return_value = MockResponse(200, _read_json('messages_multiple'))
-        messages = self.client.get_messages()
-        self.assertEqual(len(messages), 2)
-
-    def assert_request(self, mock, method, endpoint, params):
+    def assert_request(self, mock, method, endpoint, **kwargs):
         """
         Asserts that a request was made to the given endpoint with the given parameters
         """
         mock.assert_called_with(method, 'https://example.com/api/v1/%s.json' % endpoint,
                                 headers={'Content-type': 'application/json',
                                          'Authorization': 'Token 1234567890',
-                                         'Accept': u'application/json'},
-                                params=params)
+                                         'Accept': u'application/json'}, **kwargs)
 
 
 @patch('requests.models.Response', MockResponse)
