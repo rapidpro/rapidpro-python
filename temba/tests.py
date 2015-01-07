@@ -7,7 +7,7 @@ import requests
 import unittest
 
 from mock import patch
-from . import TembaClient, TembaException, Group
+from . import TembaClient, TembaException, TembaType, Group
 
 
 class MockResponse(object):
@@ -111,7 +111,7 @@ class TembaClientTest(unittest.TestCase):
         self.assert_request(mock_request, 'get', 'contacts', params={'group_uuids': ["abc"]})
 
         # check filtering by group object
-        group1 = Group.deserialize({'name': "A-Team", 'uuid': 'xyz', 'size': 4})
+        group1 = Group.create(name="A-Team", uuid='xyz', size=4)
         mock_request.return_value = MockResponse(200, _read_json('contacts_multiple'))
         self.client.get_contacts(groups=[group1])
 
@@ -296,6 +296,23 @@ class TembaExceptionTest(unittest.TestCase):
         response = MockResponse(400, '{"field_1": ["Error #1", "Error #2"], "field_2": ["Error #3"]}')
         msg = TembaException._extract_errors(response)
         self.assertTrue(msg == "Error #1. Error #2. Error #3" or msg == "Error #3. Error #1. Error #2")
+
+
+class TembaTypeTest(unittest.TestCase):
+    class TestType(TembaType):
+        class Meta:
+            fields = ('foo', 'bar')
+            datetime_fields = ('bar',)
+
+    def test_create(self):
+        obj = TembaTypeTest.TestType.create(foo=123, bar="abc")
+        self.assertEqual(obj.foo, 123)
+        self.assertEqual(obj.bar, "abc")
+        obj = TembaTypeTest.TestType.create(foo=123)
+        self.assertEqual(obj.foo, 123)
+        self.assertIsNone(obj.bar)
+
+        self.assertRaises(ValueError, TembaTypeTest.TestType.create, foo=123, xyz="abc")
 
 
 def _read_json(filename):

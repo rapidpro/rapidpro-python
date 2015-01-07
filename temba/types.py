@@ -5,6 +5,9 @@ import pytz
 import requests
 
 
+DATETIME_FORMATS = '%Y-%m-%dT%H:%M:%S.%fZ', '%Y-%m-%dT%H:%M:%SZ'
+
+
 class TembaException(Exception):
     """
     Exception class for all errors from client methods
@@ -45,11 +48,31 @@ class TembaType(object):
     """
     Base class for types returned by the Temba API
     """
-    DATETIME_FORMATS = '%Y-%m-%dT%H:%M:%S.%fZ', '%Y-%m-%dT%H:%M:%SZ'
+    @classmethod
+    def create(cls, **kwargs):
+        fields = set(cls.Meta.fields)
+        source = kwargs.copy()
+        instance = cls()
+
+        for field in fields:
+            field_attr = field[1] if isinstance(field, tuple) else field
+
+            if field_attr in source:
+                field_value = source[field_attr]
+                del source[field_attr]
+            else:
+                field_value = None
+
+            setattr(instance, field_attr, field_value)
+
+        for remaining in source:
+                raise ValueError("Class %s has no attribute '%s'" % (cls.__name__, remaining))
+
+        return instance
 
     @classmethod
     def deserialize(cls, item):
-        fields = cls.Meta.fields
+        fields = set(cls.Meta.fields)
         datetime_fields = getattr(cls.Meta, 'datetime_fields', ())
         nested_list_fields = getattr(cls.Meta, 'nested_list_fields', {})
         instance = cls()
