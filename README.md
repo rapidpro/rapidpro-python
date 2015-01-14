@@ -14,5 +14,5 @@ client = TembaClient('rapidpro.io', <YOUR-API-TOKEN>)
 for contact in client.get_contacts():
     print contact.name
     
-client.send_message("Howdy", contacts=contacts[0:5])
+client.create_broadcast("Howdy", contacts=contacts[0:5])
 ```
