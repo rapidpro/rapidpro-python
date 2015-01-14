@@ -130,7 +130,8 @@ class TembaType(object):
 
 class Broadcast(TembaType):
     class Meta:
-        fields = ('messages',)
+        fields = ('id', 'urns', 'contacts', 'groups', 'text', 'messages', 'status', 'created_on')
+        datetime_fields = ('created_on',)
 
 
 class Contact(TembaType):

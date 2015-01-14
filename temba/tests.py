@@ -41,6 +41,23 @@ class TembaClientTest(unittest.TestCase):
     def setUp(self):
         self.client = TembaClient('example.com', '1234567890')
 
+    def test_create_broadcast(self, mock_request):
+        # check by group UUID
+        mock_request.return_value = MockResponse(200, _read_json('broadcast_created'))
+        broadcast = self.client.create_broadcast("Howdy", groups=['04a4752b-0f49-480e-ae60-3a3f2bea485c'])
+
+        expected_body = json.dumps({'text': "Howdy", 'groups': ['04a4752b-0f49-480e-ae60-3a3f2bea485c']})
+        self.assert_request(mock_request, 'post', 'broadcasts', data=expected_body)
+
+        self.assertEqual(broadcast.id, 234252)
+        self.assertEqual(broadcast.urns, [1234])
+        self.assertEqual(broadcast.contacts, [])
+        self.assertEqual(broadcast.groups, ['04a4752b-0f49-480e-ae60-3a3f2bea485c'])
+        self.assertEqual(broadcast.text, "Howdy")
+        self.assertEqual(len(broadcast.messages), 3)
+        self.assertEqual(broadcast.status, 'Q')
+        self.assertEqual(broadcast.created_on, datetime.datetime(2014, 12, 12, 22, 56, 58, 917000, pytz.utc))
+
     def test_create_contact(self, mock_request):
         mock_request.return_value = MockResponse(200, _read_json('contacts_created'))
         contact = self.client.create_contact("Amy Amanda Allen", ['tel:+250700000005'],
@@ -234,16 +251,6 @@ class TembaClientTest(unittest.TestCase):
         # check by contact
         self.client.get_messages(contact='123')
         self.assert_request(mock_request, 'get', 'messages', params={'contact': '123'})
-
-    def test_send_message(self, mock_request):
-        # check by group UUID
-        mock_request.return_value = MockResponse(200, _read_json('broadcast_created'))
-        broadcast = self.client.send_message("Howdy", groups=['04a4752b-0f49-480e-ae60-3a3f2bea485c'])
-
-        expected_body = json.dumps({'text': "Howdy", 'group': ['04a4752b-0f49-480e-ae60-3a3f2bea485c']})
-        self.assert_request(mock_request, 'post', 'messages', data=expected_body)
-
-        self.assertEqual(len(broadcast.messages), 2)
 
     def test_get_run(self, mock_request):
         # check single item response

@@ -125,6 +125,13 @@ class TembaClient(AbstractTembaClient):
     """
     Client for the Temba API v1
     """
+    def create_broadcast(self, text, urns=None, contacts=None, groups=None):
+        """
+        Creates and sends a broadcast to the given URNs, contact UUIDs or group UUIDs
+        """
+        params = self._build_params(text=text, urns=urns, contacts=contacts, groups=groups)
+        return Broadcast.deserialize(self._post_single('broadcasts', params))
+
     def create_contact(self, name, urns, fields, groups):
         """
         Creates a new contact
@@ -132,18 +139,17 @@ class TembaClient(AbstractTembaClient):
         params = self._build_params(name=name, urns=urns, fields=fields, group_uuids=groups)
         return Contact.deserialize(self._post_single('contacts', params))
 
-    def update_contact(self, uuid, name, urns, fields, groups):
-        """
-        Updates an existing contact
-        """
-        params = self._build_params(uuid=uuid, name=name, urns=urns, fields=fields, group_uuids=groups)
-        return Contact.deserialize(self._post_single('contacts', params))
-
     def delete_contact(self, uuid):
         """
-        Updates an existing contact
+        Deletes an existing contact
         """
         self._delete('contacts', {'uuid': uuid})
+
+    def get_broadcast(self, _id):
+        """
+        Gets a single contact by its id
+        """
+        return Broadcast.deserialize(self._get_single('broadcasts', {'id': _id}))
 
     def get_contact(self, uuid):
         """
@@ -202,13 +208,6 @@ class TembaClient(AbstractTembaClient):
         params = self._build_params(contact=contact)
         return Message.deserialize_list(self._get_all('messages', params))
 
-    def send_message(self, text, urns=None, contacts=None, groups=None):
-        """
-        Sends a message to the given URNs, contact UUIDs or group UUIDs
-        """
-        params = self._build_params(text=text, urn=urns, contact=contacts, group=groups)
-        return Broadcast.deserialize(self._post_single('messages', params))
-
     def get_run(self, _id):
         """
         Gets a single flow run by its id
@@ -221,3 +220,10 @@ class TembaClient(AbstractTembaClient):
         """
         params = self._build_params(flow_uuid=flow, group_uuids=groups)
         return Run.deserialize_list(self._get_all('runs', params))
+
+    def update_contact(self, uuid, name, urns, fields, groups):
+        """
+        Updates an existing contact
+        """
+        params = self._build_params(uuid=uuid, name=name, urns=urns, fields=fields, group_uuids=groups)
+        return Contact.deserialize(self._post_single('contacts', params))
