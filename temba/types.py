@@ -152,7 +152,7 @@ class Field(TembaType):
 
 class FlowRuleSet(TembaType):
     class Meta:
-        fields = ('node', 'label')
+        fields = (('node', 'uuid'), 'label')
 
 
 class Flow(TembaType):
