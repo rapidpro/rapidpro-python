@@ -1,10 +1,11 @@
 from __future__ import absolute_import, unicode_literals
 
+import datetime
 import json
 import requests
 
 from abc import ABCMeta
-from .types import TembaException, TembaType
+from .types import TembaException, TembaType, format_iso8601
 
 
 class AbstractTembaClient(object):
@@ -66,7 +67,7 @@ class AbstractTembaClient(object):
         DELETEs to the given endpoint which won't return anything
         """
         url = '%s/%s.json' % (self.root_url, endpoint)
-        return self._request('delete', url, params=params)
+        self._request('delete', url, params=params)
 
     def _request(self, method, url, body=None, params=None):
         """
@@ -117,5 +118,7 @@ class AbstractTembaClient(object):
             return serialized
         elif isinstance(value, TembaType) and hasattr(value, 'uuid'):
             return value.uuid
+        elif isinstance(value, datetime.datetime):
+            return format_iso8601(value)
         else:
             return value

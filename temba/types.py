@@ -5,7 +5,37 @@ import pytz
 import requests
 
 
-DATETIME_FORMATS = '%Y-%m-%dT%H:%M:%S.%fZ', '%Y-%m-%dT%H:%M:%SZ'
+ISO8601_DATE_FORMAT = '%Y-%m-%d'
+ISO8601_DATETIME_FORMAT = ISO8601_DATE_FORMAT + 'T' + '%H:%M:%S'
+
+
+def parse_iso8601(value):
+    """
+    Parses a datetime as a UTC ISO8601 date
+    """
+    if not value:
+        return None
+
+    if 'T' in value:  # has time
+        _format = ISO8601_DATETIME_FORMAT
+
+        if '.' in value:  # has microseconds. Some values from RapidPro don't include this.
+            _format += '.%f'
+        if 'Z' in value:  # has zero offset marker
+            _format += 'Z'
+    else:
+        _format = ISO8601_DATE_FORMAT
+
+    return datetime.datetime.strptime(value, _format).replace(tzinfo=pytz.utc)
+
+
+def format_iso8601(_datetime):
+    """
+    Formats a datetime as a UTC ISO8601 date
+    """
+    _format = ISO8601_DATETIME_FORMAT + '.%f'
+
+    return _datetime.astimezone(pytz.UTC).strftime(_format)
 
 
 class TembaException(Exception):
@@ -92,7 +122,7 @@ class TembaType(object):
 
             # parse datetime fields
             if field_attr in datetime_fields:
-                field_value = cls._parse_datetime(field_value)
+                field_value = parse_iso8601(field_value)
 
             # parse nested list type fields
             if field_attr in nested_list_fields:
@@ -110,18 +140,6 @@ class TembaType(object):
     @classmethod
     def deserialize_list(cls, item_list):
         return [cls.deserialize(item) for item in item_list]
-
-    @classmethod
-    def _parse_datetime(cls, value):
-        if not value:
-            return None
-
-        if '.' in value:
-            datetime_format = '%Y-%m-%dT%H:%M:%S.%fZ'
-        else:
-            datetime_format = '%Y-%m-%dT%H:%M:%SZ'
-
-        return datetime.datetime.strptime(value, datetime_format).replace(tzinfo=pytz.utc)
 
     class Meta:
         fields = ()
@@ -181,7 +199,23 @@ class RunStep(TembaType):
 
 
 class Run(TembaType):
+    @classmethod
+    def deserialize(cls, item):
+        run = super(Run, cls).deserialize(item)
+
+        # Temba API should only be returning values for the last visit to each step but returns all instead
+        last_only = []
+        nodes_seen = set()
+        for valueset in reversed(run.values):
+            if valueset.node not in nodes_seen:
+                last_only.append(valueset)
+                nodes_seen.add(valueset.node)
+        last_only.reverse()
+        run.values = last_only
+
+        return run
+
     class Meta:
-        fields = ('uuid', ('flow_uuid', 'flow'), 'contact', 'steps', 'values', 'created_on')
+        fields = (('run', 'id'), ('flow_uuid', 'flow'), 'contact', 'steps', 'values', 'created_on')
         datetime_fields = ('created_on',)
         nested_list_fields = {'steps': RunStep, 'values': RunValueSet}

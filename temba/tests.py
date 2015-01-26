@@ -8,6 +8,7 @@ import unittest
 
 from mock import patch
 from . import TembaClient, TembaException, TembaType, Group
+from types import format_iso8601, parse_iso8601
 
 
 class MockResponse(object):
@@ -249,7 +250,7 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(len(messages), 2)
 
         # check by contact
-        self.client.get_messages(contact='123')
+        self.client.get_messages(contacts='123')
         self.assert_request(mock_request, 'get', 'messages', params={'contact': '123'})
 
     def test_get_run(self, mock_request):
@@ -259,25 +260,25 @@ class TembaClientTest(unittest.TestCase):
 
         self.assert_request(mock_request, 'get', 'runs', params={'run': 123})
 
-        self.assertEqual(run.uuid, '9ec96b73-78c3-4029-ba86-5279c92996fc')
-        self.assertEqual(run.flow, 'a68567fa-ad95-45fc-b5f7-3ce90ebbd46d')
-        self.assertEqual(run.contact, '3597f744-fc7a-4709-9cb4-4db24c484f45')
-        self.assertEqual(len(run.steps), 1)
-        self.assertEqual(run.steps[0].node, 'e16ff762-6051-4940-964a-9b2efcb670ca')
-        self.assertEqual(run.steps[0].text, "ping one")
-        self.assertEqual(run.steps[0].value, "ping one")
-        self.assertEqual(run.steps[0].type, "R")
-        self.assertEqual(run.steps[0].arrived_on, datetime.datetime(2014, 12, 12, 22, 34, 36, 978000, pytz.utc))
-        self.assertEqual(run.steps[0].left_on, None)
+        self.assertEqual(run.id, 1258967)
+        self.assertEqual(run.flow, 'aab50309-59a6-4502-aafb-73bcb072b695')
+        self.assertEqual(run.contact, '7f16e47a-dbca-47d3-9d2f-d79dc5e1eb26')
+        self.assertEqual(len(run.steps), 5)
+        self.assertEqual(run.steps[0].node, '9a8870d7-f7a4-4f11-9379-a158d1fad6f7')
+        self.assertEqual(run.steps[0].text, "This is the sheep poll. How many sheep do you have?")
+        self.assertEqual(run.steps[0].value, "None")
+        self.assertEqual(run.steps[0].type, "A")
+        self.assertEqual(run.steps[0].arrived_on, datetime.datetime(2015, 1, 26, 13, 56, 18, 809000, pytz.utc))
+        self.assertEqual(run.steps[0].left_on, datetime.datetime(2015, 1, 26, 13, 56, 18, 829000, pytz.utc))
         self.assertEqual(len(run.values), 1)
-        self.assertEqual(run.values[0].category, "All Responses")
-        self.assertEqual(run.values[0].node, 'e16ff762-6051-4940-964a-9b2efcb670ca')
-        self.assertEqual(run.values[0].text, "ping one")
-        self.assertEqual(run.values[0].rule_value, "ping one")
-        self.assertEqual(run.values[0].value, "ping one")
-        self.assertEqual(run.values[0].label, "Response 1")
-        self.assertEqual(run.values[0].time, datetime.datetime(2014, 12, 12, 22, 34, 36, 978000, pytz.utc))
-        self.assertEqual(run.created_on, datetime.datetime(2014, 12, 12, 22, 56, 58, 917000, pytz.utc))
+        self.assertEqual(run.values[0].category, "1 - 100")
+        self.assertEqual(run.values[0].node, 'a227e4cb-351b-4284-b2bf-b91dc27ace57')
+        self.assertEqual(run.values[0].text, "12")
+        self.assertEqual(run.values[0].rule_value, "12")
+        self.assertEqual(run.values[0].value, "12.00000000")
+        self.assertEqual(run.values[0].label, "Number of Sheep")
+        self.assertEqual(run.values[0].time, datetime.datetime(2015, 1, 26, 13, 57, 55, 704000, pytz.utc))
+        self.assertEqual(run.created_on, datetime.datetime(2015, 1, 26, 13, 56, 18, 689000, pytz.utc))
 
         # check empty response
         mock_request.return_value = MockResponse(200, _read_json('empty'))
@@ -286,6 +287,24 @@ class TembaClientTest(unittest.TestCase):
         # check multiple item response
         mock_request.return_value = MockResponse(200, _read_json('groups_multiple'))
         self.assertRaises(TembaException, self.client.get_group, '9ec96b73-78c3-4029-ba86-5279c92996fc')
+
+    def test_get_runs(self, mock_request):
+        # check no params
+        mock_request.return_value = MockResponse(200, _read_json('runs_multiple'))
+        runs = self.client.get_runs()
+
+        self.assert_request(mock_request, 'get', 'runs')
+
+        self.assertEqual(len(runs), 2)
+
+        # check with all params
+        runs = self.client.get_runs(flow='a68567fa-ad95-45fc-b5f7-3ce90ebbd46d',
+                                    after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978000, pytz.utc),
+                                    before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917000, pytz.utc))
+
+        self.assert_request(mock_request, 'get', 'runs', params={'flow_uuid': 'a68567fa-ad95-45fc-b5f7-3ce90ebbd46d',
+                                                                 'after': '2014-12-12T22:34:36.978000',
+                                                                 'before': '2014-12-12T22:56:58.917000'})
 
     def assert_request(self, mock, method, endpoint, **kwargs):
         """
@@ -303,6 +322,22 @@ class TembaExceptionTest(unittest.TestCase):
         response = MockResponse(400, '{"field_1": ["Error #1", "Error #2"], "field_2": ["Error #3"]}')
         msg = TembaException._extract_errors(response)
         self.assertTrue(msg == "Error #1. Error #2. Error #3" or msg == "Error #3. Error #1. Error #2")
+
+
+class DatesAndTimesTest(unittest.TestCase):
+    class TestTZ(datetime.tzinfo):
+        def utcoffset(self, dt):
+            return datetime.timedelta(hours=-5)
+
+    def test_format_iso8601(self):
+        d = datetime.datetime(2014, 1, 2, 3, 4, 5, 6, DatesAndTimesTest.TestTZ())
+        self.assertEqual(format_iso8601(d), '2014-01-02T08:04:05.000006')
+
+    def test_parse_iso8601(self):
+        d = datetime.datetime(2014, 1, 2, 3, 4, 5, 0, pytz.UTC)
+        self.assertEqual(parse_iso8601('2014-01-02T03:04:05.000000Z'), d)
+        self.assertEqual(parse_iso8601('2014-01-02T03:04:05.000000'), d)
+        self.assertEqual(parse_iso8601('2014-01-02T03:04:05'), d)
 
 
 class TembaTypeTest(unittest.TestCase):

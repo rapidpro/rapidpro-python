@@ -65,11 +65,12 @@ class TembaClient(AbstractTembaClient):
         """
         return Flow.deserialize(self._get_single('flows', {'uuid': uuid}))
 
-    def get_flows(self):
+    def get_flows(self, before=None, after=None):
         """
         Gets all flows
         """
-        return Flow.deserialize_list(self._get_all('flows', {}))
+        params = self._build_params(before=before, after=after)
+        return Flow.deserialize_list(self._get_all('flows', params))
 
     def get_group(self, uuid):
         """
@@ -84,11 +85,14 @@ class TembaClient(AbstractTembaClient):
         params = self._build_params(name=name)
         return Group.deserialize_list(self._get_all('groups', params))
 
-    def get_messages(self, contact=None):
+    def get_messages(self, contacts=None, groups=None, status=None, direction=None, _type=None,
+                     before=None, after=None):
         """
         Gets all matching messages
         """
-        params = self._build_params(contact=contact)
+        params = self._build_params(contact=contacts, group_uuids=groups,
+                                    status=status, direction=direction, type=_type,
+                                    before=before, after=after)
         return Message.deserialize_list(self._get_all('messages', params))
 
     def get_run(self, _id):
@@ -97,11 +101,11 @@ class TembaClient(AbstractTembaClient):
         """
         return Run.deserialize(self._get_single('runs', {'run': _id}))
 
-    def get_runs(self, flow=None, groups=None):
+    def get_runs(self, flow=None, groups=None, before=None, after=None):
         """
         Gets all matching flow runs
         """
-        params = self._build_params(flow_uuid=flow, group_uuids=groups)
+        params = self._build_params(flow_uuid=flow, group_uuids=groups, before=before, after=after)
         return Run.deserialize_list(self._get_all('runs', params))
 
     def update_contact(self, uuid, name, urns, fields, groups):
