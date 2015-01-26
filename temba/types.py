@@ -96,7 +96,7 @@ class TembaType(object):
             setattr(instance, field_attr, field_value)
 
         for remaining in source:
-                raise ValueError("Class %s has no attribute '%s'" % (cls.__name__, remaining))
+            raise ValueError("Class %s has no attribute '%s'" % (cls.__name__, remaining))
 
         return instance
 
