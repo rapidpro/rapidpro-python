@@ -4,8 +4,145 @@ import datetime
 import json
 import requests
 
-from abc import ABCMeta
-from .types import TembaException, TembaType, format_iso8601
+from abc import ABCMeta, abstractmethod
+from .utils import format_iso8601, parse_iso8601
+
+
+class TembaException(Exception):
+    """
+    Exception class for all errors from client methods
+    """
+    def __init__(self, msg, caused_by=None):
+        self.msg = msg
+        self.caused_by = caused_by
+
+        # if error was caused by a HTTP 400 response, we may have a useful validation error
+        if isinstance(caused_by, requests.HTTPError) and caused_by.response.status_code == 400:
+            msg = self._extract_errors(caused_by.response)
+            if msg:
+                self.caused_by = msg
+
+    @staticmethod
+    def _extract_errors(response):
+        try:
+            errors = response.json()
+            msgs = []
+            for field, field_errors in errors.iteritems():
+                for error in field_errors:
+                    msgs.append(error)
+            return ". ".join(msgs)
+        except Exception:
+            return None
+
+    def __unicode__(self):
+        if self.caused_by:
+            return "%s. Caused by: %s" % (self.msg, self.caused_by)
+        else:
+            return self.msg
+
+    def __str__(self):
+        return str(self.__unicode__())
+
+
+class TembaObject(object):
+    """
+    Base class for objects returned by the Temba API
+    """
+    __metaclass__ = ABCMeta
+
+    @classmethod
+    def create(cls, **kwargs):
+        source = kwargs.copy()
+        instance = cls()
+
+        for attr_name, field in cls._get_fields().iteritems():
+            if attr_name in source:
+                field_value = source.pop(attr_name)
+            else:
+                field_value = None
+
+            setattr(instance, attr_name, field_value)
+
+        for remaining in source:
+            raise ValueError("Class %s has no attribute '%s'" % (cls.__name__, remaining))
+
+        return instance
+
+    @classmethod
+    def deserialize(cls, item):
+        instance = cls()
+
+        for attr_name, field in cls._get_fields().iteritems():
+            field_source = field.src if field.src else attr_name
+
+            if field_source not in item:
+                raise TembaException("Serialized %s item is missing field '%s'" % (cls.__name__, field_source))
+
+            field_value = item[field_source]
+            attr_value = field.deserialize(field_value)
+
+            setattr(instance, attr_name, attr_value)
+
+        return instance
+
+    @classmethod
+    def deserialize_list(cls, item_list):
+        return [cls.deserialize(item) for item in item_list]
+
+    @classmethod
+    def _get_fields(cls):
+        return {k: v for k, v in cls.__dict__.iteritems() if isinstance(v, TembaField)}
+
+
+# =====================================================================
+# Field types
+# =====================================================================
+
+
+class TembaField(object):
+    __metaclass__ = ABCMeta
+
+    def __init__(self, src=None):
+        self.src = src
+
+    @abstractmethod
+    def deserialize(self, value):
+        pass
+
+
+class SimpleField(TembaField):
+    def deserialize(self, value):
+        return value
+
+
+class IntegerField(TembaField):
+    def deserialize(self, value):
+        if not isinstance(value, int) and not isinstance(value, long):
+            raise TembaException("Value '%s' field is not an integer" % unicode(value))
+
+        return value
+
+
+class DatetimeField(TembaField):
+    def deserialize(self, value):
+        return parse_iso8601(value)
+
+
+class ObjectListField(TembaField):
+    def __init__(self, item_class, src=None):
+        super(ObjectListField, self).__init__(src)
+        self.item_class = item_class
+
+    def deserialize(self, value):
+        if not isinstance(value, list):
+            raise TembaException("Value '%s' field is not a list" % unicode(value))
+
+        return self.item_class.deserialize_list(value)
+
+
+# =====================================================================
+# Client base
+# =====================================================================
 
 
 class AbstractTembaClient(object):
@@ -125,7 +262,7 @@ class AbstractTembaClient(object):
             for item in value:
                 serialized.append(cls._serialize_value(item, flat))
             return ','.join(serialized) if flat else serialized
-        elif isinstance(value, TembaType):
+        elif isinstance(value, TembaObject):
             if hasattr(value, 'uuid'):
                 return value.uuid
             elif hasattr(value, 'id'):

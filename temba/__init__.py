@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from .base import AbstractTembaClient
-from .types import TembaException, TembaType, Broadcast, Contact, Group, Field, Flow, Message, Run
+from .types import Broadcast, Contact, Group, Field, Flow, Message, Run
 
 
 class TembaClient(AbstractTembaClient):

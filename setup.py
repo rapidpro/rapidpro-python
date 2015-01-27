@@ -9,7 +9,7 @@ setup(
     author='Nyaruka',
     url='https://github.com/rapidpro',
     packages=['temba'],
-    install_requires=['requests'],
+    install_requires=['pytz', 'requests'],
     test_suite='nose.collector',
     tests_require=['nose'],
 )

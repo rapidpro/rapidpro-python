@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 import json
@@ -7,8 +7,10 @@ import requests
 import unittest
 
 from mock import patch
-from . import TembaClient, TembaException, TembaType, Group
-from types import format_iso8601, parse_iso8601
+from . import TembaClient
+from .base import TembaException, TembaObject, SimpleField, DatetimeField
+from .types import Group
+from .utils import format_iso8601, parse_iso8601
 
 
 class MockResponse(object):
@@ -55,7 +57,6 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(broadcast.contacts, [])
         self.assertEqual(broadcast.groups, ['04a4752b-0f49-480e-ae60-3a3f2bea485c'])
         self.assertEqual(broadcast.text, "Howdy")
-        self.assertEqual(len(broadcast.messages), 3)
         self.assertEqual(broadcast.status, 'Q')
         self.assertEqual(broadcast.created_on, datetime.datetime(2014, 12, 12, 22, 56, 58, 917000, pytz.utc))
 
@@ -335,13 +336,13 @@ class TembaExceptionTest(unittest.TestCase):
         self.assertTrue(msg == "Error #1. Error #2. Error #3" or msg == "Error #3. Error #1. Error #2")
 
 
-class DatesAndTimesTest(unittest.TestCase):
+class UtilsTest(unittest.TestCase):
     class TestTZ(datetime.tzinfo):
         def utcoffset(self, dt):
             return datetime.timedelta(hours=-5)
 
     def test_format_iso8601(self):
-        d = datetime.datetime(2014, 1, 2, 3, 4, 5, 6, DatesAndTimesTest.TestTZ())
+        d = datetime.datetime(2014, 1, 2, 3, 4, 5, 6, UtilsTest.TestTZ())
         self.assertEqual(format_iso8601(d), '2014-01-02T08:04:05.000006')
 
     def test_parse_iso8601(self):
@@ -351,21 +352,20 @@ class DatesAndTimesTest(unittest.TestCase):
         self.assertEqual(parse_iso8601('2014-01-02T03:04:05'), d)
 
 
-class TembaTypeTest(unittest.TestCase):
-    class TestType(TembaType):
-        class Meta:
-            fields = ('foo', 'bar')
-            datetime_fields = ('bar',)
+class TembaObjectTest(unittest.TestCase):
+    class TestType(TembaObject):
+        foo = SimpleField()
+        bar = DatetimeField()
 
     def test_create(self):
-        obj = TembaTypeTest.TestType.create(foo=123, bar="abc")
+        obj = TembaObjectTest.TestType.create(foo=123, bar="abc")
         self.assertEqual(obj.foo, 123)
         self.assertEqual(obj.bar, "abc")
-        obj = TembaTypeTest.TestType.create(foo=123)
+        obj = TembaObjectTest.TestType.create(foo=123)
         self.assertEqual(obj.foo, 123)
         self.assertIsNone(obj.bar)
 
-        self.assertRaises(ValueError, TembaTypeTest.TestType.create, foo=123, xyz="abc")
+        self.assertRaises(ValueError, TembaObjectTest.TestType.create, foo=123, xyz="abc")
 
 
 def _read_json(filename):
