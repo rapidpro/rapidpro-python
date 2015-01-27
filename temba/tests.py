@@ -78,6 +78,17 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(contact.language, None)
         self.assertEqual(contact.modified_on, datetime.datetime(2014, 10, 1, 6, 54, 9, 817000, pytz.utc))
 
+    def test_create_field(self, mock_request):
+        mock_request.return_value = MockResponse(200, _read_json('fields_created'))
+        field = self.client.create_field("Chat Name", 'T')
+
+        expected_body = json.dumps({'label': "Chat Name", 'value_type': 'T'})
+        self.assert_request(mock_request, 'post', 'fields', data=expected_body)
+
+        self.assertEqual(field.key, 'chat_name')
+        self.assertEqual(field.label, "Chat Name")
+        self.assertEqual(field.value_type, 'T')
+
     def test_delete_contact(self, mock_request):
         # check deleting an existing contact
         mock_request.return_value = MockResponse(204, '')
@@ -126,14 +137,14 @@ class TembaClientTest(unittest.TestCase):
         mock_request.return_value = MockResponse(200, _read_json('contacts_multiple'))
         self.client.get_contacts(groups=["abc"])
 
-        self.assert_request(mock_request, 'get', 'contacts', params={'group_uuids': ["abc"]})
+        self.assert_request(mock_request, 'get', 'contacts', params={'group_uuids': "abc"})
 
         # check filtering by group object
         group1 = Group.create(name="A-Team", uuid='xyz', size=4)
         mock_request.return_value = MockResponse(200, _read_json('contacts_multiple'))
         self.client.get_contacts(groups=[group1])
 
-        self.assert_request(mock_request, 'get', 'contacts', params={'group_uuids': ["xyz"]})
+        self.assert_request(mock_request, 'get', 'contacts', params={'group_uuids': "xyz"})
 
         # check multiple pages
         mock_request.side_effect = (MockResponse(200, _read_json('contacts_multipage_1')),
@@ -298,7 +309,7 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(len(runs), 2)
 
         # check with all params
-        runs = self.client.get_runs(flow='a68567fa-ad95-45fc-b5f7-3ce90ebbd46d',
+        runs = self.client.get_runs(flows=['a68567fa-ad95-45fc-b5f7-3ce90ebbd46d'],
                                     after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978000, pytz.utc),
                                     before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917000, pytz.utc))
 

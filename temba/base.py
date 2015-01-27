@@ -99,25 +99,37 @@ class AbstractTembaClient(object):
             raise TembaException("Request error", ex)
 
     def _build_params(self, **kwargs):
+        return self._build_data(kwargs, True)
+
+    def _build_body(self, **kwargs):
+        return self._build_data(kwargs, False)
+
+    @classmethod
+    def _build_data(cls, data, flat):
         """
-        Helper method to pack non-None keyword arguments and convert Temba objects to UUIDs
+        Helper method to build data for a POST body or query string. Converts Temba objects to ids and UUIDs and removes
+        None values.
         """
         params = {}
-        for kwarg, value in kwargs.iteritems():
+        for kwarg, value in data.iteritems():
             if value is None:
                 continue
             else:
-                params[kwarg] = self._serialize_param(value)
+                params[kwarg] = cls._serialize_value(value, flat)
         return params
 
-    def _serialize_param(self, value):
+    @classmethod
+    def _serialize_value(cls, value, flat):
         if isinstance(value, list) or isinstance(value, tuple):
             serialized = []
             for item in value:
-                serialized.append(self._serialize_param(item))
-            return serialized
-        elif isinstance(value, TembaType) and hasattr(value, 'uuid'):
-            return value.uuid
+                serialized.append(cls._serialize_value(item, flat))
+            return ','.join(serialized) if flat else serialized
+        elif isinstance(value, TembaType):
+            if hasattr(value, 'uuid'):
+                return value.uuid
+            elif hasattr(value, 'id'):
+                return value.id
         elif isinstance(value, datetime.datetime):
             return format_iso8601(value)
         else:
