@@ -1,0 +1,25 @@
+{
+    "count": 2,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 1234,
+            "urns": [55454],
+            "contacts": [],
+            "groups": ["04a4752b-0f49-480e-ae60-3a3f2bea485c"],
+            "text": "Hello",
+            "created_on": "2014-11-12T22:56:58.917Z",
+            "status": "Q"
+        },
+        {
+            "id": 2345,
+            "urns": [43633],
+            "contacts": [],
+            "groups": ["04a4752b-0f49-480e-ae60-3a3f2bea485c"],
+            "text": "Goodbye",
+            "created_on": "2014-12-12T22:56:58.917Z",
+            "status": "P"
+        }
+    ]
+}

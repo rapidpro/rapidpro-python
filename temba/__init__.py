@@ -37,9 +37,16 @@ class TembaClient(AbstractTembaClient):
 
     def get_broadcast(self, _id):
         """
-        Gets a single contact by its id
+        Gets a single broadcast by its id
         """
         return Broadcast.deserialize(self._get_single('broadcasts', {'id': _id}))
+
+    def get_broadcasts(self, ids=None, statuses=None, before=None, after=None):
+        """
+        Gets all matching broadcasts
+        """
+        params = self._build_params(id=ids, status=statuses, before=before, after=after)
+        return Broadcast.deserialize_list(self._get_all('broadcasts', params))
 
     def get_contact(self, uuid):
         """
@@ -62,7 +69,7 @@ class TembaClient(AbstractTembaClient):
 
     def get_fields(self):
         """
-        Gets all fields
+        Gets all contact fields
         """
         return Field.deserialize_list(self._get_all('fields', {}))
 
@@ -72,11 +79,11 @@ class TembaClient(AbstractTembaClient):
         """
         return Flow.deserialize(self._get_single('flows', {'uuid': uuid}))
 
-    def get_flows(self, before=None, after=None):
+    def get_flows(self, uuids=None, archived=None, labels=None, before=None, after=None):
         """
         Gets all flows
         """
-        params = self._build_params(before=before, after=after)
+        params = self._build_params(uuid=uuids, archived=archived, label=labels, before=before, after=after)
         return Flow.deserialize_list(self._get_all('flows', params))
 
     def get_group(self, uuid):
@@ -92,14 +99,14 @@ class TembaClient(AbstractTembaClient):
         params = self._build_params(name=name)
         return Group.deserialize_list(self._get_all('groups', params))
 
-    def get_messages(self, contacts=None, groups=None, statuses=None, directions=None, _types=None,
-                     before=None, after=None):
+    def get_messages(self, ids=None, urns=None, contacts=None, groups=None, statuses=None, directions=None, _types=None,
+                     labels=None, before=None, after=None):
         """
         Gets all matching messages
         """
-        params = self._build_params(contact=contacts, group_uuids=groups,
+        params = self._build_params(id=ids, urns=urns, contact=contacts, group_uuids=groups,
                                     status=statuses, direction=directions, type=_types,
-                                    before=before, after=after)
+                                    label=labels, before=before, after=after)
         return Message.deserialize_list(self._get_all('messages', params))
 
     def get_run(self, _id):

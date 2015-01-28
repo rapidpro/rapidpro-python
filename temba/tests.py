@@ -46,7 +46,7 @@ class TembaClientTest(unittest.TestCase):
 
     def test_create_broadcast(self, mock_request):
         # check by group UUID
-        mock_request.return_value = MockResponse(200, _read_json('broadcast_created'))
+        mock_request.return_value = MockResponse(200, _read_json('broadcasts_created'))
         broadcast = self.client.create_broadcast("Howdy", groups=['04a4752b-0f49-480e-ae60-3a3f2bea485c'])
 
         expected_body = json.dumps({'text': "Howdy", 'groups': ['04a4752b-0f49-480e-ae60-3a3f2bea485c']})
@@ -100,6 +100,41 @@ class TembaClientTest(unittest.TestCase):
         # check deleting a non-existent contact
         mock_request.return_value = MockResponse(404, 'NOT FOUND')
         self.assertRaises(TembaException, self.client.delete_contact, 'bfff9984-38f4-4e59-998d-3663ec3c650d')
+
+    def test_get_broadcast(self, mock_request):
+        # check single item response
+        mock_request.return_value = MockResponse(200, _read_json('broadcasts_single'))
+        broadcast = self.client.get_broadcast(1234)
+
+        self.assert_request(mock_request, 'get', 'broadcasts', params={'id': 1234})
+
+        self.assertEqual(broadcast.id, 1234)
+        self.assertEqual(broadcast.urns, [55454])
+        self.assertEqual(broadcast.contacts, [])
+        self.assertEqual(broadcast.groups, ['04a4752b-0f49-480e-ae60-3a3f2bea485c'])
+        self.assertEqual(broadcast.text, "Hello")
+        self.assertEqual(broadcast.created_on, datetime.datetime(2014, 11, 12, 22, 56, 58, 917000, pytz.utc))
+        self.assertEqual(broadcast.status, 'Q')
+
+    def test_get_broadcasts(self, mock_request):
+        # check no params
+        mock_request.return_value = MockResponse(200, _read_json('broadcasts_multiple'))
+        broadcasts = self.client.get_broadcasts()
+
+        self.assert_request(mock_request, 'get', 'broadcasts')
+
+        self.assertEqual(len(broadcasts), 2)
+        self.assertEqual(broadcasts[0].id, 1234)
+
+        # check all params
+        self.client.get_broadcasts(ids=[1234, 2345],
+                                   statuses=['P', 'Q'],
+                                   before=datetime.datetime(2014, 12, 12, 22, 34, 36, 123000, pytz.utc),
+                                   after=datetime.datetime(2014, 12, 12, 22, 34, 36, 234000, pytz.utc))
+        self.assert_request(mock_request, 'get', 'broadcasts', params={'id': '1234,2345',
+                                                                       'status': 'P,Q',
+                                                                       'before': '2014-12-12T22:34:36.123000',
+                                                                       'after': '2014-12-12T22:34:36.234000'})
 
     def test_get_contact(self, mock_request):
         # check single item response
@@ -219,6 +254,18 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(len(flows), 2)
         self.assertEqual(flows[0].uuid, 'a68567fa-ad95-45fc-b5f7-3ce90ebbd46d')
 
+        # check all params
+        self.client.get_flows(uuids=['abc', 'xyz'],
+                              archived=False,
+                              labels=['polls', 'events'],
+                              before=datetime.datetime(2014, 12, 12, 22, 34, 36, 123000, pytz.utc),
+                              after=datetime.datetime(2014, 12, 12, 22, 34, 36, 234000, pytz.utc))
+        self.assert_request(mock_request, 'get', 'flows', params={'uuid': 'abc,xyz',
+                                                                  'archived': 'N',
+                                                                  'label': 'polls,events',
+                                                                  'before': '2014-12-12T22:34:36.123000',
+                                                                  'after': '2014-12-12T22:34:36.234000'})
+
     def test_get_group(self, mock_request):
         # check single item response
         mock_request.return_value = MockResponse(200, _read_json('groups_single'))
@@ -261,9 +308,17 @@ class TembaClientTest(unittest.TestCase):
 
         self.assertEqual(len(messages), 2)
 
-        # check by contact
-        self.client.get_messages(contacts='123')
-        self.assert_request(mock_request, 'get', 'messages', params={'contact': '123'})
+        # check with params
+        self.client.get_messages(ids=[123, 234],
+                                 contacts=['abc'],
+                                 labels=['polls', 'events'],
+                                 before=datetime.datetime(2014, 12, 12, 22, 34, 36, 123000, pytz.utc),
+                                 after=datetime.datetime(2014, 12, 12, 22, 34, 36, 234000, pytz.utc))
+        self.assert_request(mock_request, 'get', 'messages', params={'id': '123,234',
+                                                                     'contact': 'abc',
+                                                                     'label': 'polls,events',
+                                                                     'before': '2014-12-12T22:34:36.123000',
+                                                                     'after': '2014-12-12T22:34:36.234000'})
 
     def test_get_run(self, mock_request):
         # check single item response

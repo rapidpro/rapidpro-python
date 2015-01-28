@@ -269,5 +269,7 @@ class AbstractTembaClient(object):
                 return value.id
         elif isinstance(value, datetime.datetime):
             return format_iso8601(value)
+        elif isinstance(value, bool):
+            return 'Y' if value else 'N'
         else:
-            return value
+            return unicode(value) if flat else value
