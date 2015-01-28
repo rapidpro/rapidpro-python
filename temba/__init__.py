@@ -164,12 +164,13 @@ class TembaClient(AbstractTembaClient):
         params = self._build_params(uuid=uuids, name=name)
         return Group.deserialize_list(self._get_all('groups', params))
 
-    def get_messages(self, ids=None, urns=None, contacts=None, groups=None, statuses=None, directions=None, _types=None,
-                     labels=None, before=None, after=None):
+    def get_messages(self, ids=None, broadcasts=None, urns=None, contacts=None, groups=None, statuses=None,
+                     directions=None, _types=None, labels=None, before=None, after=None):
         """
         Gets all matching messages
 
         :param list[int] ids: list of message ids
+        :param list broadcasts: list of broadcast objects or ids
         :param list[str] urns: list of contact URN strings
         :param list contacts: list of contact objects or UUIDs
         :param list groups: list of group objects or UUIDs
@@ -181,7 +182,7 @@ class TembaClient(AbstractTembaClient):
         :param datetime after: created after
         :return: list of messages
         """
-        params = self._build_params(id=ids, urns=urns, contact=contacts, group_uuids=groups,
+        params = self._build_params(id=ids, broadcast=broadcasts, urns=urns, contact=contacts, group_uuids=groups,
                                     status=statuses, direction=directions, type=_types,
                                     label=labels, before=before, after=after)
         return Message.deserialize_list(self._get_all('messages', params))

@@ -310,11 +310,13 @@ class TembaClientTest(unittest.TestCase):
 
         # check with params
         self.client.get_messages(ids=[123, 234],
+                                 broadcasts=[345, 456],
                                  contacts=['abc'],
                                  labels=['polls', 'events'],
                                  before=datetime.datetime(2014, 12, 12, 22, 34, 36, 123000, pytz.utc),
                                  after=datetime.datetime(2014, 12, 12, 22, 34, 36, 234000, pytz.utc))
         self.assert_request(mock_request, 'get', 'messages', params={'id': '123,234',
+                                                                     'broadcast': '345,456',
                                                                      'contact': 'abc',
                                                                      'label': 'polls,events',
                                                                      'before': '2014-12-12T22:34:36.123000',
