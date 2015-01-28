@@ -46,7 +46,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'temba-client'
+project = u'rapidpro-python'
 copyright = u'2015, Nyaruka'
 
 # The version info for the project you're documenting, acts as replacement for
