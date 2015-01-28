@@ -4,8 +4,8 @@ from distutils.core import setup
 
 setup(
     name='RapidPro Python Client',
-    version='0.0.1',
-    description='Python client library for the RapidPro API',
+    version='0.1',
+    description='Python client library for the RapidPro',
     author='Nyaruka',
     url='https://github.com/rapidpro',
     packages=['temba'],
