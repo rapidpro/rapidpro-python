@@ -4,9 +4,20 @@
    contain the root `toctree` directive.
 
 Welcome to rapidpro-python's documentation!
-==================================================
+===========================================
 
-Contents:
+This is the official Python client library for `RapidPro <http://rapidpro.github.io/rapidpro/>`_.
+
+To create a :class:`temba.TembaClient` instance, you need to know the name of the host server, and your API token.
+If you don't know your API token then visit the `API Explorer <http://rapidpro.io/api/v1/explorer>`_. For example:
+
+.. code-block:: python
+
+    from temba import TembaClient
+    client = TembaClient('rapidpro.io', <YOUR-API-TOKEN>)
+
+
+Reference:
 
 .. toctree::
    :maxdepth: 4
