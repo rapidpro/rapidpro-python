@@ -196,17 +196,18 @@ class TembaClient(AbstractTembaClient):
         """
         return Run.deserialize(self._get_single('runs', {'run': _id}))
 
-    def get_runs(self, flows=None, groups=None, before=None, after=None):
+    def get_runs(self, ids=None, flows=None, groups=None, before=None, after=None):
         """
         Gets all matching flow runs
 
+        :param list[int] ids: list of run ids
         :param list[str] flows: list of flow objects or UUIDs
         :param list groups: list of group objects or UUIDs
         :param datetime before: created before
         :param datetime after: created after
         :return: list of flow runs
         """
-        params = self._build_params(flow_uuid=flows, group_uuids=groups, before=before, after=after)
+        params = self._build_params(run=ids, flow_uuid=flows, group_uuids=groups, before=before, after=after)
         return Run.deserialize_list(self._get_all('runs', params))
 
     def update_contact(self, uuid, name, urns, fields, groups):

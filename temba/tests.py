@@ -367,11 +367,13 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(len(runs), 2)
 
         # check with all params
-        runs = self.client.get_runs(flows=['a68567fa-ad95-45fc-b5f7-3ce90ebbd46d'],
+        runs = self.client.get_runs(ids=[123, 234],
+                                    flows=['a68567fa-ad95-45fc-b5f7-3ce90ebbd46d'],
                                     after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978000, pytz.utc),
                                     before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917000, pytz.utc))
 
-        self.assert_request(mock_request, 'get', 'runs', params={'flow_uuid': ['a68567fa-ad95-45fc-b5f7-3ce90ebbd46d'],
+        self.assert_request(mock_request, 'get', 'runs', params={'run': [123, 234],
+                                                                 'flow_uuid': ['a68567fa-ad95-45fc-b5f7-3ce90ebbd46d'],
                                                                  'after': '2014-12-12T22:34:36.978000',
                                                                  'before': '2014-12-12T22:56:58.917000'})
 
