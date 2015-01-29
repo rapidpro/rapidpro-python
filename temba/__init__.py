@@ -26,7 +26,7 @@ class TembaClient(AbstractTembaClient):
         :param list groups: list of group objects or UUIDs
         :return: the new broadcast
         """
-        params = self._build_body(text=text, urns=urns, contacts=contacts, groups=groups)
+        params = self._build_params(text=text, urns=urns, contacts=contacts, groups=groups)
         return Broadcast.deserialize(self._post_single('broadcasts', params))
 
     def create_contact(self, name, urns, fields, groups):
@@ -39,7 +39,7 @@ class TembaClient(AbstractTembaClient):
         :param list groups: list of group objects or UUIDs
         :return: the new contact
         """
-        params = self._build_body(name=name, urns=urns, fields=fields, group_uuids=groups)
+        params = self._build_params(name=name, urns=urns, fields=fields, group_uuids=groups)
         return Contact.deserialize(self._post_single('contacts', params))
 
     def create_field(self, label, value_type):
@@ -50,7 +50,7 @@ class TembaClient(AbstractTembaClient):
         :param str value_type: one of 'T' (text), 'N' (decimal), 'D' (datetime), 'S' (state), 'I' (district)
         :return: the new field
         """
-        params = self._build_body(label=label, value_type=value_type)
+        params = self._build_params(label=label, value_type=value_type)
         return Field.deserialize(self._post_single('fields', params))
 
     def delete_contact(self, contact):

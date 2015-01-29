@@ -235,33 +235,27 @@ class AbstractTembaClient(object):
         except requests.HTTPError, ex:
             raise TembaException("Request error", ex)
 
-    def _build_params(self, **kwargs):
-        return self._build_data(kwargs, True)
-
-    def _build_body(self, **kwargs):
-        return self._build_data(kwargs, False)
-
     @classmethod
-    def _build_data(cls, data, flat):
+    def _build_params(cls, **kwargs):
         """
-        Helper method to build data for a POST body or query string. Converts Temba objects to ids and UUIDs and removes
-        None values.
+        Helper method to build params for a POST body or query string. Converts Temba objects to ids and UUIDs and
+        removes None values.
         """
         params = {}
-        for kwarg, value in data.iteritems():
+        for kwarg, value in kwargs.iteritems():
             if value is None:
                 continue
             else:
-                params[kwarg] = cls._serialize_value(value, flat)
+                params[kwarg] = cls._serialize_value(value)
         return params
 
     @classmethod
-    def _serialize_value(cls, value, flat):
+    def _serialize_value(cls, value):
         if isinstance(value, list) or isinstance(value, tuple):
             serialized = []
             for item in value:
-                serialized.append(cls._serialize_value(item, flat))
-            return ','.join(serialized) if flat else serialized
+                serialized.append(cls._serialize_value(item))
+            return serialized
         elif isinstance(value, TembaObject):
             if hasattr(value, 'uuid'):
                 return value.uuid
@@ -272,4 +266,4 @@ class AbstractTembaClient(object):
         elif isinstance(value, bool):
             return 'Y' if value else 'N'
         else:
-            return unicode(value) if flat else value
+            return value

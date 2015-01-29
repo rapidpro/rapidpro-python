@@ -131,8 +131,8 @@ class TembaClientTest(unittest.TestCase):
                                    statuses=['P', 'Q'],
                                    before=datetime.datetime(2014, 12, 12, 22, 34, 36, 123000, pytz.utc),
                                    after=datetime.datetime(2014, 12, 12, 22, 34, 36, 234000, pytz.utc))
-        self.assert_request(mock_request, 'get', 'broadcasts', params={'id': '1234,2345',
-                                                                       'status': 'P,Q',
+        self.assert_request(mock_request, 'get', 'broadcasts', params={'id': [1234, 2345],
+                                                                       'status': ['P', 'Q'],
                                                                        'before': '2014-12-12T22:34:36.123000',
                                                                        'after': '2014-12-12T22:34:36.234000'})
 
@@ -173,14 +173,14 @@ class TembaClientTest(unittest.TestCase):
         mock_request.return_value = MockResponse(200, _read_json('contacts_multiple'))
         self.client.get_contacts(groups=["abc"])
 
-        self.assert_request(mock_request, 'get', 'contacts', params={'group_uuids': "abc"})
+        self.assert_request(mock_request, 'get', 'contacts', params={'group_uuids': ['abc']})
 
         # check filtering by group object
         group1 = Group.create(name="A-Team", uuid='xyz', size=4)
         mock_request.return_value = MockResponse(200, _read_json('contacts_multiple'))
         self.client.get_contacts(groups=[group1])
 
-        self.assert_request(mock_request, 'get', 'contacts', params={'group_uuids': "xyz"})
+        self.assert_request(mock_request, 'get', 'contacts', params={'group_uuids': ['xyz']})
 
         # check multiple pages
         mock_request.side_effect = (MockResponse(200, _read_json('contacts_multipage_1')),
@@ -260,9 +260,9 @@ class TembaClientTest(unittest.TestCase):
                               labels=['polls', 'events'],
                               before=datetime.datetime(2014, 12, 12, 22, 34, 36, 123000, pytz.utc),
                               after=datetime.datetime(2014, 12, 12, 22, 34, 36, 234000, pytz.utc))
-        self.assert_request(mock_request, 'get', 'flows', params={'uuid': 'abc,xyz',
+        self.assert_request(mock_request, 'get', 'flows', params={'uuid': ['abc', 'xyz'],
                                                                   'archived': 'N',
-                                                                  'label': 'polls,events',
+                                                                  'label': ['polls', 'events'],
                                                                   'before': '2014-12-12T22:34:36.123000',
                                                                   'after': '2014-12-12T22:34:36.234000'})
 
@@ -315,10 +315,10 @@ class TembaClientTest(unittest.TestCase):
                                  labels=['polls', 'events'],
                                  before=datetime.datetime(2014, 12, 12, 22, 34, 36, 123000, pytz.utc),
                                  after=datetime.datetime(2014, 12, 12, 22, 34, 36, 234000, pytz.utc))
-        self.assert_request(mock_request, 'get', 'messages', params={'id': '123,234',
-                                                                     'broadcast': '345,456',
-                                                                     'contact': 'abc',
-                                                                     'label': 'polls,events',
+        self.assert_request(mock_request, 'get', 'messages', params={'id': [123, 234],
+                                                                     'broadcast': [345, 456],
+                                                                     'contact': ['abc'],
+                                                                     'label': ['polls', 'events'],
                                                                      'before': '2014-12-12T22:34:36.123000',
                                                                      'after': '2014-12-12T22:34:36.234000'})
 
@@ -371,7 +371,7 @@ class TembaClientTest(unittest.TestCase):
                                     after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978000, pytz.utc),
                                     before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917000, pytz.utc))
 
-        self.assert_request(mock_request, 'get', 'runs', params={'flow_uuid': 'a68567fa-ad95-45fc-b5f7-3ce90ebbd46d',
+        self.assert_request(mock_request, 'get', 'runs', params={'flow_uuid': ['a68567fa-ad95-45fc-b5f7-3ce90ebbd46d'],
                                                                  'after': '2014-12-12T22:34:36.978000',
                                                                  'before': '2014-12-12T22:56:58.917000'})
 
