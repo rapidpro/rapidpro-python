@@ -90,6 +90,18 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(field.label, "Chat Name")
         self.assertEqual(field.value_type, 'T')
 
+    def test_create_runs(self, mock_request):
+        mock_request.return_value = MockResponse(200, _read_json('runs_created'))
+        runs = self.client.create_runs('04a4752b-0f49-480e-ae60-3a3f2bea485c',
+                                       ['bfff9984-38f4-4e59-998d-3663ec3c650d'], True)
+
+        expected_body = json.dumps({"contacts": ['bfff9984-38f4-4e59-998d-3663ec3c650d'],
+                                    "restart_participants": 1,
+                                    "flow_uuid": "04a4752b-0f49-480e-ae60-3a3f2bea485c"})
+        self.assert_request(mock_request, 'post', 'runs', data=expected_body)
+
+        self.assertEqual(len(runs), 2)
+
     def test_delete_contact(self, mock_request):
         # check deleting an existing contact
         mock_request.return_value = MockResponse(204, '')
@@ -261,7 +273,7 @@ class TembaClientTest(unittest.TestCase):
                               before=datetime.datetime(2014, 12, 12, 22, 34, 36, 123000, pytz.utc),
                               after=datetime.datetime(2014, 12, 12, 22, 34, 36, 234000, pytz.utc))
         self.assert_request(mock_request, 'get', 'flows', params={'uuid': ['abc', 'xyz'],
-                                                                  'archived': 'N',
+                                                                  'archived': 0,
                                                                   'label': ['polls', 'events'],
                                                                   'before': '2014-12-12T22:34:36.123000',
                                                                   'after': '2014-12-12T22:34:36.234000'})

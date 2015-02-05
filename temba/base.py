@@ -192,9 +192,9 @@ class AbstractTembaClient(object):
 
         return results
 
-    def _post_single(self, endpoint, payload):
+    def _post(self, endpoint, payload):
         """
-        POSTs to the given endpoint which must return a single item
+        POSTs to the given endpoint which must return a single item or list of items
         """
         url = '%s/%s.json' % (self.root_url, endpoint)
         return self._request('post', url, body=payload)
@@ -264,6 +264,6 @@ class AbstractTembaClient(object):
         elif isinstance(value, datetime.datetime):
             return format_iso8601(value)
         elif isinstance(value, bool):
-            return 'Y' if value else 'N'
+            return 1 if value else 0
         else:
             return value

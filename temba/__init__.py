@@ -27,7 +27,7 @@ class TembaClient(AbstractTembaClient):
         :return: the new broadcast
         """
         params = self._build_params(text=text, urns=urns, contacts=contacts, groups=groups)
-        return Broadcast.deserialize(self._post_single('broadcasts', params))
+        return Broadcast.deserialize(self._post('broadcasts', params))
 
     def create_contact(self, name, urns, fields, groups):
         """
@@ -40,7 +40,7 @@ class TembaClient(AbstractTembaClient):
         :return: the new contact
         """
         params = self._build_params(name=name, urns=urns, fields=fields, group_uuids=groups)
-        return Contact.deserialize(self._post_single('contacts', params))
+        return Contact.deserialize(self._post('contacts', params))
 
     def create_field(self, label, value_type):
         """
@@ -51,7 +51,19 @@ class TembaClient(AbstractTembaClient):
         :return: the new field
         """
         params = self._build_params(label=label, value_type=value_type)
-        return Field.deserialize(self._post_single('fields', params))
+        return Field.deserialize(self._post('fields', params))
+
+    def create_runs(self, flow, contacts, restart_participants):
+        """
+        Creates new flow runs for the given contacts
+
+        :param str flow: flow UUID
+        :param list contacts: list of contact objects or UUIDs
+        :param bool restart_participants: whether or not to restart participants already in the flow
+        :return: list of new runs
+        """
+        params = self._build_params(flow_uuid=flow, contacts=contacts, restart_participants=restart_participants)
+        return Run.deserialize_list(self._post('runs', params))
 
     def delete_contact(self, contact):
         """
