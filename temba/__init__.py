@@ -234,4 +234,4 @@ class TembaClient(AbstractTembaClient):
         :return: the updated contact
         """
         params = self._build_params(uuid=uuid, name=name, urns=urns, fields=fields, group_uuids=groups)
-        return Contact.deserialize(self._post_single('contacts', params))
+        return Contact.deserialize(self._post('contacts', params))

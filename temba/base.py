@@ -218,13 +218,13 @@ class AbstractTembaClient(object):
             print "%s %s %s" % (method.upper(), url, json.dumps(params if params else body))
 
         try:
-            args = {'headers': headers}
+            kwargs = {'headers': headers}
             if body:
-                args['data'] = json.dumps(body)
+                kwargs['data'] = body
             if params:
-                args['params'] = params
+                kwargs['params'] = params
 
-            response = requests.request(method, url, **args)
+            response = request(method, url, **kwargs)
 
             if self.debug:
                 print " -> %s" % response.content
@@ -267,3 +267,13 @@ class AbstractTembaClient(object):
             return 1 if value else 0
         else:
             return value
+
+
+def request(method, url, **kwargs):
+    """
+    For the purposes of testing, all calls to requests.request go through here before JSON bodies are encoded
+    """
+    if 'data' in kwargs:
+        kwargs['data'] = json.dumps(kwargs['data'])
+
+    return requests.request(method, url, **kwargs)

@@ -37,7 +37,7 @@ class MockResponse(object):
         return json.loads(self.content)
 
 
-@patch('requests.request')
+@patch('temba.base.request')
 @patch('requests.models.Response', MockResponse)
 class TembaClientTest(unittest.TestCase):
 
@@ -49,7 +49,7 @@ class TembaClientTest(unittest.TestCase):
         mock_request.return_value = MockResponse(200, _read_json('broadcasts_created'))
         broadcast = self.client.create_broadcast("Howdy", groups=['04a4752b-0f49-480e-ae60-3a3f2bea485c'])
 
-        expected_body = json.dumps({'text': "Howdy", 'groups': ['04a4752b-0f49-480e-ae60-3a3f2bea485c']})
+        expected_body = {'text': "Howdy", 'groups': ['04a4752b-0f49-480e-ae60-3a3f2bea485c']}
         self.assert_request(mock_request, 'post', 'broadcasts', data=expected_body)
 
         self.assertEqual(broadcast.id, 234252)
@@ -65,10 +65,10 @@ class TembaClientTest(unittest.TestCase):
         contact = self.client.create_contact("Amy Amanda Allen", ['tel:+250700000005'],
                                              {'nickname': "Triple A"}, ['04a4752b-0f49-480e-ae60-3a3f2bea485c'])
 
-        expected_body = json.dumps({'name': "Amy Amanda Allen",
-                                    'urns': ['tel:+250700000005'],
-                                    'fields': {'nickname': "Triple A"},
-                                    'group_uuids': ['04a4752b-0f49-480e-ae60-3a3f2bea485c']})
+        expected_body = {'name': "Amy Amanda Allen",
+                         'urns': ['tel:+250700000005'],
+                         'fields': {'nickname': "Triple A"},
+                         'group_uuids': ['04a4752b-0f49-480e-ae60-3a3f2bea485c']}
         self.assert_request(mock_request, 'post', 'contacts', data=expected_body)
 
         self.assertEqual(contact.uuid, 'bfff9984-38f4-4e59-998d-3663ec3c650d')
@@ -83,7 +83,7 @@ class TembaClientTest(unittest.TestCase):
         mock_request.return_value = MockResponse(200, _read_json('fields_created'))
         field = self.client.create_field("Chat Name", 'T')
 
-        expected_body = json.dumps({'label': "Chat Name", 'value_type': 'T'})
+        expected_body = {'label': "Chat Name", 'value_type': 'T'}
         self.assert_request(mock_request, 'post', 'fields', data=expected_body)
 
         self.assertEqual(field.key, 'chat_name')
@@ -95,9 +95,9 @@ class TembaClientTest(unittest.TestCase):
         runs = self.client.create_runs('04a4752b-0f49-480e-ae60-3a3f2bea485c',
                                        ['bfff9984-38f4-4e59-998d-3663ec3c650d'], True)
 
-        expected_body = json.dumps({"contacts": ['bfff9984-38f4-4e59-998d-3663ec3c650d'],
-                                    "restart_participants": 1,
-                                    "flow_uuid": "04a4752b-0f49-480e-ae60-3a3f2bea485c"})
+        expected_body = {"contacts": ['bfff9984-38f4-4e59-998d-3663ec3c650d'],
+                         "restart_participants": 1,
+                         "flow_uuid": "04a4752b-0f49-480e-ae60-3a3f2bea485c"}
         self.assert_request(mock_request, 'post', 'runs', data=expected_body)
 
         self.assertEqual(len(runs), 2)
@@ -388,6 +388,29 @@ class TembaClientTest(unittest.TestCase):
                                                                  'flow_uuid': ['a68567fa-ad95-45fc-b5f7-3ce90ebbd46d'],
                                                                  'after': '2014-12-12T22:34:36.978000',
                                                                  'before': '2014-12-12T22:56:58.917000'})
+
+    def test_update_contact(self, mock_request):
+        mock_request.return_value = MockResponse(200, _read_json('contacts_created'))
+        contact = self.client.update_contact('bfff9984-38f4-4e59-998d-3663ec3c650d',
+                                             "Amy Amanda Allen",
+                                             ['tel:+250700000005'],
+                                             {'nickname': "Triple A"},
+                                             ['04a4752b-0f49-480e-ae60-3a3f2bea485c'])
+
+        expected_body = {'fields': {'nickname': "Triple A"},
+                         'urns': ['tel:+250700000005'],
+                         'uuid': 'bfff9984-38f4-4e59-998d-3663ec3c650d',
+                         'name': "Amy Amanda Allen",
+                         'group_uuids': ['04a4752b-0f49-480e-ae60-3a3f2bea485c']}
+        self.assert_request(mock_request, 'post', 'contacts', data=expected_body)
+
+        self.assertEqual(contact.uuid, 'bfff9984-38f4-4e59-998d-3663ec3c650d')
+        self.assertEqual(contact.name, "Amy Amanda Allen")
+        self.assertEqual(contact.urns, ['tel:+250700000005'])
+        self.assertEqual(contact.groups, ['04a4752b-0f49-480e-ae60-3a3f2bea485c'])
+        self.assertEqual(contact.fields, {'nickname': 'Triple A'})
+        self.assertEqual(contact.language, None)
+        self.assertEqual(contact.modified_on, datetime.datetime(2014, 10, 1, 6, 54, 9, 817000, pytz.utc))
 
     def assert_request(self, mock, method, endpoint, **kwargs):
         """
