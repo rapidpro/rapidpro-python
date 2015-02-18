@@ -91,6 +91,7 @@ class Run(TembaObject):
     steps = ObjectListField(item_class=RunStep)
     values = ObjectListField(item_class=RunValueSet)
     created_on = DatetimeField()
+    completed = SimpleField()
 
     @classmethod
     def deserialize(cls, item):

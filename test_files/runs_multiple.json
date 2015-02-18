@@ -8,6 +8,7 @@
             "flow": 22907,
             "run": 219805,
             "contact": "3597f744-fc7a-4709-9cb4-4db24c484f45",
+            "completed": true,
             "phone": "",
             "values": [
                 {
@@ -37,6 +38,7 @@
             "flow": 22907,
             "run": 219807,
             "contact": "79e0a0ef-6d92-4eed-8204-199f68eb3fdd",
+            "completed": false,
             "phone": "",
             "values": [
                 {

@@ -344,6 +344,7 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(run.id, 1258967)
         self.assertEqual(run.flow, 'aab50309-59a6-4502-aafb-73bcb072b695')
         self.assertEqual(run.contact, '7f16e47a-dbca-47d3-9d2f-d79dc5e1eb26')
+        self.assertEqual(run.completed, True)
         self.assertEqual(len(run.steps), 5)
         self.assertEqual(run.steps[0].node, '9a8870d7-f7a4-4f11-9379-a158d1fad6f7')
         self.assertEqual(run.steps[0].text, "This is the sheep poll. How many sheep do you have?")
