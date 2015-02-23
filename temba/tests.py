@@ -246,6 +246,7 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(len(flow.rulesets), 1)
         self.assertEqual(flow.rulesets[0].uuid, 'e16ff762-6051-4940-964a-9b2efcb670ca')
         self.assertEqual(flow.rulesets[0].label, "Rule 1")
+        self.assertEqual(flow.rulesets[0].response_type, "C")
         self.assertEqual(flow.created_on, datetime.datetime(2014, 12, 11, 13, 47, 55, 288000, pytz.utc))
 
         # check empty response

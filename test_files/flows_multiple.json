@@ -15,7 +15,8 @@
                 {
                     "node": "e16ff762-6051-4940-964a-9b2efcb670ca",
                     "id": 60998,
-                    "label": "Rule 1"
+                    "label": "Rule 1",
+                    "response_type": "C"
                 }
             ],
             "created_on": "2014-12-11T13:47:55.288Z",
@@ -33,7 +34,8 @@
                 {
                     "node": "549d832a-b233-43e8-918e-ae095becc583",
                     "id": 23422,
-                    "label": "Rule 2"
+                    "label": "Rule 2",
+                    "response_type": "N"
                 }
             ],
             "created_on": "2014-12-11T13:47:55.288Z",

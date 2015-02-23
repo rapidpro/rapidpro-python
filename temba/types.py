@@ -38,6 +38,7 @@ class Field(TembaObject):
 class FlowRuleSet(TembaObject):
     uuid = SimpleField(src='node')
     label = SimpleField()
+    response_type = SimpleField()
 
 
 class Flow(TembaObject):
