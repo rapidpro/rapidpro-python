@@ -312,6 +312,40 @@ class TembaClientTest(unittest.TestCase):
         self.client.get_groups(name="A-Team")
         self.assert_request(mock_request, 'get', 'groups', params={'name': 'A-Team'})
 
+    def test_get_label(self, mock_request):
+        # check single item response
+        mock_request.return_value = MockResponse(200, _read_json('labels_single'))
+        label = self.client.get_label('946c930d-83b1-4982-a797-9f0c0cc554de')
+
+        self.assert_request(mock_request, 'get', 'labels', params={'uuid': '946c930d-83b1-4982-a797-9f0c0cc554de'})
+
+        self.assertEqual(label.uuid, '946c930d-83b1-4982-a797-9f0c0cc554de')
+        self.assertEqual(label.name, "High Priority")
+        self.assertEqual(label.parent, None)
+        self.assertEqual(label.count, 4567)
+
+        # check empty response
+        mock_request.return_value = MockResponse(200, _read_json('empty'))
+        self.assertRaises(TembaException, self.client.get_label, 'xyz')
+
+        # check multiple item response
+        mock_request.return_value = MockResponse(200, _read_json('labels_multiple'))
+        self.assertRaises(TembaException, self.client.get_label, '946c930d-83b1-4982-a797-9f0c0cc554de')
+
+    def test_get_labels(self, mock_request):
+        # check no params
+        mock_request.return_value = MockResponse(200, _read_json('labels_multiple'))
+        labels = self.client.get_labels()
+
+        self.assert_request(mock_request, 'get', 'labels')
+
+        self.assertEqual(len(labels), 2)
+        self.assertEqual(labels[0].uuid, "946c930d-83b1-4982-a797-9f0c0cc554de")
+
+        # check filtering by name
+        self.client.get_labels(name="Priority")
+        self.assert_request(mock_request, 'get', 'labels', params={'name': 'Priority'})
+
     def test_get_messages(self, mock_request):
         # check no params
         mock_request.return_value = MockResponse(200, _read_json('messages_multiple'))

@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from .base import AbstractTembaClient
-from .types import Broadcast, Contact, Group, Field, Flow, Message, Run
+from .types import Broadcast, Contact, Group, Field, Flow, Label, Message, Run
 
 
 class TembaClient(AbstractTembaClient):
@@ -175,6 +175,26 @@ class TembaClient(AbstractTembaClient):
         """
         params = self._build_params(uuid=uuids, name=name)
         return Group.deserialize_list(self._get_all('groups', params))
+
+    def get_label(self, uuid):
+        """
+        Gets a single message label by its UUID
+
+        :param str uuid: label UUID
+        :return: the label
+        """
+        return Label.deserialize(self._get_single('labels', {'uuid': uuid}))
+
+    def get_labels(self, uuids=None, name=None):
+        """
+        Gets all matching message labels
+
+        :param list[str] uuids: list of label UUIDs
+        :param str name: partial name match
+        :return: list of labels
+        """
+        params = self._build_params(uuid=uuids, name=name)
+        return Label.deserialize_list(self._get_all('labels', params))
 
     def get_messages(self, ids=None, broadcasts=None, urns=None, contacts=None, groups=None, statuses=None,
                      directions=None, _types=None, labels=None, before=None, after=None):

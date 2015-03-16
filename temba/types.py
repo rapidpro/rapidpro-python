@@ -53,6 +53,13 @@ class Flow(TembaObject):
     created_on = DatetimeField()
 
 
+class Label(TembaObject):
+    uuid = SimpleField()
+    name = SimpleField()
+    parent = SimpleField()
+    count = IntegerField()
+
+
 class Message(TembaObject):
     contact = SimpleField()
     urn = SimpleField()
