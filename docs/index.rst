@@ -17,6 +17,49 @@ If you don't know your API token then visit the `API Explorer <http://rapidpro.i
     client = TembaClient('rapidpro.io', <YOUR-API-TOKEN>)
 
 
+Fetching Single Objects
+-----------------------
+
+For each type, the client provides a method for fetching a single instance by it's unique identifier. For most types
+this will be a UUID. However for broadcasts, messages and flow runs, this will be an integer, and for fields this will
+be the key name.
+
+If the object is not found, then an exception is thrown.
+
+.. code-block:: python
+
+    contact = client.get_contact('cc276708-7752-4b52-a4ea-d3264847220e')
+    message = client.get_message(12345)
+    field = client.get_field('age')
+
+Fetching Multiple Objects
+-------------------------
+
+For each type, the client provides a method for fetching multiple instances, which can be used to fetch results
+with or without paging. For example the following method calls don't use paging and so return all results available from
+the API, making as many requests as required:
+
+.. code-block:: python
+
+    contacts = client.get_contacts()             # all contacts
+    contacts = client.get_contacts(name="Bob")   # all contacts whose name contains "Bob"
+    contacts = client.get_contacts(uuids=[...])  # contacts whose UUID is listed
+
+Obviously such calls have the potential to return very large numbers of results and so should be used with caution.
+Alternatively the same results can be fetched with paging. For example the following code downloads all matching
+contacts one page at a time:
+
+.. code-block:: python
+
+    pager = client.pager()
+    while True:
+        contacts = client.get_contacts(name="Bob", pager=pager)
+
+        # do something with this page of contacts...
+
+        if not pager.has_more()
+            break
+
 Reference:
 
 .. toctree::

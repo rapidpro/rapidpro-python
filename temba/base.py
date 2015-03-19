@@ -43,6 +43,31 @@ class TembaException(Exception):
     def __str__(self):
         return str(self.__unicode__())
 
+# =====================================================================
+# Paging
+# =====================================================================
+
+
+class TembaPager(object):
+    def __init__(self, next_url):
+        self.next_url = next_url
+        self._count = None
+
+    def update(self, response):
+        self._count = response['count']
+        self.next_url = response['next']
+
+    @property
+    def total(self):
+        return self._count
+
+    def has_more(self):
+        return bool(self.next_url)
+
+
+# =====================================================================
+# Domain objects
+# =====================================================================
 
 class TembaObject(object):
     """
@@ -98,7 +123,6 @@ class TembaObject(object):
 # Field types
 # =====================================================================
 
-
 class TembaField(object):
     __metaclass__ = ABCMeta
 
@@ -144,7 +168,6 @@ class ObjectListField(TembaField):
 # Client base
 # =====================================================================
 
-
 class AbstractTembaClient(object):
     """
     Abstract and version agnostic base client class
@@ -159,6 +182,15 @@ class AbstractTembaClient(object):
 
         self.token = token
         self.debug = debug
+
+    def pager(self, next_url=None):
+        """
+        Returns a new pager
+
+        :param str next_url: the next URL
+        :return: the pager
+        """
+        return TembaPager(next_url)
 
     def _get_single(self, endpoint, params):
         """
@@ -176,17 +208,40 @@ class AbstractTembaClient(object):
         else:
             return response['results'][0]
 
+    def _get_multiple(self, endpoint, params, pager):
+        """
+        GETs multiple results from the given endpoint
+        """
+        if pager:
+            return self._get_page(endpoint, params, pager)
+        else:
+            return self._get_all(endpoint, params)
+
+    def _get_page(self, endpoint, params, pager):
+        """
+        GETs a page of results from the given endpoint
+        """
+        if pager.next_url:
+            url = pager.next_url
+            params = None
+        else:
+            url = '%s/%s.json' % (self.root_url, endpoint)
+
+        response = self._request('get', url, params=params)
+
+        pager.update(response)
+
+        return response['results']
+
     def _get_all(self, endpoint, params):
         """
-        GETs all results from the given endpoint
+        GETs all results from the given endpoint using multiple requests to fetch all pages
         """
-        num_requests = 0
         results = []
-
         url = '%s/%s.json' % (self.root_url, endpoint)
+
         while url:
             response = self._request('get', url, params=params)
-            num_requests += 1
             results += response['results']
             url = response['next']
 

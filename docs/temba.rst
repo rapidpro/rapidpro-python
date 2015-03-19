@@ -9,5 +9,6 @@ Module contents
 .. automodule:: temba
     :members:
     :undoc-members:
+    :inherited-members:
     :show-inheritance:
 

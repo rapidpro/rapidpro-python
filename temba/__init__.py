@@ -93,7 +93,7 @@ class TembaClient(AbstractTembaClient):
         """
         return Broadcast.deserialize(self._get_single('broadcasts', {'id': _id}))
 
-    def get_broadcasts(self, ids=None, statuses=None, before=None, after=None):
+    def get_broadcasts(self, ids=None, statuses=None, before=None, after=None, pager=None):
         """
         Gets all matching broadcasts
 
@@ -104,7 +104,7 @@ class TembaClient(AbstractTembaClient):
         :return: list of broadcasts
         """
         params = self._build_params(id=ids, status=statuses, before=before, after=after)
-        return Broadcast.deserialize_list(self._get_all('broadcasts', params))
+        return Broadcast.deserialize_list(self._get_multiple('broadcasts', params, pager))
 
     def get_contact(self, uuid):
         """
@@ -115,7 +115,7 @@ class TembaClient(AbstractTembaClient):
         """
         return Contact.deserialize(self._get_single('contacts', {'uuid': uuid}))
 
-    def get_contacts(self, uuids=None, urns=None, groups=None):
+    def get_contacts(self, uuids=None, urns=None, groups=None, pager=None):
         """
         Gets all matching contacts
 
@@ -125,7 +125,7 @@ class TembaClient(AbstractTembaClient):
         :return: list of contacts
         """
         params = self._build_params(uuid=uuids, urns=urns, group_uuids=groups)
-        return Contact.deserialize_list(self._get_all('contacts', params))
+        return Contact.deserialize_list(self._get_multiple('contacts', params, pager))
 
     def get_field(self, key):
         """
@@ -136,13 +136,13 @@ class TembaClient(AbstractTembaClient):
         """
         return Field.deserialize(self._get_single('fields', {'key': key}))
 
-    def get_fields(self):
+    def get_fields(self, pager=None):
         """
         Gets all contact fields
 
         :return: list of fields
         """
-        return Field.deserialize_list(self._get_all('fields', {}))
+        return Field.deserialize_list(self._get_multiple('fields', {}, pager))
 
     def get_flow(self, uuid):
         """
@@ -153,7 +153,7 @@ class TembaClient(AbstractTembaClient):
         """
         return Flow.deserialize(self._get_single('flows', {'uuid': uuid}))
 
-    def get_flows(self, uuids=None, archived=None, labels=None, before=None, after=None):
+    def get_flows(self, uuids=None, archived=None, labels=None, before=None, after=None, pager=None):
         """
         Gets all flows
 
@@ -165,7 +165,7 @@ class TembaClient(AbstractTembaClient):
         :return: list of flows
         """
         params = self._build_params(uuid=uuids, archived=archived, label=labels, before=before, after=after)
-        return Flow.deserialize_list(self._get_all('flows', params))
+        return Flow.deserialize_list(self._get_multiple('flows', params, pager))
 
     def get_group(self, uuid):
         """
@@ -176,7 +176,7 @@ class TembaClient(AbstractTembaClient):
         """
         return Group.deserialize(self._get_single('groups', {'uuid': uuid}))
 
-    def get_groups(self, uuids=None, name=None):
+    def get_groups(self, uuids=None, name=None, pager=None):
         """
         Gets all matching groups
 
@@ -185,7 +185,7 @@ class TembaClient(AbstractTembaClient):
         :return: list of groups
         """
         params = self._build_params(uuid=uuids, name=name)
-        return Group.deserialize_list(self._get_all('groups', params))
+        return Group.deserialize_list(self._get_multiple('groups', params, pager))
 
     def get_label(self, uuid):
         """
@@ -196,7 +196,7 @@ class TembaClient(AbstractTembaClient):
         """
         return Label.deserialize(self._get_single('labels', {'uuid': uuid}))
 
-    def get_labels(self, uuids=None, name=None):
+    def get_labels(self, uuids=None, name=None, pager=None):
         """
         Gets all matching message labels
 
@@ -205,10 +205,10 @@ class TembaClient(AbstractTembaClient):
         :return: list of labels
         """
         params = self._build_params(uuid=uuids, name=name)
-        return Label.deserialize_list(self._get_all('labels', params))
+        return Label.deserialize_list(self._get_multiple('labels', params, pager))
 
     def get_messages(self, ids=None, broadcasts=None, urns=None, contacts=None, groups=None, statuses=None,
-                     directions=None, _types=None, labels=None, before=None, after=None):
+                     directions=None, _types=None, labels=None, before=None, after=None, pager=None):
         """
         Gets all matching messages
 
@@ -228,7 +228,7 @@ class TembaClient(AbstractTembaClient):
         params = self._build_params(id=ids, broadcast=broadcasts, urns=urns, contact=contacts, group_uuids=groups,
                                     status=statuses, direction=directions, type=_types,
                                     label=labels, before=before, after=after)
-        return Message.deserialize_list(self._get_all('messages', params))
+        return Message.deserialize_list(self._get_multiple('messages', params, pager))
 
     def get_run(self, _id):
         """
@@ -239,7 +239,7 @@ class TembaClient(AbstractTembaClient):
         """
         return Run.deserialize(self._get_single('runs', {'run': _id}))
 
-    def get_runs(self, ids=None, flows=None, groups=None, before=None, after=None):
+    def get_runs(self, ids=None, flows=None, groups=None, before=None, after=None, pager=None):
         """
         Gets all matching flow runs
 
@@ -251,7 +251,7 @@ class TembaClient(AbstractTembaClient):
         :return: list of flow runs
         """
         params = self._build_params(run=ids, flow_uuid=flows, group_uuids=groups, before=before, after=after)
-        return Run.deserialize_list(self._get_all('runs', params))
+        return Run.deserialize_list(self._get_multiple('runs', params, pager))
 
     def update_contact(self, uuid, name, urns, fields, groups):
         """
