@@ -24,7 +24,7 @@ For each type, the client provides a method for fetching a single instance by it
 this will be a UUID. However for broadcasts, messages and flow runs, this will be an integer, and for fields this will
 be the key name.
 
-If the object is not found, then an exception is thrown.
+If the requested object is not found, then an exception is raised.
 
 .. code-block:: python
 
@@ -59,6 +59,11 @@ contacts one page at a time:
 
         if not pager.has_more()
             break
+
+.. warning::
+    Fetching multiple objects may require multiple requests to the API. Care should be take to formulate queries which
+    will match the same sequence of results, even if new objects are created between those API requests. For example,
+    when querying for messages one could use the `after` keyword argument to ensure new messages aren't included.
 
 Reference:
 
