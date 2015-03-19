@@ -213,6 +213,24 @@ class TembaClientTest(unittest.TestCase):
         contacts = self.client.get_contacts()
         self.assertEqual(len(contacts), 21)
 
+        # test with paging
+        mock_request.side_effect = (MockResponse(200, _read_json('contacts_multipage_1')),
+                                    MockResponse(200, _read_json('contacts_multipage_2')),
+                                    MockResponse(200, _read_json('contacts_multipage_3')))
+        pager = self.client.pager()
+        contacts = self.client.get_contacts(pager=pager)
+        self.assertEqual(len(contacts), 10)
+        self.assertEqual(pager.total, 21)
+        self.assertTrue(pager.has_more())
+        contacts = self.client.get_contacts(pager=pager)
+        self.assertEqual(len(contacts), 10)
+        self.assertEqual(pager.total, 21)
+        self.assertTrue(pager.has_more())
+        contacts = self.client.get_contacts(pager=pager)
+        self.assertEqual(len(contacts), 1)
+        self.assertEqual(pager.total, 21)
+        self.assertFalse(pager.has_more())
+
     def test_get_field(self, mock_request):
         # check single item response
         mock_request.return_value = MockResponse(200, _read_json('fields_single'))
