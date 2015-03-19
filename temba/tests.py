@@ -8,7 +8,8 @@ import unittest
 
 from mock import patch
 from . import TembaClient
-from .base import TembaException, TembaObject, SimpleField, DatetimeField
+from .base import TembaObject, SimpleField, DatetimeField
+from .base import TembaNoSuchObjectError, TembaMultipleResultsError, TembaAPIError
 from .types import Group
 from .utils import format_iso8601, parse_iso8601
 
@@ -123,7 +124,7 @@ class TembaClientTest(unittest.TestCase):
 
         # check deleting a non-existent contact
         mock_request.return_value = MockResponse(404, 'NOT FOUND')
-        self.assertRaises(TembaException, self.client.delete_contact, 'bfff9984-38f4-4e59-998d-3663ec3c650d')
+        self.assertRaises(TembaAPIError, self.client.delete_contact, 'bfff9984-38f4-4e59-998d-3663ec3c650d')
 
     def test_get_broadcast(self, mock_request):
         # check single item response
@@ -177,11 +178,11 @@ class TembaClientTest(unittest.TestCase):
 
         # check empty response
         mock_request.return_value = MockResponse(200, _read_json('empty'))
-        self.assertRaises(TembaException, self.client.get_contact, 'xyz')
+        self.assertRaises(TembaNoSuchObjectError, self.client.get_contact, 'xyz')
 
         # check multiple item response
         mock_request.return_value = MockResponse(200, _read_json('contacts_multiple'))
-        self.assertRaises(TembaException, self.client.get_contact, 'bfff9984-38f4-4e59-998d-3663ec3c650d')
+        self.assertRaises(TembaMultipleResultsError, self.client.get_contact, 'bfff9984-38f4-4e59-998d-3663ec3c650d')
 
     def test_get_contacts(self, mock_request):
         # check no params
@@ -243,11 +244,11 @@ class TembaClientTest(unittest.TestCase):
 
         # check empty response
         mock_request.return_value = MockResponse(200, _read_json('empty'))
-        self.assertRaises(TembaException, self.client.get_field, 'xyz')
+        self.assertRaises(TembaNoSuchObjectError, self.client.get_field, 'xyz')
 
         # check multiple item response
         mock_request.return_value = MockResponse(200, _read_json('fields_multiple'))
-        self.assertRaises(TembaException, self.client.get_flow, 'chat_name')
+        self.assertRaises(TembaMultipleResultsError, self.client.get_flow, 'chat_name')
 
     def test_get_fields(self, mock_request):
         # check no params
@@ -281,11 +282,11 @@ class TembaClientTest(unittest.TestCase):
 
         # check empty response
         mock_request.return_value = MockResponse(200, _read_json('empty'))
-        self.assertRaises(TembaException, self.client.get_flow, 'xyz')
+        self.assertRaises(TembaNoSuchObjectError, self.client.get_flow, 'xyz')
 
         # check multiple item response
         mock_request.return_value = MockResponse(200, _read_json('flows_multiple'))
-        self.assertRaises(TembaException, self.client.get_flow, 'a68567fa-ad95-45fc-b5f7-3ce90ebbd46d')
+        self.assertRaises(TembaMultipleResultsError, self.client.get_flow, 'a68567fa-ad95-45fc-b5f7-3ce90ebbd46d')
 
     def test_get_flows(self, mock_request):
         # check no params
@@ -322,11 +323,11 @@ class TembaClientTest(unittest.TestCase):
 
         # check empty response
         mock_request.return_value = MockResponse(200, _read_json('empty'))
-        self.assertRaises(TembaException, self.client.get_group, 'xyz')
+        self.assertRaises(TembaNoSuchObjectError, self.client.get_group, 'xyz')
 
         # check multiple item response
         mock_request.return_value = MockResponse(200, _read_json('groups_multiple'))
-        self.assertRaises(TembaException, self.client.get_group, '04a4752b-0f49-480e-ae60-3a3f2bea485c')
+        self.assertRaises(TembaMultipleResultsError, self.client.get_group, '04a4752b-0f49-480e-ae60-3a3f2bea485c')
 
     def test_get_groups(self, mock_request):
         # check no params
@@ -356,11 +357,11 @@ class TembaClientTest(unittest.TestCase):
 
         # check empty response
         mock_request.return_value = MockResponse(200, _read_json('empty'))
-        self.assertRaises(TembaException, self.client.get_label, 'xyz')
+        self.assertRaises(TembaNoSuchObjectError, self.client.get_label, 'xyz')
 
         # check multiple item response
         mock_request.return_value = MockResponse(200, _read_json('labels_multiple'))
-        self.assertRaises(TembaException, self.client.get_label, '946c930d-83b1-4982-a797-9f0c0cc554de')
+        self.assertRaises(TembaMultipleResultsError, self.client.get_label, '946c930d-83b1-4982-a797-9f0c0cc554de')
 
     def test_get_labels(self, mock_request):
         # check no params
@@ -429,11 +430,11 @@ class TembaClientTest(unittest.TestCase):
 
         # check empty response
         mock_request.return_value = MockResponse(200, _read_json('empty'))
-        self.assertRaises(TembaException, self.client.get_run, 'xyz')
+        self.assertRaises(TembaNoSuchObjectError, self.client.get_run, 'xyz')
 
         # check multiple item response
         mock_request.return_value = MockResponse(200, _read_json('groups_multiple'))
-        self.assertRaises(TembaException, self.client.get_group, '9ec96b73-78c3-4029-ba86-5279c92996fc')
+        self.assertRaises(TembaMultipleResultsError, self.client.get_group, '9ec96b73-78c3-4029-ba86-5279c92996fc')
 
     def test_get_runs(self, mock_request):
         # check no params
@@ -492,7 +493,7 @@ class TembaClientTest(unittest.TestCase):
 class TembaExceptionTest(unittest.TestCase):
     def test_extract_errors(self):
         response = MockResponse(400, '{"field_1": ["Error #1", "Error #2"], "field_2": ["Error #3"]}')
-        msg = TembaException._extract_errors(response)
+        msg = TembaAPIError._extract_errors(response)
         self.assertTrue(msg == "Error #1. Error #2. Error #3" or msg == "Error #3. Error #1. Error #2")
 
 

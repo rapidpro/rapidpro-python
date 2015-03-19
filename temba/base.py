@@ -8,19 +8,40 @@ from abc import ABCMeta, abstractmethod
 from .utils import format_iso8601, parse_iso8601
 
 
+# =====================================================================
+# Exceptions
+# =====================================================================
+
 class TembaException(Exception):
+    def __unicode__(self):
+        return self.message
+
+    def __str__(self):
+        return str(self.__unicode__())
+
+
+class TembaNoSuchObjectError(TembaException):
+    message = "Request for single object returned no objects"
+
+
+class TembaMultipleResultsError(TembaException):
+    message = "Request for single object returned multiple objects"
+
+
+class TembaAPIError(TembaException):
     """
-    Exception class for all errors from client methods
+    Errors returned by the Temba API
     """
-    def __init__(self, msg, caused_by=None):
-        self.msg = msg
+    message = "API request error"
+
+    def __init__(self, caused_by=None):
         self.caused_by = caused_by
 
         # if error was caused by a HTTP 400 response, we may have a useful validation error
         if isinstance(caused_by, requests.HTTPError) and caused_by.response.status_code == 400:
-            msg = self._extract_errors(caused_by.response)
-            if msg:
-                self.caused_by = msg
+            message = self._extract_errors(caused_by.response)
+            if message:
+                self.caused_by = message
 
     @staticmethod
     def _extract_errors(response):
@@ -36,17 +57,18 @@ class TembaException(Exception):
 
     def __unicode__(self):
         if self.caused_by:
-            return "%s. Caused by: %s" % (self.msg, self.caused_by)
+            return "%s. Caused by: %s" % (self.message, self.caused_by)
         else:
-            return self.msg
+            return self.message
 
-    def __str__(self):
-        return str(self.__unicode__())
+
+class TembaConnectionError(TembaException):
+    message = "Unable to connect to host"
+
 
 # =====================================================================
 # Paging
 # =====================================================================
-
 
 class TembaPager(object):
     def __init__(self, next_url):
@@ -202,9 +224,9 @@ class AbstractTembaClient(object):
         num_results = len(response['results'])
 
         if num_results > 1:
-            raise TembaException("Request for single object returned %d objects" % num_results)
+            raise TembaMultipleResultsError()
         elif num_results == 0:
-            raise TembaException("Request for single object returned no objects")
+            raise TembaNoSuchObjectError()
         else:
             return response['results'][0]
 
@@ -288,7 +310,9 @@ class AbstractTembaClient(object):
 
             return response.json() if response.content else None
         except requests.HTTPError, ex:
-            raise TembaException("Request error", ex)
+            raise TembaAPIError(ex)
+        except requests.exceptions.ConnectionError:
+            raise TembaConnectionError()
 
     @classmethod
     def _build_params(cls, **kwargs):
