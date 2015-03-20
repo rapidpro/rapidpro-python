@@ -42,7 +42,7 @@ the API, making as many requests as required:
 .. code-block:: python
 
     contacts = client.get_contacts()             # all contacts
-    contacts = client.get_contacts(name="Bob")   # all contacts whose name contains "Bob"
+    contacts = client.get_contacts(name="Bob")   # all contacts whose name contains Bob
     contacts = client.get_contacts(uuids=[...])  # contacts whose UUID is listed
 
 Obviously such calls have the potential to return very large numbers of results and so should be used with caution.
@@ -59,6 +59,16 @@ contacts one page at a time:
 
         if not pager.has_more()
             break
+
+The pager also allows you to specify a particular page to start at. For example:
+
+.. code-block:: python
+
+    pager = client.pager(start_page=2)
+    contacts = client.get_contacts(name="Bob", pager=pager)  # the second page of contacts called Bob
+
+.. note::
+    Page numbers are one-based rather than zero-based for consistency with the RapidPro API.
 
 .. warning::
     Fetching multiple objects may require multiple requests to the API. Care should be take to formulate queries which

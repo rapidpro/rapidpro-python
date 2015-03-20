@@ -71,17 +71,18 @@ class TembaConnectionError(TembaException):
 # =====================================================================
 
 class TembaPager(object):
-    def __init__(self, next_url):
-        self.next_url = next_url
-        self._count = None
+    def __init__(self, start_page):
+        self.start_page = start_page
+        self.count = None
+        self.next_url = None
 
     def update(self, response):
-        self._count = response['count']
+        self.count = response['count']
         self.next_url = response['next']
 
     @property
     def total(self):
-        return self._count
+        return self.count
 
     def has_more(self):
         return bool(self.next_url)
@@ -205,14 +206,14 @@ class AbstractTembaClient(object):
         self.token = token
         self.debug = debug
 
-    def pager(self, next_url=None):
+    def pager(self, start_page=1):
         """
         Returns a new pager
 
-        :param str next_url: the next URL
+        :param int start_page: the starting page number
         :return: the pager
         """
-        return TembaPager(next_url)
+        return TembaPager(start_page)
 
     def _get_single(self, endpoint, params):
         """
@@ -248,6 +249,8 @@ class AbstractTembaClient(object):
             params = None
         else:
             url = '%s/%s.json' % (self.root_url, endpoint)
+            if pager.start_page != 1:
+                params['page'] = pager.start_page
 
         response = self._request('get', url, params=params)
 
