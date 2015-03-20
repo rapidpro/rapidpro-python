@@ -9,7 +9,7 @@
             "urn": "tel:+250700000001",
             "status": "H",
             "type": "F",
-            "labels": [],
+            "labels": ["Important"],
             "relayer": 101,
             "relayer_phone": "+250780000000",
             "phone": "+250700000001",

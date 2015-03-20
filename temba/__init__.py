@@ -207,6 +207,15 @@ class TembaClient(AbstractTembaClient):
         params = self._build_params(uuid=uuids, name=name)
         return Label.deserialize_list(self._get_multiple('labels', params, pager))
 
+    def get_message(self, _id):
+        """
+        Gets a single message by its id
+
+        :param int _id: message id
+        :return: the message
+        """
+        return Message.deserialize(self._get_single('messages', {'id': _id}))
+
     def get_messages(self, ids=None, broadcasts=None, urns=None, contacts=None, groups=None, statuses=None,
                      directions=None, _types=None, labels=None, before=None, after=None, pager=None):
         """

@@ -61,6 +61,7 @@ class Label(TembaObject):
 
 
 class Message(TembaObject):
+    id = IntegerField()
     contact = SimpleField()
     urn = SimpleField()
     status = SimpleField()

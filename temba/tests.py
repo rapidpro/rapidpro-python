@@ -377,6 +377,33 @@ class TembaClientTest(unittest.TestCase):
         self.client.get_labels(name="Priority")
         self.assert_request(mock_request, 'get', 'labels', params={'name': 'Priority'})
 
+    def get_message(self, mock_request):
+        # check single item response
+        mock_request.return_value = MockResponse(200, _read_json('messages_single'))
+        message = self.client.get_message(13441143)
+
+        self.assert_request(mock_request, 'get', 'messages', params={'id': 13441143})
+
+        self.assertEqual(message.id, 13441143)
+        self.assertEqual(message.contact, '92fc2eee-a19a-4589-81b6-1366d2b1cb12')
+        self.assertEqual(message.urn, 'tel:+250700000001')
+        self.assertEqual(message.status, 'H')
+        self.assertEqual(message.type, 'F')
+        self.assertEqual(message.labels, ["Important"])
+        self.assertEqual(message.direction, 'I')
+        self.assertEqual(message.text, "Hello \u0633.")
+        self.assertEqual(message.created_on, datetime.datetime(2014, 12, 12, 13, 34, 44, 0, pytz.utc))
+        self.assertEqual(message.sent_on, None)
+        self.assertEqual(message.delivered_on, datetime.datetime(2014, 12, 12, 13, 35, 12, 861000, pytz.utc))
+
+        # check empty response
+        mock_request.return_value = MockResponse(200, _read_json('empty'))
+        self.assertRaises(TembaNoSuchObjectError, self.client.get_message, 'xyz')
+
+        # check multiple item response
+        mock_request.return_value = MockResponse(200, _read_json('messages_multiple'))
+        self.assertRaises(TembaMultipleResultsError, self.client.get_message, 13441143)
+
     def test_get_messages(self, mock_request):
         # check no params
         mock_request.return_value = MockResponse(200, _read_json('messages_multiple'))
@@ -393,6 +420,7 @@ class TembaClientTest(unittest.TestCase):
                                  labels=['polls', 'events'],
                                  before=datetime.datetime(2014, 12, 12, 22, 34, 36, 123000, pytz.utc),
                                  after=datetime.datetime(2014, 12, 12, 22, 34, 36, 234000, pytz.utc))
+
         self.assert_request(mock_request, 'get', 'messages', params={'id': [123, 234],
                                                                      'broadcast': [345, 456],
                                                                      'contact': ['abc'],
@@ -446,10 +474,10 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(len(runs), 2)
 
         # check with all params
-        runs = self.client.get_runs(ids=[123, 234],
-                                    flows=['a68567fa-ad95-45fc-b5f7-3ce90ebbd46d'],
-                                    after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978000, pytz.utc),
-                                    before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917000, pytz.utc))
+        self.client.get_runs(ids=[123, 234],
+                             flows=['a68567fa-ad95-45fc-b5f7-3ce90ebbd46d'],
+                             after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978000, pytz.utc),
+                             before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917000, pytz.utc))
 
         self.assert_request(mock_request, 'get', 'runs', params={'run': [123, 234],
                                                                  'flow_uuid': ['a68567fa-ad95-45fc-b5f7-3ce90ebbd46d'],
