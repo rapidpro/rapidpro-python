@@ -63,7 +63,8 @@ contacts one page at a time:
 .. warning::
     Fetching multiple objects may require multiple requests to the API. Care should be take to formulate queries which
     will match the same sequence of results, even if new objects are created between those API requests. For example,
-    when querying for messages one could use the `after` keyword argument to ensure new messages aren't included.
+    when querying for messages one could use the `before` argument with the current timestamp to ensure new messages
+    aren't included.
 
 Reference:
 
