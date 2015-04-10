@@ -419,14 +419,18 @@ class TembaClientTest(unittest.TestCase):
                                  contacts=['abc'],
                                  labels=['polls', 'events'],
                                  before=datetime.datetime(2014, 12, 12, 22, 34, 36, 123000, pytz.utc),
-                                 after=datetime.datetime(2014, 12, 12, 22, 34, 36, 234000, pytz.utc))
+                                 after=datetime.datetime(2014, 12, 12, 22, 34, 36, 234000, pytz.utc),
+                                 text='heists',
+                                 reverse=True)
 
         self.assert_request(mock_request, 'get', 'messages', params={'id': [123, 234],
                                                                      'broadcast': [345, 456],
                                                                      'contact': ['abc'],
                                                                      'label': ['polls', 'events'],
                                                                      'before': '2014-12-12T22:34:36.123000',
-                                                                     'after': '2014-12-12T22:34:36.234000'})
+                                                                     'after': '2014-12-12T22:34:36.234000',
+                                                                     'text': 'heists',
+                                                                     'reverse': 1})
 
     def test_get_run(self, mock_request):
         # check single item response
