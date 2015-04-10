@@ -511,6 +511,42 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(contact.language, None)
         self.assertEqual(contact.modified_on, datetime.datetime(2014, 10, 1, 6, 54, 9, 817000, pytz.utc))
 
+    def test_label_messages(self, mock_request):
+        mock_request.return_value = MockResponse(204)
+        self.client.label_messages(messages=[123, 234, 345], label="Test")
+
+        expected_body = {'messages': [123, 234, 345], 'action': 'label', 'label': "Test"}
+        self.assert_request(mock_request, 'post', 'message_actions', data=expected_body)
+
+    def test_unlabel_messages(self, mock_request):
+        mock_request.return_value = MockResponse(204)
+        self.client.unlabel_messages(messages=[123, 234, 345], label_uuid='affa6685-0725-49c7-a15a-96f301d996e4')
+
+        expected_body = {'messages': [123, 234, 345], 'action': 'unlabel',
+                         'label_uuid': 'affa6685-0725-49c7-a15a-96f301d996e4'}
+        self.assert_request(mock_request, 'post', 'message_actions', data=expected_body)
+
+    def test_archive_messages(self, mock_request):
+        mock_request.return_value = MockResponse(204)
+        self.client.archive_messages(messages=[123, 234, 345])
+
+        expected_body = {'messages': [123, 234, 345], 'action': 'archive'}
+        self.assert_request(mock_request, 'post', 'message_actions', data=expected_body)
+
+    def test_unarchive_messages(self, mock_request):
+        mock_request.return_value = MockResponse(204)
+        self.client.unarchive_messages(messages=[123, 234, 345])
+
+        expected_body = {'messages': [123, 234, 345], 'action': 'unarchive'}
+        self.assert_request(mock_request, 'post', 'message_actions', data=expected_body)
+
+    def test_delete_messages(self, mock_request):
+        mock_request.return_value = MockResponse(204)
+        self.client.delete_messages(messages=[123, 234, 345])
+
+        expected_body = {'messages': [123, 234, 345], 'action': 'delete'}
+        self.assert_request(mock_request, 'post', 'message_actions', data=expected_body)
+
     def assert_request(self, mock, method, endpoint, **kwargs):
         """
         Asserts that a request was made to the given endpoint with the given parameters

@@ -16,6 +16,10 @@ class TembaClient(AbstractTembaClient):
     def __init__(self, host, token, ssl=True, debug=False):
         super(TembaClient, self).__init__(host, token, ssl, debug)
 
+    # ==================================================================================================================
+    # Create object operations
+    # ==================================================================================================================
+
     def create_broadcast(self, text, urns=None, contacts=None, groups=None):
         """
         Creates and sends a broadcast to the given URNs, contacts or contact groups
@@ -76,6 +80,10 @@ class TembaClient(AbstractTembaClient):
         params = self._build_params(flow_uuid=flow, contacts=contacts, restart_participants=restart_participants)
         return Run.deserialize_list(self._post('runs', params))
 
+    # ==================================================================================================================
+    # Delete object operations
+    # ==================================================================================================================
+
     def delete_contact(self, contact):
         """
         Deletes an existing contact
@@ -83,6 +91,10 @@ class TembaClient(AbstractTembaClient):
         :param contact: contact object or UUID
         """
         self._delete('contacts', self._build_params(uuid=contact))
+
+    # ==================================================================================================================
+    # Fetch object(s) operations
+    # ==================================================================================================================
 
     def get_broadcast(self, _id):
         """
@@ -266,6 +278,10 @@ class TembaClient(AbstractTembaClient):
         params = self._build_params(run=ids, flow_uuid=flows, group_uuids=groups, before=before, after=after)
         return Run.deserialize_list(self._get_multiple('runs', params, pager))
 
+    # ==================================================================================================================
+    # Update object operations
+    # ==================================================================================================================
+
     def update_contact(self, uuid, name, urns, fields, groups):
         """
         Updates an existing contact
@@ -280,14 +296,60 @@ class TembaClient(AbstractTembaClient):
         params = self._build_params(uuid=uuid, name=name, urns=urns, fields=fields, group_uuids=groups)
         return Contact.deserialize(self._post('contacts', params))
 
-    def update_label(self, uuid, name, parent):
+    def update_label(self, uuid, name, parent_uuid):
         """
         Updates an existing message label
 
         :param str uuid: label UUID
         :param str name: label name
-        :param str parent: parent label UUID
+        :param str parent_uuid: parent label UUID
         :return: the updated message label
         """
-        params = self._build_params(uuid=uuid, name=name, parent=parent)
+        params = self._build_params(uuid=uuid, name=name, parent=parent_uuid)
         return Label.deserialize(self._post('labels', params))
+
+    # ==================================================================================================================
+    # Bulk message operations
+    # ==================================================================================================================
+
+    def label_messages(self, messages, label=None, label_uuid=None):
+        """
+        Applies a label to the given messages. Label can be specified by name or by UUID. If specified by name and it
+        doesn't exist, it will be created.
+        :param list[int] messages: the message ids
+        :param str label: the label name
+        :param str label_uuid: the label UUID
+        """
+        params = self._build_params(messages=messages, action='label', label=label, label_uuid=label_uuid)
+        self._post('message_actions', params)
+
+    def unlabel_messages(self, messages, label=None, label_uuid=None):
+        """
+        Removes a label from the given messages. Label can be specified by name or by UUID.
+        :param list[int] messages: the message ids
+        :param str label: the label name
+        :param str label_uuid: the label UUID
+        """
+        params = self._build_params(messages=messages, action='unlabel', label=label, label_uuid=label_uuid)
+        self._post('message_actions', params)
+
+    def archive_messages(self, messages):
+        """
+        Archives the given messages.
+        :param list[int] messages: the message ids
+        """
+        self._post('message_actions', self._build_params(messages=messages, action='archive'))
+
+    def unarchive_messages(self, messages):
+        """
+        Un-archives (restores) the given messages.
+        :param list[int] messages: the message ids
+        """
+        self._post('message_actions', self._build_params(messages=messages, action='unarchive'))
+
+    def delete_messages(self, messages):
+        """
+        Permanently deletes the given messages.
+        :param list[int] messages: the message ids
+        """
+        self._post('message_actions', self._build_params(messages=messages, action='delete'))
