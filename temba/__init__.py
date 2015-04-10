@@ -113,6 +113,7 @@ class TembaClient(AbstractTembaClient):
         :param list[str] statuses: list of statuses
         :param datetime before: created before this datetime
         :param datetime after: created after this datetime
+        :param object pager: pager for paged results
         :return: list of broadcasts
         """
         params = self._build_params(id=ids, status=statuses, before=before, after=after)
@@ -134,6 +135,7 @@ class TembaClient(AbstractTembaClient):
         :param list[str] uuids: list of UUIDs
         :param list[str] urns: list of URN strings
         :param list groups: list of group objects or UUIDs
+        :param object pager: pager for paged results
         :return: list of contacts
         """
         params = self._build_params(uuid=uuids, urns=urns, group_uuids=groups)
@@ -152,6 +154,7 @@ class TembaClient(AbstractTembaClient):
         """
         Gets all contact fields
 
+        :param object pager: pager for paged results
         :return: list of fields
         """
         return Field.deserialize_list(self._get_multiple('fields', {}, pager))
@@ -174,6 +177,7 @@ class TembaClient(AbstractTembaClient):
         :param list[str] labels: list of flow labels
         :param datetime before: created before
         :param datetime after: created after
+        :param object pager: pager for paged results
         :return: list of flows
         """
         params = self._build_params(uuid=uuids, archived=archived, label=labels, before=before, after=after)
@@ -194,6 +198,7 @@ class TembaClient(AbstractTembaClient):
 
         :param list[str] uuids: list of group UUIDs
         :param str name: partial name match
+        :param object pager: pager for paged results
         :return: list of groups
         """
         params = self._build_params(uuid=uuids, name=name)
@@ -214,6 +219,7 @@ class TembaClient(AbstractTembaClient):
 
         :param list[str] uuids: list of label UUIDs
         :param str name: partial name match
+        :param object pager: pager for paged results
         :return: list of labels
         """
         params = self._build_params(uuid=uuids, name=name)
@@ -273,6 +279,7 @@ class TembaClient(AbstractTembaClient):
         :param list groups: list of group objects or UUIDs
         :param datetime before: created before
         :param datetime after: created after
+        :param object pager: pager for paged results
         :return: list of flow runs
         """
         params = self._build_params(run=ids, flow_uuid=flows, group_uuids=groups, before=before, after=after)
@@ -316,6 +323,7 @@ class TembaClient(AbstractTembaClient):
         """
         Applies a label to the given messages. Label can be specified by name or by UUID. If specified by name and it
         doesn't exist, it will be created.
+
         :param list[int] messages: the message ids
         :param str label: the label name
         :param str label_uuid: the label UUID
@@ -326,6 +334,7 @@ class TembaClient(AbstractTembaClient):
     def unlabel_messages(self, messages, label=None, label_uuid=None):
         """
         Removes a label from the given messages. Label can be specified by name or by UUID.
+
         :param list[int] messages: the message ids
         :param str label: the label name
         :param str label_uuid: the label UUID
@@ -336,6 +345,7 @@ class TembaClient(AbstractTembaClient):
     def archive_messages(self, messages):
         """
         Archives the given messages.
+
         :param list[int] messages: the message ids
         """
         self._post('message_actions', self._build_params(messages=messages, action='archive'))
@@ -343,6 +353,7 @@ class TembaClient(AbstractTembaClient):
     def unarchive_messages(self, messages):
         """
         Un-archives (restores) the given messages.
+
         :param list[int] messages: the message ids
         """
         self._post('message_actions', self._build_params(messages=messages, action='unarchive'))
@@ -350,6 +361,7 @@ class TembaClient(AbstractTembaClient):
     def delete_messages(self, messages):
         """
         Permanently deletes the given messages.
+
         :param list[int] messages: the message ids
         """
         self._post('message_actions', self._build_params(messages=messages, action='delete'))
