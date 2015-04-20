@@ -511,6 +511,18 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(contact.language, None)
         self.assertEqual(contact.modified_on, datetime.datetime(2014, 10, 1, 6, 54, 9, 817000, pytz.utc))
 
+    def test_update_flow(self, mock_request):
+        mock_request.return_value = MockResponse(200, _read_json('flows_created'))
+        flow = self.client.update_flow('a68567fa-ad95-45fc-b5f7-3ce90ebbd46d', "Ping", 'F')
+
+        expected_body = {'uuid': 'a68567fa-ad95-45fc-b5f7-3ce90ebbd46d',
+                         'name': "Ping",
+                         'flow_type': 'F'}
+        self.assert_request(mock_request, 'post', 'flows', data=expected_body)
+
+        self.assertEqual(flow.uuid, 'a68567fa-ad95-45fc-b5f7-3ce90ebbd46d')
+        self.assertEqual(flow.name, "Ping")
+
     def test_label_messages(self, mock_request):
         mock_request.return_value = MockResponse(204)
         self.client.label_messages(messages=[123, 234, 345], label="Test")

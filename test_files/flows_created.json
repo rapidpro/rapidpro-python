@@ -1,0 +1,19 @@
+{
+    "uuid": "a68567fa-ad95-45fc-b5f7-3ce90ebbd46d",
+    "archived": false,
+    "name": "Ping",
+    "labels": ["Registration"],
+    "participants": 5,
+    "runs": 6,
+    "completed_runs": 4,
+    "rulesets": [
+        {
+            "node": "e16ff762-6051-4940-964a-9b2efcb670ca",
+            "id": 60998,
+            "label": "Rule 1",
+            "response_type": "C"
+        }
+    ],
+    "created_on": "2014-12-11T13:47:55.288Z",
+    "flow": 22819
+}

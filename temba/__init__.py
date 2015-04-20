@@ -57,6 +57,18 @@ class TembaClient(AbstractTembaClient):
         params = self._build_params(label=label, value_type=value_type)
         return Field.deserialize(self._post('fields', params))
 
+    def create_flow(self, name, _type, definition=None):
+        """
+        Creates a new flow
+
+        :param str name: flow name
+        :param str _type: flow type: F, M or V
+        :param dict definition: dictionary containing the flow definition
+        :return: the new flow
+        """
+        params = self._build_params(name=name, flow_type=_type, definition=definition)
+        return Flow.deserialize(self._post('flows', params))
+
     def create_label(self, name, parent):
         """
         Creates a new message label
@@ -302,6 +314,19 @@ class TembaClient(AbstractTembaClient):
         """
         params = self._build_params(uuid=uuid, name=name, urns=urns, fields=fields, group_uuids=groups)
         return Contact.deserialize(self._post('contacts', params))
+
+    def update_flow(self, uuid, name, _type, definition=None):
+        """
+        Updates an existing flow
+
+        :param str uuid: flow UUID
+        :param str name: flow name
+        :param str _type: flow type: F, M or V
+        :param dict definition: dictionary containing the flow definition
+        :return: the updated flow
+        """
+        params = self._build_params(uuid=uuid, name=name, flow_type=_type, definition=definition)
+        return Flow.deserialize(self._post('flows', params))
 
     def update_label(self, uuid, name, parent_uuid):
         """
