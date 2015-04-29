@@ -68,6 +68,7 @@ class Message(TembaObject):
     type = SimpleField()
     labels = SimpleField()
     direction = SimpleField()
+    archived = SimpleField()
     text = SimpleField()
     created_on = DatetimeField()
     delivered_on = DatetimeField()

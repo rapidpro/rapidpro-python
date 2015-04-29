@@ -14,6 +14,7 @@
             "relayer_phone": "+250780000000",
             "phone": "+250700000001",
             "direction": "I",
+            "archived": false,
             "text": "Hello \u0633.",
             "created_on": "2014-12-12T13:34:44Z",
             "sent_on": null,

@@ -421,6 +421,7 @@ class TembaClientTest(unittest.TestCase):
                                  before=datetime.datetime(2014, 12, 12, 22, 34, 36, 123000, pytz.utc),
                                  after=datetime.datetime(2014, 12, 12, 22, 34, 36, 234000, pytz.utc),
                                  text='heists',
+                                 archived=False,
                                  reverse=True)
 
         self.assert_request(mock_request, 'get', 'messages', params={'id': [123, 234],
@@ -430,6 +431,7 @@ class TembaClientTest(unittest.TestCase):
                                                                      'before': '2014-12-12T22:34:36.123000',
                                                                      'after': '2014-12-12T22:34:36.234000',
                                                                      'text': 'heists',
+                                                                     'archived': 0,
                                                                      'reverse': 1})
 
     def test_get_run(self, mock_request):
