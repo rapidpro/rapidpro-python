@@ -247,7 +247,7 @@ class TembaClient(AbstractTembaClient):
         return Message.deserialize(self._get_single('messages', {'id': _id}))
 
     def get_messages(self, ids=None, broadcasts=None, urns=None, contacts=None, groups=None, statuses=None,
-                     direction=None, _types=None, labels=None, labels_all=None, before=None, after=None, text=None,
+                     direction=None, _types=None, labels=None, before=None, after=None, text=None,
                      archived=None, reverse=None, pager=None):
         """
         Gets all matching messages
@@ -260,8 +260,7 @@ class TembaClient(AbstractTembaClient):
         :param list[str] statuses: list of message statuses
         :param str direction: message direction (I or O)
         :param list[str] _types: list of message types
-        :param list[str] labels: list of message labels (match ANY in list)
-        :param list[str] labels_all: list of message labels (match ALL in list)
+        :param list[str] labels: list of message labels. Prefix the label name with + to require it and with - to exclude it.
         :param datetime before: created before
         :param datetime after: created after
         :param str text: containing text
@@ -272,8 +271,7 @@ class TembaClient(AbstractTembaClient):
         """
         params = self._build_params(id=ids, broadcast=broadcasts,
                                     urns=urns, contact=contacts, group_uuids=groups,
-                                    status=statuses, direction=direction, type=_types,
-                                    label=labels, label_all=labels_all,
+                                    status=statuses, direction=direction, type=_types, label=labels,
                                     before=before, after=after, text=text, archived=archived, reverse=reverse)
         return Message.deserialize_list(self._get_multiple('messages', params, pager))
 
