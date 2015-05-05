@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(
-    name='RapidPro Python Client',
+    name='rapidpro-python',
     version='0.1',
     description='Python client library for the RapidPro',
     author='Nyaruka',
