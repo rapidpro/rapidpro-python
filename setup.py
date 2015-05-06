@@ -11,5 +11,5 @@ setup(
     packages=['temba'],
     install_requires=['pytz', 'requests'],
     test_suite='nose.collector',
-    tests_require=['nose'],
+    tests_require=['nose', 'mock'],
 )

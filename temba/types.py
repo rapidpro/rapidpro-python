@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from .base import TembaObject, SimpleField, IntegerField, DatetimeField, ObjectListField
+from .base import TembaObject, SimpleField, IntegerField, DatetimeField, ObjectListField, ObjectField
 
 
 class Broadcast(TembaObject):
@@ -118,3 +118,17 @@ class Run(TembaObject):
         run.values = last_only
 
         return run
+
+
+class Geometry(TembaObject):
+    type = SimpleField()
+    coordinates = SimpleField()
+
+
+class Boundary(TembaObject):
+    boundary = SimpleField()
+    name = SimpleField()
+    level = IntegerField()
+    parent = SimpleField()
+    geometry = ObjectField(item_class=Geometry)
+

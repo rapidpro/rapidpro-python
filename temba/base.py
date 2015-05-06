@@ -175,11 +175,16 @@ class DatetimeField(TembaField):
         return parse_iso8601(value)
 
 
-class ObjectListField(TembaField):
+class ObjectField(TembaField):
     def __init__(self, item_class, src=None):
-        super(ObjectListField, self).__init__(src)
+        super(ObjectField, self).__init__(src)
         self.item_class = item_class
 
+    def deserialize(self, value):
+        return self.item_class.deserialize(value)
+
+
+class ObjectListField(ObjectField):
     def deserialize(self, value):
         if not isinstance(value, list):
             raise TembaException("Value '%s' field is not a list" % unicode(value))

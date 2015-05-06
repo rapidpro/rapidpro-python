@@ -490,6 +490,28 @@ class TembaClientTest(unittest.TestCase):
                                                                  'after': '2014-12-12T22:34:36.978000',
                                                                  'before': '2014-12-12T22:56:58.917000'})
 
+    def test_get_boundaries(self, mock_request):
+        mock_request.return_value = MockResponse(200, _read_json('boundaries'))
+        boundaries = self.client.get_boundaries()
+
+        self.assert_request(mock_request, 'get', 'boundaries')
+
+        self.assertEqual(len(boundaries), 2)
+        boundary1 = boundaries[0]
+        boundary2 = boundaries[1]
+
+        self.assertEqual(boundary1.boundary, "R195269")
+        self.assertEqual(boundary1.name, "Burundi")
+        self.assertEqual(boundary1.level, 0)
+        self.assertFalse(boundary1.parent)
+        self.assertEqual(boundary1.geometry.type, "MultiPolygon")
+        self.assertIsInstance(boundary1.geometry.coordinates, list)
+
+        self.assertEqual(boundary2.level, 1)
+        self.assertEqual(boundary2.parent, "R195269")
+
+
+
     def test_update_contact(self, mock_request):
         mock_request.return_value = MockResponse(200, _read_json('contacts_created'))
         contact = self.client.update_contact('bfff9984-38f4-4e59-998d-3663ec3c650d',
