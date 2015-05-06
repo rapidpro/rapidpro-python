@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from .base import AbstractTembaClient
-from .types import Broadcast, Contact, Group, Field, Flow, Label, Message, Run
+from .types import Broadcast, Contact, Group, Field, Flow, Label, Message, Run, Boundary
 
 
 class TembaClient(AbstractTembaClient):
@@ -298,6 +298,16 @@ class TembaClient(AbstractTembaClient):
         """
         params = self._build_params(run=ids, flow_uuid=flows, group_uuids=groups, before=before, after=after)
         return Run.deserialize_list(self._get_multiple('runs', params, pager))
+
+    def get_boundaries(self, pager=None):
+        """
+        Gets all boundaries
+
+        :param object pager: pager for paged results
+        :return: list of boundaries
+        """
+        return Boundary.deserialize_list(self._get_multiple('boundaries', {}, pager))
+
 
     # ==================================================================================================================
     # Update object operations
