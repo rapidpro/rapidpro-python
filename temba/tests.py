@@ -505,7 +505,7 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(boundary1.level, 0)
         self.assertFalse(boundary1.parent)
         self.assertEqual(boundary1.geometry.type, "MultiPolygon")
-        self.assertTrue(isinstance(boundary1.geometry.coordinates, list))
+        self.assertIsInstance(boundary1.geometry.coordinates, list)
 
         self.assertEqual(boundary2.level, 1)
         self.assertEqual(boundary2.parent, "R195269")
