@@ -8,7 +8,7 @@ import unittest
 
 from mock import patch
 from . import TembaClient
-from .base import TembaObject, SimpleField, DatetimeField
+from .base import TembaObject, SimpleField, DatetimeField, TembaException
 from .base import TembaNoSuchObjectError, TembaMultipleResultsError, TembaAPIError
 from .types import Group
 from .utils import format_iso8601, parse_iso8601
@@ -510,6 +510,24 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(boundary2.level, 1)
         self.assertEqual(boundary2.parent, "R195269")
 
+    def test_get_flow_results(self, mock_request):
+        mock_request.return_value = MockResponse(200, _read_json('flow_results_missing_optional'))
+        flow_results = self.client.get_flow_results()
+
+        flow_result = flow_results[0]
+
+        self.assertIsNone(flow_result.boundary)
+        self.assertEqual(flow_result.categories[0].label, "Male")
+        self.assertEqual(flow_result.categories[0].count, 2)
+        self.assertEqual(flow_result.categories[1].label, "Female")
+        self.assertEqual(flow_result.categories[1].count, 5)
+        self.assertEqual(flow_result.set, 7)
+        self.assertEqual(flow_result.unset, 3)
+        self.assertEqual(flow_result.label, "All")
+        self.assertIsNone(flow_result.open_ended)
+
+        mock_request.return_value = MockResponse(200, _read_json('flow_results_missing_required'))
+        self.assertRaises(TembaException, self.client.get_flow_results)
 
 
     def test_update_contact(self, mock_request):
