@@ -42,7 +42,7 @@ class FlowRuleSet(TembaObject):
 
 
 class Flow(TembaObject):
-    uuid = SimpleField(optional=True)
+    uuid = SimpleField()
     name = SimpleField()
     archived = SimpleField()
     labels = SimpleField()
