@@ -1,0 +1,61 @@
+{
+    "count": 2,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "boundary": "R195269",
+            "name": "Burundi",
+            "level": 0,
+            "parent": null,
+            "geometry": {
+                "type": "MultiPolygon",
+                "coordinates": [
+                    [
+                        [
+                            [
+                                30.2140541,
+                                -3.990247
+                            ],
+                            [
+                                30.2291985,
+                                -4.0145059
+                            ],
+                            [
+                                30.1913548,
+                                -4.0508509
+                            ]
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "boundary": "R195270",
+            "name": "Bujumbura",
+            "level": 1,
+            "parent": "R195269",
+            "geometry": {
+                "type": "MultiPolygon",
+                "coordinates": [
+                    [
+                        [
+                            [
+                                29.5025959,
+                                -3.2634468
+                            ],
+                            [
+                                29.4886074,
+                                -3.2496493
+                            ],
+                            [
+                                29.4170303,
+                                -3.2721906
+                            ]
+                        ]
+                    ]
+                ]
+            }
+        }
+    ]
+}

@@ -5,14 +5,13 @@
     "results": [
         {
             "id": 13441143,
+            "broadcast": null,
             "contact": "92fc2eee-a19a-4589-81b6-1366d2b1cb12",
             "urn": "tel:+250700000001",
             "status": "H",
             "type": "F",
             "labels": ["Important"],
             "relayer": 101,
-            "relayer_phone": "+250780000000",
-            "phone": "+250700000001",
             "direction": "I",
             "archived": false,
             "text": "Hello \u0633.",

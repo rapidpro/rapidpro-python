@@ -125,6 +125,26 @@ class TembaClientTest(unittest.TestCase):
         # check deleting a non-existent contact
         mock_request.return_value = MockResponse(404, 'NOT FOUND')
         self.assertRaises(TembaAPIError, self.client.delete_contact, 'bfff9984-38f4-4e59-998d-3663ec3c650d')
+        
+    def test_get_boundaries(self, mock_request):
+        mock_request.return_value = MockResponse(200, _read_json('boundaries_multiple'))
+        boundaries = self.client.get_boundaries()
+
+        self.assert_request(mock_request, 'get', 'boundaries')
+
+        self.assertEqual(len(boundaries), 2)
+        boundary1 = boundaries[0]
+        boundary2 = boundaries[1]
+
+        self.assertEqual(boundary1.boundary, "R195269")
+        self.assertEqual(boundary1.name, "Burundi")
+        self.assertEqual(boundary1.level, 0)
+        self.assertFalse(boundary1.parent)
+        self.assertEqual(boundary1.geometry.type, "MultiPolygon")
+        self.assertIsInstance(boundary1.geometry.coordinates, list)
+
+        self.assertEqual(boundary2.level, 1)
+        self.assertEqual(boundary2.parent, "R195269")
 
     def test_get_broadcast(self, mock_request):
         # check single item response
@@ -385,6 +405,7 @@ class TembaClientTest(unittest.TestCase):
         self.assert_request(mock_request, 'get', 'messages', params={'id': 13441143})
 
         self.assertEqual(message.id, 13441143)
+        self.assertEqual(message.broadcast, None)
         self.assertEqual(message.contact, '92fc2eee-a19a-4589-81b6-1366d2b1cb12')
         self.assertEqual(message.urn, 'tel:+250700000001')
         self.assertEqual(message.status, 'H')
@@ -528,7 +549,6 @@ class TembaClientTest(unittest.TestCase):
 
         mock_request.return_value = MockResponse(200, _read_json('flow_results_missing_required'))
         self.assertRaises(TembaException, self.client.get_flow_results)
-
 
     def test_update_contact(self, mock_request):
         mock_request.return_value = MockResponse(200, _read_json('contacts_created'))
