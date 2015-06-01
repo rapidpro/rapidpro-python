@@ -1,6 +1,8 @@
 RapidPro Python Client
 ======================
 
+![Build Status](https://travis-ci.org/rapidpro/rapidpro-python.svg?branch=master)
+
 Official Python client library for the [RapidPro](http://rapidpro.github.io/rapidpro/). 
 Visit [here](http://rapidpro-python.readthedocs.org/) for complete documentation.
 
