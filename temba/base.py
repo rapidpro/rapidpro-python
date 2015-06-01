@@ -13,10 +13,10 @@ from .utils import format_iso8601, parse_iso8601
 # =====================================================================
 
 class TembaException(Exception):
-    def __unicode__(self):
+    def __unicode__(self):  # pragma: no cover
         return self.message
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         return str(self.__unicode__())
 
 
@@ -154,7 +154,7 @@ class TembaField(object):
         self.optional = optional
 
     @abstractmethod
-    def deserialize(self, value):
+    def deserialize(self, value):  # pragma: no cover
         pass
 
 
@@ -300,7 +300,7 @@ class AbstractTembaClient(object):
                    'Accept': 'application/json',
                    'Authorization': 'Token %s' % self.token}
 
-        if self.debug:
+        if self.debug:  # pragma: no cover
             print "%s %s %s" % (method.upper(), url, json.dumps(params if params else body))
 
         try:
@@ -312,7 +312,7 @@ class AbstractTembaClient(object):
 
             response = request(method, url, **kwargs)
 
-            if self.debug:
+            if self.debug:  # pragma: no cover
                 print " -> %s" % response.content
 
             response.raise_for_status()
@@ -357,9 +357,10 @@ class AbstractTembaClient(object):
             return value
 
 
-def request(method, url, **kwargs):
+def request(method, url, **kwargs):  # pragma: no cover
     """
-    For the purposes of testing, all calls to requests.request go through here before JSON bodies are encoded
+    For the purposes of testing, all calls to requests.request go through here before JSON bodies are encoded. It's
+    easier to mock this and verify request data before it's encoded.
     """
     if 'data' in kwargs:
         kwargs['data'] = json.dumps(kwargs['data'])

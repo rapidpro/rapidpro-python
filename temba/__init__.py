@@ -108,6 +108,15 @@ class TembaClient(AbstractTembaClient):
     # Fetch object(s) operations
     # ==================================================================================================================
 
+    def get_boundaries(self, pager=None):
+        """
+        Gets all boundaries
+
+        :param object pager: pager for paged results
+        :return: list of boundaries
+        """
+        return Boundary.deserialize_list(self._get_multiple('boundaries', {}, pager))
+
     def get_broadcast(self, _id):
         """
         Gets a single broadcast by its id
@@ -275,6 +284,21 @@ class TembaClient(AbstractTembaClient):
                                     before=before, after=after, text=text, archived=archived, reverse=reverse)
         return Message.deserialize_list(self._get_multiple('messages', params, pager))
 
+    def get_results(self, ruleset=None, contact_field=None, segment=None):
+        """
+        Gets all flow results for the passed in ruleset or contact field with an optional segment
+
+        :param ruleset: a ruleset uuid
+        :param contact_field: a contact field label
+        :param segment:  segments are expected in these formats instead:
+               { ruleset: 1515, categories: ["Red", "Blue"] }  // segmenting by another field, for those categories
+               { groups: 124,151,151 }                         // segment by each each group in the passed in ids
+               { location: "State", parent: null }             // segment for each admin boundary within the parent
+        :return: segmented results
+        """
+        params = self._build_params(ruleset=ruleset, contact_field=contact_field, segment=segment)
+        return FlowResult.deserialize_list(self._get_all('results', params))
+
     def get_run(self, _id):
         """
         Gets a single flow run by its id
@@ -298,30 +322,6 @@ class TembaClient(AbstractTembaClient):
         """
         params = self._build_params(run=ids, flow_uuid=flows, group_uuids=groups, before=before, after=after)
         return Run.deserialize_list(self._get_multiple('runs', params, pager))
-
-    def get_boundaries(self, pager=None):
-        """
-        Gets all boundaries
-
-        :param object pager: pager for paged results
-        :return: list of boundaries
-        """
-        return Boundary.deserialize_list(self._get_multiple('boundaries', {}, pager))
-
-    def get_flow_results(self, ruleset=None, contact_field=None, segment=None):
-        """
-        Gets all flow results for the passed in ruleset or contact field with an optional segment
-        :param ruleset: a ruleset uuid
-        :param contact_field: a contact fieurlld label
-        :param segment:  segments are expected in these formats instead:
-               { ruleset: 1515, categories: ["Red", "Blue"] }  // segmenting by another field, for those categories
-               { groups: 124,151,151 }                         // segment by each each group in the passed in ids
-               { location: "State", parent: null }             // segment for each admin boundary within the parent
-        :return: segmented results
-        """
-
-        params = self._build_params(ruleset=ruleset, contact_field=contact_field, segment=segment)
-        return FlowResult.deserialize_list(self._get_all('results', params))
 
     # ==================================================================================================================
     # Update object operations

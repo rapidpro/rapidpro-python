@@ -8,7 +8,7 @@ import unittest
 
 from mock import patch
 from . import TembaClient
-from .base import TembaObject, SimpleField, DatetimeField, TembaException
+from .base import TembaObject, SimpleField, IntegerField, DatetimeField, ObjectListField, TembaException
 from .base import TembaNoSuchObjectError, TembaMultipleResultsError, TembaAPIError
 from .types import Group
 from .utils import format_iso8601, parse_iso8601
@@ -44,6 +44,13 @@ class TembaClientTest(unittest.TestCase):
 
     def setUp(self):
         self.client = TembaClient('example.com', '1234567890')
+
+    def test_archive_messages(self, mock_request):
+        mock_request.return_value = MockResponse(204)
+        self.client.archive_messages(messages=[123, 234, 345])
+
+        expected_body = {'messages': [123, 234, 345], 'action': 'archive'}
+        self.assert_request(mock_request, 'post', 'message_actions', data=expected_body)
 
     def test_create_broadcast(self, mock_request):
         # check by group UUID
@@ -91,6 +98,16 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(field.label, "Chat Name")
         self.assertEqual(field.value_type, 'T')
 
+    def test_create_flow(self, mock_request):
+        mock_request.return_value = MockResponse(200, _read_json('flows_created'))
+        flow = self.client.create_flow("Ping", 'F')
+
+        expected_body = {'name': "Ping", 'flow_type': 'F'}
+        self.assert_request(mock_request, 'post', 'flows', data=expected_body)
+
+        self.assertEqual(flow.uuid, 'a68567fa-ad95-45fc-b5f7-3ce90ebbd46d')
+        self.assertEqual(flow.name, "Ping")
+
     def test_create_label(self, mock_request):
         mock_request.return_value = MockResponse(200, _read_json('labels_created'))
         label = self.client.create_label("Really High Priority", '946c930d-83b1-4982-a797-9f0c0cc554de')
@@ -125,6 +142,13 @@ class TembaClientTest(unittest.TestCase):
         # check deleting a non-existent contact
         mock_request.return_value = MockResponse(404, 'NOT FOUND')
         self.assertRaises(TembaAPIError, self.client.delete_contact, 'bfff9984-38f4-4e59-998d-3663ec3c650d')
+
+    def test_delete_messages(self, mock_request):
+        mock_request.return_value = MockResponse(204)
+        self.client.delete_messages(messages=[123, 234, 345])
+
+        expected_body = {'messages': [123, 234, 345], 'action': 'delete'}
+        self.assert_request(mock_request, 'post', 'message_actions', data=expected_body)
         
     def test_get_boundaries(self, mock_request):
         mock_request.return_value = MockResponse(200, _read_json('boundaries_multiple'))
@@ -397,7 +421,7 @@ class TembaClientTest(unittest.TestCase):
         self.client.get_labels(name="Priority")
         self.assert_request(mock_request, 'get', 'labels', params={'name': 'Priority'})
 
-    def get_message(self, mock_request):
+    def test_get_message(self, mock_request):
         # check single item response
         mock_request.return_value = MockResponse(200, _read_json('messages_single'))
         message = self.client.get_message(13441143)
@@ -455,6 +479,25 @@ class TembaClientTest(unittest.TestCase):
                                                                      'archived': 0,
                                                                      'reverse': 1})
 
+    def test_get_results(self, mock_request):
+        mock_request.return_value = MockResponse(200, _read_json('results_missing_optional'))
+        results = self.client.get_results(ruleset='aabe7d0f-bf27-4e76-a6b3-4d26ec18dd58')
+
+        self.assert_request(mock_request, 'get', 'results', params={'ruleset': 'aabe7d0f-bf27-4e76-a6b3-4d26ec18dd58'})
+
+        self.assertEqual(results[0].boundary, None)
+        self.assertEqual(results[0].categories[0].label, "Male")
+        self.assertEqual(results[0].categories[0].count, 2)
+        self.assertEqual(results[0].categories[1].label, "Female")
+        self.assertEqual(results[0].categories[1].count, 5)
+        self.assertEqual(results[0].set, 7)
+        self.assertEqual(results[0].unset, 3)
+        self.assertEqual(results[0].label, "All")
+        self.assertEqual(results[0].open_ended, None)
+
+        mock_request.return_value = MockResponse(200, _read_json('results_missing_required'))
+        self.assertRaises(TembaException, self.client.get_results)
+
     def test_get_run(self, mock_request):
         # check single item response
         mock_request.return_value = MockResponse(200, _read_json('runs_single'))
@@ -511,44 +554,27 @@ class TembaClientTest(unittest.TestCase):
                                                                  'after': '2014-12-12T22:34:36.978000',
                                                                  'before': '2014-12-12T22:56:58.917000'})
 
-    def test_get_boundaries(self, mock_request):
-        mock_request.return_value = MockResponse(200, _read_json('boundaries'))
-        boundaries = self.client.get_boundaries()
+    def test_label_messages(self, mock_request):
+        mock_request.return_value = MockResponse(204)
+        self.client.label_messages(messages=[123, 234, 345], label="Test")
 
-        self.assert_request(mock_request, 'get', 'boundaries')
+        expected_body = {'messages': [123, 234, 345], 'action': 'label', 'label': "Test"}
+        self.assert_request(mock_request, 'post', 'message_actions', data=expected_body)
 
-        self.assertEqual(len(boundaries), 2)
-        boundary1 = boundaries[0]
-        boundary2 = boundaries[1]
+    def test_unarchive_messages(self, mock_request):
+        mock_request.return_value = MockResponse(204)
+        self.client.unarchive_messages(messages=[123, 234, 345])
 
-        self.assertEqual(boundary1.boundary, "R195269")
-        self.assertEqual(boundary1.name, "Burundi")
-        self.assertEqual(boundary1.level, 0)
-        self.assertFalse(boundary1.parent)
-        self.assertEqual(boundary1.geometry.type, "MultiPolygon")
-        self.assertIsInstance(boundary1.geometry.coordinates, list)
+        expected_body = {'messages': [123, 234, 345], 'action': 'unarchive'}
+        self.assert_request(mock_request, 'post', 'message_actions', data=expected_body)
 
-        self.assertEqual(boundary2.level, 1)
-        self.assertEqual(boundary2.parent, "R195269")
+    def test_unlabel_messages(self, mock_request):
+        mock_request.return_value = MockResponse(204)
+        self.client.unlabel_messages(messages=[123, 234, 345], label_uuid='affa6685-0725-49c7-a15a-96f301d996e4')
 
-    def test_get_flow_results(self, mock_request):
-        mock_request.return_value = MockResponse(200, _read_json('flow_results_missing_optional'))
-        flow_results = self.client.get_flow_results()
-
-        flow_result = flow_results[0]
-
-        self.assertIsNone(flow_result.boundary)
-        self.assertEqual(flow_result.categories[0].label, "Male")
-        self.assertEqual(flow_result.categories[0].count, 2)
-        self.assertEqual(flow_result.categories[1].label, "Female")
-        self.assertEqual(flow_result.categories[1].count, 5)
-        self.assertEqual(flow_result.set, 7)
-        self.assertEqual(flow_result.unset, 3)
-        self.assertEqual(flow_result.label, "All")
-        self.assertIsNone(flow_result.open_ended)
-
-        mock_request.return_value = MockResponse(200, _read_json('flow_results_missing_required'))
-        self.assertRaises(TembaException, self.client.get_flow_results)
+        expected_body = {'messages': [123, 234, 345], 'action': 'unlabel',
+                         'label_uuid': 'affa6685-0725-49c7-a15a-96f301d996e4'}
+        self.assert_request(mock_request, 'post', 'message_actions', data=expected_body)
 
     def test_update_contact(self, mock_request):
         mock_request.return_value = MockResponse(200, _read_json('contacts_created'))
@@ -585,41 +611,19 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(flow.uuid, 'a68567fa-ad95-45fc-b5f7-3ce90ebbd46d')
         self.assertEqual(flow.name, "Ping")
 
-    def test_label_messages(self, mock_request):
-        mock_request.return_value = MockResponse(204)
-        self.client.label_messages(messages=[123, 234, 345], label="Test")
+    def test_update_label(self, mock_request):
+        mock_request.return_value = MockResponse(200, _read_json('labels_created'))
+        label = self.client.update_label('affa6685-0725-49c7-a15a-96f301d996e4',
+                                         "Really High Priority", '946c930d-83b1-4982-a797-9f0c0cc554de')
 
-        expected_body = {'messages': [123, 234, 345], 'action': 'label', 'label': "Test"}
-        self.assert_request(mock_request, 'post', 'message_actions', data=expected_body)
+        expected_body = {'uuid': 'affa6685-0725-49c7-a15a-96f301d996e4',
+                         'name': "Really High Priority",
+                         'parent': '946c930d-83b1-4982-a797-9f0c0cc554de'}
+        self.assert_request(mock_request, 'post', 'labels', data=expected_body)
 
-    def test_unlabel_messages(self, mock_request):
-        mock_request.return_value = MockResponse(204)
-        self.client.unlabel_messages(messages=[123, 234, 345], label_uuid='affa6685-0725-49c7-a15a-96f301d996e4')
-
-        expected_body = {'messages': [123, 234, 345], 'action': 'unlabel',
-                         'label_uuid': 'affa6685-0725-49c7-a15a-96f301d996e4'}
-        self.assert_request(mock_request, 'post', 'message_actions', data=expected_body)
-
-    def test_archive_messages(self, mock_request):
-        mock_request.return_value = MockResponse(204)
-        self.client.archive_messages(messages=[123, 234, 345])
-
-        expected_body = {'messages': [123, 234, 345], 'action': 'archive'}
-        self.assert_request(mock_request, 'post', 'message_actions', data=expected_body)
-
-    def test_unarchive_messages(self, mock_request):
-        mock_request.return_value = MockResponse(204)
-        self.client.unarchive_messages(messages=[123, 234, 345])
-
-        expected_body = {'messages': [123, 234, 345], 'action': 'unarchive'}
-        self.assert_request(mock_request, 'post', 'message_actions', data=expected_body)
-
-    def test_delete_messages(self, mock_request):
-        mock_request.return_value = MockResponse(204)
-        self.client.delete_messages(messages=[123, 234, 345])
-
-        expected_body = {'messages': [123, 234, 345], 'action': 'delete'}
-        self.assert_request(mock_request, 'post', 'message_actions', data=expected_body)
+        self.assertEqual(label.uuid, 'affa6685-0725-49c7-a15a-96f301d996e4')
+        self.assertEqual(label.name, "Really High Priority")
+        self.assertEqual(label.parent, '946c930d-83b1-4982-a797-9f0c0cc554de')
 
     def assert_request(self, mock, method, endpoint, **kwargs):
         """
@@ -649,26 +653,54 @@ class UtilsTest(unittest.TestCase):
         self.assertEqual(format_iso8601(d), '2014-01-02T08:04:05.000006')
 
     def test_parse_iso8601(self):
-        d = datetime.datetime(2014, 1, 2, 3, 4, 5, 0, pytz.UTC)
-        self.assertEqual(parse_iso8601('2014-01-02T03:04:05.000000Z'), d)
-        self.assertEqual(parse_iso8601('2014-01-02T03:04:05.000000'), d)
-        self.assertEqual(parse_iso8601('2014-01-02T03:04:05'), d)
+        dt = datetime.datetime(2014, 1, 2, 3, 4, 5, 0, pytz.UTC)
+        self.assertEqual(parse_iso8601('2014-01-02T03:04:05.000000Z'), dt)
+        self.assertEqual(parse_iso8601('2014-01-02T03:04:05.000000'), dt)
+        self.assertEqual(parse_iso8601('2014-01-02T03:04:05'), dt)
+
+        d = datetime.datetime(2014, 1, 2, 0, 0, 0, 0, pytz.UTC)
+        self.assertEqual(parse_iso8601('2014-01-02'), d)
+
+
+
+class TestSubType(TembaObject):
+    zed = SimpleField()
+
+
+class TestType(TembaObject):
+    foo = SimpleField()
+    bar = IntegerField()
+    doh = DatetimeField()
+    hum = ObjectListField(item_class=TestSubType)
 
 
 class TembaObjectTest(unittest.TestCase):
-    class TestType(TembaObject):
-        foo = SimpleField()
-        bar = DatetimeField()
-
     def test_create(self):
-        obj = TembaObjectTest.TestType.create(foo=123, bar="abc")
-        self.assertEqual(obj.foo, 123)
-        self.assertEqual(obj.bar, "abc")
-        obj = TembaObjectTest.TestType.create(foo=123)
-        self.assertEqual(obj.foo, 123)
-        self.assertIsNone(obj.bar)
+        # unspecified fields become None
+        obj = TestType.create(foo='a', bar=123)
+        self.assertEqual(obj.foo, 'a')
+        self.assertEqual(obj.bar, 123)
+        self.assertEqual(obj.doh, None)
+        self.assertEqual(obj.hum, None)
 
-        self.assertRaises(ValueError, TembaObjectTest.TestType.create, foo=123, xyz="abc")
+        # exception if field doesn't exist
+        self.assertRaises(ValueError, TestType.create, foo='a', xyz="abc")
+
+    def test_deserialize(self):
+        obj = TestType.deserialize({'foo': 'a', 'bar': 123, 'doh': '2014-01-02T03:04:05', 'hum': [{'zed': 'b'}]})
+        self.assertEqual(obj.foo, 'a')
+        self.assertEqual(obj.bar, 123)
+        self.assertEqual(obj.doh, datetime.datetime(2014, 1, 2, 3, 4, 5, 0, pytz.UTC))
+        self.assertEqual(len(obj.hum), 1)
+        self.assertEqual(obj.hum[0].zed, 'b')
+
+        # exception when integer field receives non-number
+        self.assertRaises(TembaException, TestType.deserialize,
+                          {'foo': 'a', 'bar': 'x', 'doh': '2014-01-02T03:04:05', 'hum': []})
+
+        # exception when object list field receives non-list
+        self.assertRaises(TembaException, TestType.deserialize,
+                          {'foo': 'a', 'bar': 'x', 'doh': '2014-01-02T03:04:05', 'hum': {}})
 
 
 def _read_json(filename):
