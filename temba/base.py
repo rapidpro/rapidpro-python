@@ -123,10 +123,10 @@ class TembaObject(object):
         for attr_name, field in cls._get_fields().iteritems():
             field_source = field.src if field.src else attr_name
 
-            if field_source not in item:
+            if field_source not in item and not field.optional:
                 raise TembaException("Serialized %s item is missing field '%s'" % (cls.__name__, field_source))
 
-            field_value = item[field_source]
+            field_value = item.get(field_source, None)
             attr_value = field.deserialize(field_value)
 
             setattr(instance, attr_name, attr_value)
@@ -149,8 +149,9 @@ class TembaObject(object):
 class TembaField(object):
     __metaclass__ = ABCMeta
 
-    def __init__(self, src=None):
+    def __init__(self, src=None, optional=False):
         self.src = src
+        self.optional = optional
 
     @abstractmethod
     def deserialize(self, value):
@@ -159,6 +160,7 @@ class TembaField(object):
 
 class SimpleField(TembaField):
     def deserialize(self, value):
+
         return value
 
 
@@ -272,7 +274,7 @@ class AbstractTembaClient(object):
         while url:
             response = self._request('get', url, params=params)
             results += response['results']
-            url = response['next']
+            url = response.get('next', None)
 
         return results
 

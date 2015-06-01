@@ -1,0 +1,19 @@
+{
+  "results": [
+    {
+      "categories": [
+        {
+          "count": 2,
+          "label": "Male"
+        },
+        {
+          "count": 5,
+          "label": "Female"
+        }
+      ],
+      "open_ended": null,
+      "set": 7,
+      "unset": 3
+    }
+  ]
+}

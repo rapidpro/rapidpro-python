@@ -133,3 +133,16 @@ class Boundary(TembaObject):
     parent = SimpleField()
     geometry = ObjectField(item_class=Geometry)
 
+
+class CategoryStats(TembaObject):
+    count = IntegerField()
+    label = SimpleField()
+
+
+class FlowResult(TembaObject):
+    boundary = SimpleField(optional=True)
+    set = IntegerField()
+    unset = IntegerField()
+    open_ended = SimpleField()
+    label = SimpleField()
+    categories = ObjectListField(item_class=CategoryStats)
