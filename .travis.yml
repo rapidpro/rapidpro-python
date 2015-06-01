@@ -1,0 +1,15 @@
+language: python
+python:
+- '2.7'
+sudo: false
+cache:
+  directories:
+  - $HOME/.cache/pip
+install:
+- pip install --upgrade pip
+- pip install -r pip-requires.txt --upgrade
+- pip install coveralls
+script:
+- nosetests --with-coverage --cover-erase --cover-package=temba
+after_success:
+- coveralls
