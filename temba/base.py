@@ -16,7 +16,7 @@ class TembaException(Exception):
     def __unicode__(self):  # pragma: no cover
         return self.message
 
-    def __str__(self):  # pragma: no cover
+    def __str__(self):
         return str(self.__unicode__())
 
 
@@ -34,32 +34,26 @@ class TembaAPIError(TembaException):
     """
     message = "API request error"
 
-    def __init__(self, caused_by=None):
+    def __init__(self, caused_by):
         self.caused_by = caused_by
+        self.errors = {}
 
         # if error was caused by a HTTP 400 response, we may have a useful validation error
         if isinstance(caused_by, requests.HTTPError) and caused_by.response.status_code == 400:
-            message = self._extract_errors(caused_by.response)
-            if message:
-                self.caused_by = message
-
-    @staticmethod
-    def _extract_errors(response):
-        try:
-            errors = response.json()
-            msgs = []
-            for field, field_errors in errors.iteritems():
-                for error in field_errors:
-                    msgs.append(error)
-            return ". ".join(msgs)
-        except Exception:
-            return None
+            try:
+                self.errors = caused_by.response.json()
+            except ValueError:
+                pass
 
     def __unicode__(self):
-        if self.caused_by:
-            return "%s. Caused by: %s" % (self.message, self.caused_by)
+        if self.errors:
+            msgs = []
+            for field, field_errors in self.errors.iteritems():
+                for error in field_errors:
+                    msgs.append(error)
+            return "%s. Caused by: %s" % (self.message, ". ".join(msgs))
         else:
-            return self.message
+            return "%s. Caused by: %s" % (self.message, unicode(self.caused_by))
 
 
 class TembaConnectionError(TembaException):
@@ -203,11 +197,14 @@ class AbstractTembaClient(object):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, host, token, ssl=True, debug=False):
+    def __init__(self, host, token, debug=False):
         if host.startswith('http'):
-            self.root_url = host
+            if host.endswith('/'):
+                self.root_url = host[:-1]
+            else:
+                self.root_url = host
         else:
-            self.root_url = '%s://%s/api/v1' % ('https' if ssl else 'http', host)
+            self.root_url = 'https://%s/api/v1' % host
 
         self.token = token
         self.debug = debug

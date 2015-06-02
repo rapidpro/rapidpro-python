@@ -9,8 +9,8 @@ import unittest
 from mock import patch
 from . import TembaClient
 from .base import TembaObject, SimpleField, IntegerField, DatetimeField, ObjectListField, TembaException
-from .base import TembaNoSuchObjectError, TembaMultipleResultsError, TembaAPIError
-from .types import Group
+from .base import TembaNoSuchObjectError, TembaMultipleResultsError, TembaAPIError, TembaConnectionError
+from .types import Group, Broadcast
 from .utils import format_iso8601, parse_iso8601
 
 
@@ -44,6 +44,22 @@ class TembaClientTest(unittest.TestCase):
 
     def setUp(self):
         self.client = TembaClient('example.com', '1234567890')
+
+    def test_init(self, mock_request):
+        # by host and token
+        client = TembaClient('example.com', '1234567890')
+        self.assertEqual(client.root_url, 'https://example.com/api/v1')
+        self.assertEqual(client.token, '1234567890')
+
+        # by URL and token
+        client = TembaClient('http://example.com/api/v1', '1234567890')
+        self.assertEqual(client.root_url, 'http://example.com/api/v1')
+        self.assertEqual(client.token, '1234567890')
+
+        # by URL with trailing / and token
+        client = TembaClient('http://example.com/api/v1/', '1234567890')
+        self.assertEqual(client.root_url, 'http://example.com/api/v1')
+        self.assertEqual(client.token, '1234567890')
 
     def test_archive_messages(self, mock_request):
         mock_request.return_value = MockResponse(204)
@@ -276,6 +292,19 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(pager.total, 21)
         self.assertFalse(pager.has_more())
 
+        # test asking for explicit page
+        mock_request.return_value = MockResponse(200, _read_json('contacts_multipage_2'))
+        mock_request.side_effect = None
+        pager = self.client.pager(start_page=2)
+        contacts = self.client.get_contacts(pager=pager)
+        self.assertEqual(len(contacts), 10)
+
+        self.assert_request(mock_request, 'get', 'contacts', params={'page': 2})
+
+        # test with connection error
+        mock_request.side_effect = requests.exceptions.ConnectionError
+        self.assertRaises(TembaConnectionError, self.client.get_contacts)
+
     def test_get_field(self, mock_request):
         # check single item response
         mock_request.return_value = MockResponse(200, _read_json('fields_single'))
@@ -479,6 +508,12 @@ class TembaClientTest(unittest.TestCase):
                                                                      'archived': 0,
                                                                      'reverse': 1})
 
+        # test getting by broadcast object (should extract id)
+        broadcast = Broadcast.create(id=123)
+        self.client.get_messages(broadcasts=[broadcast])
+
+        self.assert_request(mock_request, 'get', 'messages', params={'broadcast': [123]})
+
     def test_get_results(self, mock_request):
         mock_request.return_value = MockResponse(200, _read_json('results_missing_optional'))
         results = self.client.get_results(ruleset='aabe7d0f-bf27-4e76-a6b3-4d26ec18dd58')
@@ -625,6 +660,29 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(label.name, "Really High Priority")
         self.assertEqual(label.parent, '946c930d-83b1-4982-a797-9f0c0cc554de')
 
+        # test when we get 400 error back
+        mock_request.return_value = MockResponse(400, '{"uuid": ["No such message label with UUID: 12345678"]}')
+
+        try:
+            self.client.update_label('12345678', "Really High Priority", '946c930d-83b1-4982-a797-9f0c0cc554de')
+        except TembaAPIError, ex:
+            self.assertEqual(ex.errors, {'uuid': ["No such message label with UUID: 12345678"]})
+            self.assertEqual(unicode(ex), "API request error. Caused by: No such message label with UUID: 12345678")
+            self.assertEqual(str(ex), "API request error. Caused by: No such message label with UUID: 12345678")
+        else:
+            self.fail("Should have thrown exception")
+
+        # test when (for some reason) we get a 400 but invalid JSON
+        mock_request.return_value = MockResponse(400, 'xyz')
+
+        try:
+            self.client.update_label('12345678', "Really High Priority", '946c930d-83b1-4982-a797-9f0c0cc554de')
+        except TembaAPIError, ex:
+            self.assertEqual(ex.errors, {})
+            self.assertEqual(unicode(ex), "API request error. Caused by: 400 Client Error: ...")
+        else:
+            self.fail("Should have thrown exception")
+
     def assert_request(self, mock, method, endpoint, **kwargs):
         """
         Asserts that a request was made to the given endpoint with the given parameters
@@ -633,14 +691,6 @@ class TembaClientTest(unittest.TestCase):
                                 headers={'Content-type': 'application/json',
                                          'Authorization': 'Token 1234567890',
                                          'Accept': u'application/json'}, **kwargs)
-
-
-@patch('requests.models.Response', MockResponse)
-class TembaExceptionTest(unittest.TestCase):
-    def test_extract_errors(self):
-        response = MockResponse(400, '{"field_1": ["Error #1", "Error #2"], "field_2": ["Error #3"]}')
-        msg = TembaAPIError._extract_errors(response)
-        self.assertTrue(msg == "Error #1. Error #2. Error #3" or msg == "Error #3. Error #1. Error #2")
 
 
 class UtilsTest(unittest.TestCase):

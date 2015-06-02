@@ -10,11 +10,10 @@ class TembaClient(AbstractTembaClient):
 
     :param str host: server hostname, e.g. 'rapidpro.io'
     :param str token: organization API token
-    :param bool ssl: use SSL
     :param bool debug: print debugging statements
     """
-    def __init__(self, host, token, ssl=True, debug=False):
-        super(TembaClient, self).__init__(host, token, ssl, debug)
+    def __init__(self, host, token, debug=False):
+        super(TembaClient, self).__init__(host, token, debug)
 
     # ==================================================================================================================
     # Create object operations
