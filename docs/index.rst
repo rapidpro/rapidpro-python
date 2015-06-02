@@ -16,6 +16,12 @@ If you don't know your API token then visit the `API Explorer <http://rapidpro.i
     from temba import TembaClient
     client = TembaClient('rapidpro.io', <YOUR-API-TOKEN>)
 
+Alternatively you can create a client from the complete URL of the API root. You can use this if you need to connect to
+a local RapidPro instance that doesn't use SSL. For example:
+
+.. code-block:: python
+
+    client = TembaClient('http://localhost:8000/api/v1', <YOUR-API-TOKEN>)
 
 Fetching Single Objects
 -----------------------
@@ -24,7 +30,7 @@ For each type, the client provides a method for fetching a single instance by it
 this will be a UUID. However for broadcasts, messages and flow runs, this will be an integer, and for fields this will
 be the key name.
 
-If the requested object is not found, then an exception is raised.
+If the requested object is not found, then a `TembaNoSuchObjectError` is raised.
 
 .. code-block:: python
 
@@ -76,16 +82,35 @@ The pager also allows you to specify a particular page to start at. For example:
     when querying for messages one could use the `before` argument with the current timestamp to ensure new messages
     aren't included.
 
-Reference:
+
+
+Error Handling
+--------------
+
+If an API request causes a validation error in RapidPro, the client call will raise a `TembaAPIError` which will contain
+the error messages for each field.
+
+.. code-block:: python
+
+    try:
+        client.update_label('invalid-uuid', name="Test", parent_uuid=None)
+    except TembaAPIError, ex:
+        for field, field_errors = ex.errors.iteritems():
+            for field_error in field_errors:
+                # TODO do something with each error message
+
+.. note::
+    Field names for errors won't always match the names of the arguments passed to the client call.
+
+If there was a connection problem then the client call will raise a `TembaConnectionError`.
+
+See Also
+==================
 
 .. toctree::
    :maxdepth: 4
 
    temba
-
-
-Indices and tables
-==================
 
 * :ref:`genindex`
 * :ref:`search`
