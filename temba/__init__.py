@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from .base import AbstractTembaClient
-from .types import Broadcast, Contact, Group, Field, Flow, Label, Message, Run, Boundary, FlowResult
+from .types import Boundary, Broadcast, Campaign, Contact, Group, Event, Field, Flow, Label, Message, Result, Run
 
 
 class TembaClient(AbstractTembaClient):
@@ -32,6 +32,17 @@ class TembaClient(AbstractTembaClient):
         params = self._build_params(text=text, urns=urns, contacts=contacts, groups=groups)
         return Broadcast.deserialize(self._post('broadcasts', params))
 
+    def create_campaign(self, name, group):
+        """
+        Creates a new campaign
+
+        :param str name: name
+        :param str group: contact group object or UUID
+        :return: the new campaign
+        """
+        params = self._build_params(name=name, group_uuid=group)
+        return Campaign.deserialize(self._post('campaigns', params))
+
     def create_contact(self, name, urns, fields, groups):
         """
         Creates a new contact
@@ -44,6 +55,23 @@ class TembaClient(AbstractTembaClient):
         """
         params = self._build_params(name=name, urns=urns, fields=fields, group_uuids=groups)
         return Contact.deserialize(self._post('contacts', params))
+
+    def create_event(self, campaign, relative_to, offset, unit, delivery_hour, message=None, flow=None):
+        """
+        Creates a new campaign event
+
+        :param str campaign: campaign object or UUID
+        :param str relative_to: label of contact field containing a date
+        :param int offset: time offset from date
+        :param str unit: one of 'M' (minutes), 'H' (hours), 'D' (days), 'W' (weeks)
+        :param int delivery_hour: hour of the day to fire event
+        :param str message: message to send (optional)
+        :param str flow: flow object or UUID to start (optional)
+        :return: the new event
+        """
+        params = self._build_params(campaign_uuid=campaign, relative_to=relative_to, offset=offset, unit=unit,
+                                    delivery_hour=delivery_hour, message=message, flow_uuid=flow)
+        return Event.deserialize(self._post('events', params))
 
     def create_field(self, label, value_type):
         """
@@ -62,7 +90,6 @@ class TembaClient(AbstractTembaClient):
 
         :param str name: flow name
         :param str _type: flow type: F, M or V
-
         :return: the new flow
         """
         params = self._build_params(name=name, flow_type=_type)
@@ -103,6 +130,14 @@ class TembaClient(AbstractTembaClient):
         """
         self._delete('contacts', self._build_params(uuid=contact))
 
+    def delete_event(self, event):
+        """
+        Deletes an existing campaign event
+
+        :param event: event object or UUID
+        """
+        self._delete('events', self._build_params(uuid=event))
+
     # ==================================================================================================================
     # Fetch object(s) operations
     # ==================================================================================================================
@@ -139,6 +174,25 @@ class TembaClient(AbstractTembaClient):
         params = self._build_params(id=ids, status=statuses, before=before, after=after)
         return Broadcast.deserialize_list(self._get_multiple('broadcasts', params, pager))
 
+    def get_campaign(self, uuid):
+        """
+        Gets a single campaign by its UUID
+
+        :param str uuid: campaign UUID
+        :return: the campaign
+        """
+        return Campaign.deserialize(self._get_single('campaigns', {'uuid': uuid}))
+
+    def get_campaigns(self, uuids=None, before=None, after=None, pager=None):
+        """
+        Gets all matching campaigns
+
+        :param list[str] uuids: list of UUIDs
+        :return: list of campaigns
+        """
+        params = self._build_params(uuid=uuids, before=before, after=after)
+        return Campaign.deserialize_list(self._get_multiple('campaigns', params, pager))
+
     def get_contact(self, uuid):
         """
         Gets a single contact by its UUID
@@ -160,6 +214,25 @@ class TembaClient(AbstractTembaClient):
         """
         params = self._build_params(uuid=uuids, urns=urns, group_uuids=groups)
         return Contact.deserialize_list(self._get_multiple('contacts', params, pager))
+
+    def get_event(self, uuid):
+        """
+        Gets a single campaign event by its UUID
+
+        :param str uuid: campaign UUID
+        :return: the event
+        """
+        return Event.deserialize(self._get_single('events', {'uuid': uuid}))
+
+    def get_events(self, uuids=None, campaigns=None, before=None, after=None, pager=None):
+        """
+        Gets all matching campaign events
+
+        :param list[str] uuids: list of UUIDs
+        :return: list of events
+        """
+        params = self._build_params(uuid=uuids, campaign_uuid=campaigns, before=before, after=after)
+        return Event.deserialize_list(self._get_multiple('events', params, pager))
 
     def get_field(self, key):
         """
@@ -296,7 +369,7 @@ class TembaClient(AbstractTembaClient):
         :return: segmented results
         """
         params = self._build_params(ruleset=ruleset, contact_field=contact_field, segment=segment)
-        return FlowResult.deserialize_list(self._get_all('results', params))
+        return Result.deserialize_list(self._get_all('results', params))
 
     def get_run(self, _id):
         """

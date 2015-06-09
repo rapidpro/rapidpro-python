@@ -13,6 +13,13 @@ class Broadcast(TembaObject):
     created_on = DatetimeField()
 
 
+class Campaign(TembaObject):
+    uuid = SimpleField()
+    name = SimpleField()
+    group = SimpleField(src='group_uuid')
+    created_on = DatetimeField()
+
+
 class Contact(TembaObject):
     uuid = SimpleField()
     name = SimpleField()
@@ -29,13 +36,25 @@ class Group(TembaObject):
     size = IntegerField()
 
 
+class Event(TembaObject):
+    uuid = SimpleField()
+    campaign = SimpleField(src='campaign_uuid')
+    relative_to = SimpleField()
+    offset = IntegerField()
+    unit = SimpleField()
+    delivery_hour = IntegerField()
+    message = SimpleField()
+    flow = SimpleField(src='flow_uuid')
+    created_on = DatetimeField()
+
+
 class Field(TembaObject):
     key = SimpleField()
     label = SimpleField()
     value_type = SimpleField()
 
 
-class FlowRuleSet(TembaObject):
+class RuleSet(TembaObject):
     uuid = SimpleField(src='node')
     label = SimpleField()
     response_type = SimpleField()
@@ -49,7 +68,7 @@ class Flow(TembaObject):
     participants = IntegerField()
     runs = IntegerField()
     completed_runs = IntegerField()
-    rulesets = ObjectListField(item_class=FlowRuleSet)
+    rulesets = ObjectListField(item_class=RuleSet)
     created_on = DatetimeField()
 
 
@@ -86,7 +105,7 @@ class RunValueSet(TembaObject):
     time = DatetimeField()
 
 
-class RunStep(TembaObject):
+class FlowStep(TembaObject):
     node = SimpleField()
     text = SimpleField()
     value = SimpleField()
@@ -99,7 +118,7 @@ class Run(TembaObject):
     id = IntegerField(src='run')
     flow = SimpleField(src='flow_uuid')
     contact = SimpleField()
-    steps = ObjectListField(item_class=RunStep)
+    steps = ObjectListField(item_class=FlowStep)
     values = ObjectListField(item_class=RunValueSet)
     created_on = DatetimeField()
     completed = SimpleField()
@@ -139,7 +158,7 @@ class CategoryStats(TembaObject):
     label = SimpleField()
 
 
-class FlowResult(TembaObject):
+class Result(TembaObject):
     boundary = SimpleField(optional=True)
     set = IntegerField()
     unset = IntegerField()

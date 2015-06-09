@@ -84,6 +84,15 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(broadcast.status, 'Q')
         self.assertEqual(broadcast.created_on, datetime.datetime(2014, 12, 12, 22, 56, 58, 917000, pytz.utc))
 
+    def test_create_campaign(self, mock_request):
+        mock_request.return_value = MockResponse(200, _read_json('campaigns_created'))
+        campaign = self.client.create_campaign("Reminders", group='591de2c3-66bb-471b-9c9a-761b49a5ca69')
+
+        expected_body = {'name': "Reminders", 'group_uuid': '591de2c3-66bb-471b-9c9a-761b49a5ca69'}
+        self.assert_request(mock_request, 'post', 'campaigns', data=expected_body)
+
+        self.assertEqual(campaign.uuid, '9ccae91f-b3f8-4c18-ad92-e795a2332c11')
+
     def test_create_contact(self, mock_request):
         mock_request.return_value = MockResponse(200, _read_json('contacts_created'))
         contact = self.client.create_contact("Amy Amanda Allen", ['tel:+250700000005'],
@@ -102,6 +111,16 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(contact.fields, {'nickname': 'Triple A'})
         self.assertEqual(contact.language, None)
         self.assertEqual(contact.modified_on, datetime.datetime(2014, 10, 1, 6, 54, 9, 817000, pytz.utc))
+
+    def test_create_event(self, mock_request):
+        mock_request.return_value = MockResponse(200, _read_json('events_created'))
+        event = self.client.create_event('9ccae91f-b3f8-4c18-ad92-e795a2332c11', "EDD", 14, 'D', -1, "Howdy")
+
+        expected_body = {'campaign_uuid': '9ccae91f-b3f8-4c18-ad92-e795a2332c11', 'relative_to': "EDD",
+                         'offset': 14, 'unit': 'D', 'delivery_hour': -1, 'message': "Howdy"}
+        self.assert_request(mock_request, 'post', 'events', data=expected_body)
+
+        self.assertEqual(event.uuid, '9e6beda-0ce2-46cd-8810-91157f261cbd')
 
     def test_create_field(self, mock_request):
         mock_request.return_value = MockResponse(200, _read_json('fields_created'))
@@ -158,6 +177,12 @@ class TembaClientTest(unittest.TestCase):
         # check deleting a non-existent contact
         mock_request.return_value = MockResponse(404, 'NOT FOUND')
         self.assertRaises(TembaAPIError, self.client.delete_contact, 'bfff9984-38f4-4e59-998d-3663ec3c650d')
+
+    def test_delete_event(self, mock_request):
+        mock_request.return_value = MockResponse(204, '')
+        self.client.delete_event('bfff9984-38f4-4e59-998d-3663ec3c650d')
+
+        self.assert_request(mock_request, 'delete', 'events', params={'uuid': 'bfff9984-38f4-4e59-998d-3663ec3c650d'})
 
     def test_delete_messages(self, mock_request):
         mock_request.return_value = MockResponse(204)
@@ -220,6 +245,36 @@ class TembaClientTest(unittest.TestCase):
                                                                        'status': ['P', 'Q'],
                                                                        'before': '2014-12-12T22:34:36.123000',
                                                                        'after': '2014-12-12T22:34:36.234000'})
+
+    def test_get_campaign(self, mock_request):
+        # check single item response
+        mock_request.return_value = MockResponse(200, _read_json('campaigns_single'))
+        campaign = self.client.get_campaign('9ccae91f-b3f8-4c18-ad92-e795a2332c11')
+
+        self.assert_request(mock_request, 'get', 'campaigns', params={'uuid': '9ccae91f-b3f8-4c18-ad92-e795a2332c11'})
+
+        self.assertEqual(campaign.uuid, '9ccae91f-b3f8-4c18-ad92-e795a2332c11')
+        self.assertEqual(campaign.name, "Mother Reminders")
+        self.assertEqual(campaign.group, '591de2c3-66bb-471b-9c9a-761b49a5ca69')
+        self.assertEqual(campaign.created_on, datetime.datetime(2015, 6, 8, 12, 18, 7, 671000, pytz.utc))
+
+        # check empty response
+        mock_request.return_value = MockResponse(200, _read_json('empty'))
+        self.assertRaises(TembaNoSuchObjectError, self.client.get_campaign, 'xyz')
+
+        # check multiple item response
+        mock_request.return_value = MockResponse(200, _read_json('campaigns_multiple'))
+        self.assertRaises(TembaMultipleResultsError, self.client.get_campaign, '9ccae91f-b3f8-4c18-ad92-e795a2332c11')
+
+    def test_get_campaigns(self, mock_request):
+        # check no params
+        mock_request.return_value = MockResponse(200, _read_json('campaigns_multiple'))
+        campaigns = self.client.get_campaigns()
+
+        self.assert_request(mock_request, 'get', 'campaigns')
+
+        self.assertEqual(len(campaigns), 2)
+        self.assertEqual(campaigns[0].uuid, '9ccae91f-b3f8-4c18-ad92-e795a2332c11')
 
     def test_get_contact(self, mock_request):
         # check single item response
@@ -304,6 +359,41 @@ class TembaClientTest(unittest.TestCase):
         # test with connection error
         mock_request.side_effect = requests.exceptions.ConnectionError
         self.assertRaises(TembaConnectionError, self.client.get_contacts)
+
+    def test_get_event(self, mock_request):
+        # check single item response
+        mock_request.return_value = MockResponse(200, _read_json('events_single'))
+        event = self.client.get_event('9e6beda-0ce2-46cd-8810-91157f261cbd')
+
+        self.assert_request(mock_request, 'get', 'events', params={'uuid': '9e6beda-0ce2-46cd-8810-91157f261cbd'})
+
+        self.assertEqual(event.uuid, '9e6beda-0ce2-46cd-8810-91157f261cbd')
+        self.assertEqual(event.campaign, '9ccae91f-b3f8-4c18-ad92-e795a2332c11')
+        self.assertEqual(event.relative_to, "EDD")
+        self.assertEqual(event.offset, 14)
+        self.assertEqual(event.unit, 'D')
+        self.assertEqual(event.delivery_hour, -1)
+        self.assertEqual(event.message, "")
+        self.assertEqual(event.flow, '70c38f94-ab42-4666-86fd-3c76139110d3')
+        self.assertEqual(event.created_on, datetime.datetime(2015, 6, 8, 12, 18, 7, 671000, pytz.utc))
+
+        # check empty response
+        mock_request.return_value = MockResponse(200, _read_json('empty'))
+        self.assertRaises(TembaNoSuchObjectError, self.client.get_event, 'xyz')
+
+        # check multiple item response
+        mock_request.return_value = MockResponse(200, _read_json('events_multiple'))
+        self.assertRaises(TembaMultipleResultsError, self.client.get_event, '9e6beda-0ce2-46cd-8810-91157f261cbd')
+
+    def test_get_events(self, mock_request):
+        # check no params
+        mock_request.return_value = MockResponse(200, _read_json('events_multiple'))
+        events = self.client.get_events()
+
+        self.assert_request(mock_request, 'get', 'events')
+
+        self.assertEqual(len(events), 2)
+        self.assertEqual(events[0].uuid, '9e6beda-0ce2-46cd-8810-91157f261cbd')
 
     def test_get_field(self, mock_request):
         # check single item response
