@@ -145,14 +145,13 @@ class TembaClientTest(unittest.TestCase):
 
     def test_create_label(self, mock_request):
         mock_request.return_value = MockResponse(200, _read_json('labels_created'))
-        label = self.client.create_label("Really High Priority", '946c930d-83b1-4982-a797-9f0c0cc554de')
+        label = self.client.create_label("Really High Priority")
 
-        expected_body = {'name': "Really High Priority", 'parent': '946c930d-83b1-4982-a797-9f0c0cc554de'}
+        expected_body = {'name': "Really High Priority"}
         self.assert_request(mock_request, 'post', 'labels', data=expected_body)
 
         self.assertEqual(label.uuid, 'affa6685-0725-49c7-a15a-96f301d996e4')
         self.assertEqual(label.name, "Really High Priority")
-        self.assertEqual(label.parent, '946c930d-83b1-4982-a797-9f0c0cc554de')
         self.assertEqual(label.count, 0)
 
     def test_create_runs(self, mock_request):
@@ -515,7 +514,6 @@ class TembaClientTest(unittest.TestCase):
 
         self.assertEqual(label.uuid, '946c930d-83b1-4982-a797-9f0c0cc554de')
         self.assertEqual(label.name, "High Priority")
-        self.assertEqual(label.parent, None)
         self.assertEqual(label.count, 4567)
 
         # check empty response
@@ -738,23 +736,20 @@ class TembaClientTest(unittest.TestCase):
 
     def test_update_label(self, mock_request):
         mock_request.return_value = MockResponse(200, _read_json('labels_created'))
-        label = self.client.update_label('affa6685-0725-49c7-a15a-96f301d996e4',
-                                         "Really High Priority", '946c930d-83b1-4982-a797-9f0c0cc554de')
+        label = self.client.update_label('affa6685-0725-49c7-a15a-96f301d996e4', "Really High Priority")
 
         expected_body = {'uuid': 'affa6685-0725-49c7-a15a-96f301d996e4',
-                         'name': "Really High Priority",
-                         'parent': '946c930d-83b1-4982-a797-9f0c0cc554de'}
+                         'name': "Really High Priority"}
         self.assert_request(mock_request, 'post', 'labels', data=expected_body)
 
         self.assertEqual(label.uuid, 'affa6685-0725-49c7-a15a-96f301d996e4')
         self.assertEqual(label.name, "Really High Priority")
-        self.assertEqual(label.parent, '946c930d-83b1-4982-a797-9f0c0cc554de')
 
         # test when we get 400 error back
         mock_request.return_value = MockResponse(400, '{"uuid": ["No such message label with UUID: 12345678"]}')
 
         try:
-            self.client.update_label('12345678', "Really High Priority", '946c930d-83b1-4982-a797-9f0c0cc554de')
+            self.client.update_label('12345678', "Really High Priority")
         except TembaAPIError, ex:
             self.assertEqual(ex.errors, {'uuid': ["No such message label with UUID: 12345678"]})
             self.assertEqual(unicode(ex), "API request error. Caused by: No such message label with UUID: 12345678")
@@ -766,7 +761,7 @@ class TembaClientTest(unittest.TestCase):
         mock_request.return_value = MockResponse(400, 'xyz')
 
         try:
-            self.client.update_label('12345678', "Really High Priority", '946c930d-83b1-4982-a797-9f0c0cc554de')
+            self.client.update_label('12345678', "Really High Priority")
         except TembaAPIError, ex:
             self.assertEqual(ex.errors, {})
             self.assertEqual(unicode(ex), "API request error. Caused by: 400 Client Error: ...")

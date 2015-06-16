@@ -75,7 +75,6 @@ class Flow(TembaObject):
 class Label(TembaObject):
     uuid = SimpleField()
     name = SimpleField()
-    parent = SimpleField()
     count = IntegerField()
 
 
