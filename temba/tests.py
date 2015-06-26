@@ -775,7 +775,8 @@ class TembaClientTest(unittest.TestCase):
         mock.assert_called_with(method, 'https://example.com/api/v1/%s.json' % endpoint,
                                 headers={'Content-type': 'application/json',
                                          'Authorization': 'Token 1234567890',
-                                         'Accept': u'application/json'}, **kwargs)
+                                         'Accept': u'application/json',
+                                         'User-Agent': 'rapidpro-python/1.0'}, **kwargs)
 
 
 class UtilsTest(unittest.TestCase):
