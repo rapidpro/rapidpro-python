@@ -198,7 +198,7 @@ class AbstractTembaClient(object):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, host, token, debug=False):
+    def __init__(self, host, token, user_agent=None, debug=False):
         if host.startswith('http'):
             if host.endswith('/'):
                 self.root_url = host[:-1]
@@ -208,6 +208,7 @@ class AbstractTembaClient(object):
             self.root_url = 'https://%s/api/v1' % host
 
         self.token = token
+        self.user_agent = user_agent
         self.debug = debug
 
     def pager(self, start_page=1):
@@ -294,10 +295,15 @@ class AbstractTembaClient(object):
         """
         Makes a GET or POST request to the given URL and returns the parsed JSON
         """
+        if self.user_agent:
+            user_agent_header = '%s rapidpro-python/%s' % (self.user_agent, __version__)
+        else:
+            user_agent_header = 'rapidpro-python/%s' % __version__
+
         headers = {'Content-type': 'application/json',
                    'Accept': 'application/json',
                    'Authorization': 'Token %s' % self.token,
-                   'User-Agent': 'rapidpro-python/%s' % __version__}
+                   'User-Agent': user_agent_header}
 
         if self.debug:  # pragma: no cover
             print "%s %s %s" % (method.upper(), url, json.dumps(params if params else body))

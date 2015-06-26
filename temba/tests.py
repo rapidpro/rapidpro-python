@@ -43,7 +43,7 @@ class MockResponse(object):
 class TembaClientTest(unittest.TestCase):
 
     def setUp(self):
-        self.client = TembaClient('example.com', '1234567890')
+        self.client = TembaClient('example.com', '1234567890', user_agent='test/0.1')
 
     def test_init(self, mock_request):
         # by host and token
@@ -776,7 +776,7 @@ class TembaClientTest(unittest.TestCase):
                                 headers={'Content-type': 'application/json',
                                          'Authorization': 'Token 1234567890',
                                          'Accept': u'application/json',
-                                         'User-Agent': 'rapidpro-python/1.0'}, **kwargs)
+                                         'User-Agent': 'test/0.1 rapidpro-python/1.0'}, **kwargs)
 
 
 class UtilsTest(unittest.TestCase):
