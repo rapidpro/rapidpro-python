@@ -189,7 +189,7 @@ class TembaClientTest(unittest.TestCase):
 
         expected_body = {'messages': [123, 234, 345], 'action': 'delete'}
         self.assert_request(mock_request, 'post', 'message_actions', data=expected_body)
-        
+
     def test_get_boundaries(self, mock_request):
         mock_request.return_value = MockResponse(200, _read_json('boundaries_multiple'))
         boundaries = self.client.get_boundaries()
@@ -750,7 +750,7 @@ class TembaClientTest(unittest.TestCase):
 
         try:
             self.client.update_label('12345678', "Really High Priority")
-        except TembaAPIError, ex:
+        except TembaAPIError as ex:
             self.assertEqual(ex.errors, {'uuid': ["No such message label with UUID: 12345678"]})
             self.assertEqual(unicode(ex), "API request error. Caused by: No such message label with UUID: 12345678")
             self.assertEqual(str(ex), "API request error. Caused by: No such message label with UUID: 12345678")
@@ -762,7 +762,7 @@ class TembaClientTest(unittest.TestCase):
 
         try:
             self.client.update_label('12345678', "Really High Priority")
-        except TembaAPIError, ex:
+        except TembaAPIError as ex:
             self.assertEqual(ex.errors, {})
             self.assertEqual(unicode(ex), "API request error. Caused by: 400 Client Error: ...")
         else:

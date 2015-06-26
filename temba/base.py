@@ -325,7 +325,7 @@ class AbstractTembaClient(object):
             response.raise_for_status()
 
             return response.json() if response.content else None
-        except requests.HTTPError, ex:
+        except requests.HTTPError as ex:
             raise TembaAPIError(ex)
         except requests.exceptions.ConnectionError:
             raise TembaConnectionError()
