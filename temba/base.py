@@ -2,11 +2,15 @@ from __future__ import absolute_import, unicode_literals
 
 import datetime
 import json
+import logging
 import requests
 
 from abc import ABCMeta, abstractmethod
 from . import __version__
 from .utils import format_iso8601, parse_iso8601
+
+
+logger = logging.getLogger(__name__)
 
 
 # =====================================================================
@@ -305,8 +309,7 @@ class AbstractTembaClient(object):
                    'Authorization': 'Token %s' % self.token,
                    'User-Agent': user_agent_header}
 
-        if self.debug:  # pragma: no cover
-            print "%s %s %s" % (method.upper(), url, json.dumps(params if params else body))
+        logger.debug("%s %s %s" % (method.upper(), url, json.dumps(params if params else body)))
 
         try:
             kwargs = {'headers': headers}
@@ -317,8 +320,7 @@ class AbstractTembaClient(object):
 
             response = request(method, url, **kwargs)
 
-            if self.debug:  # pragma: no cover
-                print " -> %s" % response.content
+            logger.debug(" -> %s" % response.content)
 
             response.raise_for_status()
 
