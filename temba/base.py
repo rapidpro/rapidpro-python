@@ -5,6 +5,7 @@ import json
 import requests
 
 from abc import ABCMeta, abstractmethod
+from . import __version__
 from .utils import format_iso8601, parse_iso8601
 
 
@@ -295,7 +296,8 @@ class AbstractTembaClient(object):
         """
         headers = {'Content-type': 'application/json',
                    'Accept': 'application/json',
-                   'Authorization': 'Token %s' % self.token}
+                   'Authorization': 'Token %s' % self.token,
+                   'User-Agent': 'rapidpro-python/%s' % __version__}
 
         if self.debug:  # pragma: no cover
             print "%s %s %s" % (method.upper(), url, json.dumps(params if params else body))

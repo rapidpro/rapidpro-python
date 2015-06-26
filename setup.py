@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(
     name='rapidpro-python',
-    version='0.1',
+    version='1.0',
     description='Python client library for the RapidPro',
     author='Nyaruka',
     url='https://github.com/rapidpro',
