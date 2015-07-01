@@ -166,7 +166,7 @@ class SimpleField(TembaField):
 
 class IntegerField(TembaField):
     def deserialize(self, value):
-        if value and (not isinstance(value, int) and not isinstance(value, long)):
+        if value and type(value) not in six.integer_types:
             raise TembaException("Value '%s' field is not an integer" % unicode(value))
         return value
 
