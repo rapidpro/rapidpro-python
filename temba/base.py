@@ -4,6 +4,7 @@ import datetime
 import json
 import logging
 import requests
+import six
 
 from abc import ABCMeta, abstractmethod
 from . import __version__
@@ -53,7 +54,7 @@ class TembaAPIError(TembaException):
     def __unicode__(self):
         if self.errors:
             msgs = []
-            for field, field_errors in self.errors.iteritems():
+            for field, field_errors in six.iteritems(self.errors):
                 for error in field_errors:
                     msgs.append(error)
             return "%s. Caused by: %s" % (self.message, ". ".join(msgs))
@@ -102,7 +103,7 @@ class TembaObject(object):
         source = kwargs.copy()
         instance = cls()
 
-        for attr_name, field in cls._get_fields().iteritems():
+        for attr_name, field in six.iteritems(cls._get_fields()):
             if attr_name in source:
                 field_value = source.pop(attr_name)
             else:
@@ -119,7 +120,7 @@ class TembaObject(object):
     def deserialize(cls, item):
         instance = cls()
 
-        for attr_name, field in cls._get_fields().iteritems():
+        for attr_name, field in six.iteritems(cls._get_fields()):
             field_source = field.src if field.src else attr_name
 
             if field_source not in item and not field.optional:
@@ -138,7 +139,7 @@ class TembaObject(object):
 
     @classmethod
     def _get_fields(cls):
-        return {k: v for k, v in cls.__dict__.iteritems() if isinstance(v, TembaField)}
+        return {k: v for k, v in six.iteritems(cls.__dict__) if isinstance(v, TembaField)}
 
 
 # =====================================================================
@@ -337,7 +338,7 @@ class AbstractTembaClient(object):
         removes None values.
         """
         params = {}
-        for kwarg, value in kwargs.iteritems():
+        for kwarg, value in six.iteritems(kwargs):
             if value is None:
                 continue
             else:
