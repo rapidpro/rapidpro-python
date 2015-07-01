@@ -3,6 +3,7 @@ from setuptools import setup
 
 here = path.abspath(path.dirname(__file__))
 
+
 setup(
     name='rapidpro-python',
     version='1.0',
@@ -29,5 +30,5 @@ setup(
     install_requires=['pytz', 'requests'],
 
     test_suite='nose.collector',
-    tests_require=['nose', 'mock'],
+    tests_require=['nose', 'mock', 'coverage'],
 )
