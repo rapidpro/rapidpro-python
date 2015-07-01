@@ -4,6 +4,7 @@ import datetime
 import json
 import pytz
 import requests
+import six
 import unittest
 
 from mock import patch
@@ -752,7 +753,7 @@ class TembaClientTest(unittest.TestCase):
             self.client.update_label('12345678', "Really High Priority")
         except TembaAPIError as ex:
             self.assertEqual(ex.errors, {'uuid': ["No such message label with UUID: 12345678"]})
-            self.assertEqual(unicode(ex), "API request error. Caused by: No such message label with UUID: 12345678")
+            self.assertEqual(six.text_type(ex), "API request error. Caused by: No such message label with UUID: 12345678")
             self.assertEqual(str(ex), "API request error. Caused by: No such message label with UUID: 12345678")
         else:
             self.fail("Should have thrown exception")
@@ -764,7 +765,7 @@ class TembaClientTest(unittest.TestCase):
             self.client.update_label('12345678', "Really High Priority")
         except TembaAPIError as ex:
             self.assertEqual(ex.errors, {})
-            self.assertEqual(unicode(ex), "API request error. Caused by: 400 Client Error: ...")
+            self.assertEqual(six.text_type(ex), "API request error. Caused by: 400 Client Error: ...")
         else:
             self.fail("Should have thrown exception")
 
@@ -841,6 +842,6 @@ class TembaObjectTest(unittest.TestCase):
 
 def _read_json(filename):
     handle = open('test_files/%s.json' % filename)
-    contents = unicode(handle.read())
+    contents = six.text_type(handle.read())
     handle.close()
     return contents

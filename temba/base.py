@@ -59,7 +59,7 @@ class TembaAPIError(TembaException):
                     msgs.append(error)
             return "%s. Caused by: %s" % (self.message, ". ".join(msgs))
         else:
-            return "%s. Caused by: %s" % (self.message, unicode(self.caused_by))
+            return "%s. Caused by: %s" % (self.message, six.text_type(self.caused_by))
 
 
 class TembaConnectionError(TembaException):
@@ -167,7 +167,7 @@ class SimpleField(TembaField):
 class IntegerField(TembaField):
     def deserialize(self, value):
         if value and type(value) not in six.integer_types:
-            raise TembaException("Value '%s' field is not an integer" % unicode(value))
+            raise TembaException("Value '%s' field is not an integer" % six.text_type(value))
         return value
 
 
@@ -188,7 +188,7 @@ class ObjectField(TembaField):
 class ObjectListField(ObjectField):
     def deserialize(self, value):
         if not isinstance(value, list):
-            raise TembaException("Value '%s' field is not a list" % unicode(value))
+            raise TembaException("Value '%s' field is not a list" % six.text_type(value))
 
         return self.item_class.deserialize_list(value)
 
