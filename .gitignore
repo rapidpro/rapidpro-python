@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 *~
+*.sw[po]
 
 sitestatic/
 config/
