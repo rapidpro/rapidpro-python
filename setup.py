@@ -27,7 +27,7 @@ setup(
 
     keywords='rapidpro client',
     packages=['temba'],
-    install_requires=['pytz', 'requests'],
+    install_requires=['pytz', 'requests', 'six'],
 
     test_suite='nose.collector',
     tests_require=['nose', 'mock', 'coverage'],
