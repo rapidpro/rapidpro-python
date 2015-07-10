@@ -1,15 +1,17 @@
 language: python
 python:
-- '2.7'
+  - '2.7'
 sudo: false
 cache:
   directories:
   - $HOME/.cache/pip
+env:
+  - TOXENV=py27
+  - TOXENV=py34
 install:
-- pip install --upgrade pip
-- pip install -r pip-requires.txt --upgrade
-- pip install coveralls
+  - pip install -q --use-mirrors tox
+  - pip install coveralls
 script:
-- nosetests --with-coverage --cover-erase --cover-package=temba
+  - tox
 after_success:
-- coveralls
+  - coveralls

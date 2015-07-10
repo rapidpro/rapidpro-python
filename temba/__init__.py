@@ -13,10 +13,9 @@ class TembaClient(AbstractTembaClient):
     :param str host: server hostname, e.g. 'rapidpro.io'
     :param str token: organization API token
     :param str user_agent: string to be included in the User-Agent header
-    :param bool debug: print debugging statements
     """
-    def __init__(self, host, token, user_agent=None, debug=False):
-        super(TembaClient, self).__init__(host, token, user_agent, debug)
+    def __init__(self, host, token, user_agent=None):
+        super(TembaClient, self).__init__(host, token, user_agent)
 
     # ==================================================================================================================
     # Create object operations

@@ -3,6 +3,7 @@ from setuptools import setup
 
 here = path.abspath(path.dirname(__file__))
 
+
 setup(
     name='rapidpro-python',
     version='1.0',
@@ -26,8 +27,8 @@ setup(
 
     keywords='rapidpro client',
     packages=['temba'],
-    install_requires=['pytz', 'requests'],
+    install_requires=['pytz', 'requests', 'six'],
 
     test_suite='nose.collector',
-    tests_require=['nose', 'mock'],
+    tests_require=['nose', 'mock', 'coverage'],
 )

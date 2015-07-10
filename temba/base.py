@@ -2,11 +2,16 @@ from __future__ import absolute_import, unicode_literals
 
 import datetime
 import json
+import logging
 import requests
+import six
 
 from abc import ABCMeta, abstractmethod
 from . import __version__
 from .utils import format_iso8601, parse_iso8601
+
+
+logger = logging.getLogger(__name__)
 
 
 # =====================================================================
@@ -49,12 +54,12 @@ class TembaAPIError(TembaException):
     def __unicode__(self):
         if self.errors:
             msgs = []
-            for field, field_errors in self.errors.iteritems():
+            for field, field_errors in six.iteritems(self.errors):
                 for error in field_errors:
                     msgs.append(error)
             return "%s. Caused by: %s" % (self.message, ". ".join(msgs))
         else:
-            return "%s. Caused by: %s" % (self.message, unicode(self.caused_by))
+            return "%s. Caused by: %s" % (self.message, six.text_type(self.caused_by))
 
 
 class TembaConnectionError(TembaException):
@@ -98,7 +103,7 @@ class TembaObject(object):
         source = kwargs.copy()
         instance = cls()
 
-        for attr_name, field in cls._get_fields().iteritems():
+        for attr_name, field in six.iteritems(cls._get_fields()):
             if attr_name in source:
                 field_value = source.pop(attr_name)
             else:
@@ -115,7 +120,7 @@ class TembaObject(object):
     def deserialize(cls, item):
         instance = cls()
 
-        for attr_name, field in cls._get_fields().iteritems():
+        for attr_name, field in six.iteritems(cls._get_fields()):
             field_source = field.src if field.src else attr_name
 
             if field_source not in item and not field.optional:
@@ -134,7 +139,7 @@ class TembaObject(object):
 
     @classmethod
     def _get_fields(cls):
-        return {k: v for k, v in cls.__dict__.iteritems() if isinstance(v, TembaField)}
+        return {k: v for k, v in six.iteritems(cls.__dict__) if isinstance(v, TembaField)}
 
 
 # =====================================================================
@@ -161,8 +166,8 @@ class SimpleField(TembaField):
 
 class IntegerField(TembaField):
     def deserialize(self, value):
-        if value and (not isinstance(value, int) and not isinstance(value, long)):
-            raise TembaException("Value '%s' field is not an integer" % unicode(value))
+        if value and type(value) not in six.integer_types:
+            raise TembaException("Value '%s' field is not an integer" % six.text_type(value))
         return value
 
 
@@ -183,7 +188,7 @@ class ObjectField(TembaField):
 class ObjectListField(ObjectField):
     def deserialize(self, value):
         if not isinstance(value, list):
-            raise TembaException("Value '%s' field is not a list" % unicode(value))
+            raise TembaException("Value '%s' field is not a list" % six.text_type(value))
 
         return self.item_class.deserialize_list(value)
 
@@ -198,7 +203,7 @@ class AbstractTembaClient(object):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, host, token, user_agent=None, debug=False):
+    def __init__(self, host, token, user_agent=None):
         if host.startswith('http'):
             if host.endswith('/'):
                 self.root_url = host[:-1]
@@ -209,7 +214,6 @@ class AbstractTembaClient(object):
 
         self.token = token
         self.user_agent = user_agent
-        self.debug = debug
 
     def pager(self, start_page=1):
         """
@@ -305,8 +309,7 @@ class AbstractTembaClient(object):
                    'Authorization': 'Token %s' % self.token,
                    'User-Agent': user_agent_header}
 
-        if self.debug:  # pragma: no cover
-            print "%s %s %s" % (method.upper(), url, json.dumps(params if params else body))
+        logger.debug("%s %s %s" % (method.upper(), url, json.dumps(params if params else body)))
 
         try:
             kwargs = {'headers': headers}
@@ -317,13 +320,12 @@ class AbstractTembaClient(object):
 
             response = request(method, url, **kwargs)
 
-            if self.debug:  # pragma: no cover
-                print " -> %s" % response.content
+            logger.debug(" -> %s" % response.content)
 
             response.raise_for_status()
 
             return response.json() if response.content else None
-        except requests.HTTPError, ex:
+        except requests.HTTPError as ex:
             raise TembaAPIError(ex)
         except requests.exceptions.ConnectionError:
             raise TembaConnectionError()
@@ -335,7 +337,7 @@ class AbstractTembaClient(object):
         removes None values.
         """
         params = {}
-        for kwarg, value in kwargs.iteritems():
+        for kwarg, value in six.iteritems(kwargs):
             if value is None:
                 continue
             else:

@@ -3,7 +3,7 @@ RapidPro Python Client
 
 ![Build Status](https://travis-ci.org/rapidpro/rapidpro-python.svg?branch=master)
 
-Official Python client library for the [RapidPro](http://rapidpro.github.io/rapidpro/). 
+Official Python client library for the [RapidPro](http://rapidpro.github.io/rapidpro/).
 Visit [here](http://rapidpro-python.readthedocs.org/) for complete documentation.
 
 Example
@@ -13,8 +13,8 @@ Example
 from temba import TembaClient
 client = TembaClient('rapidpro.io', 'your-api-token')
 for contact in client.get_contacts():
-    print contact.name
-    
+    print(contact.name)
+
 client.create_broadcast(text="Howdy", contacts=contacts[0:5])
 ```
 

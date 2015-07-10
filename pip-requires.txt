@@ -1,4 +1,6 @@
 pytz
 requests
+six
 nose
 mock
+coverage
