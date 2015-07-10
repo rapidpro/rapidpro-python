@@ -203,7 +203,7 @@ class AbstractTembaClient(object):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, host, token, user_agent=None, debug=False):
+    def __init__(self, host, token, user_agent=None):
         if host.startswith('http'):
             if host.endswith('/'):
                 self.root_url = host[:-1]
@@ -214,7 +214,6 @@ class AbstractTembaClient(object):
 
         self.token = token
         self.user_agent = user_agent
-        self.debug = debug
 
     def pager(self, start_page=1):
         """
