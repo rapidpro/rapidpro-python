@@ -438,6 +438,56 @@ class TembaClient(AbstractTembaClient):
         return Label.deserialize(self._post('labels', params))
 
     # ==================================================================================================================
+    # Bulk contact operations
+    # ==================================================================================================================
+
+    def add_contacts(self, contacts, group=None, group_uuid=None):
+        """
+        Adds the given contacts to a contact group. Group can be specified by name or by UUID.
+
+        :param list[str] contacts: the contact UUIDs
+        :param str group: the group name
+        :param str group_uuid: the group UUID
+        """
+        params = self._build_params(contacts=contacts, action='add', group=group, group_uuid=group_uuid)
+        self._post('contact_actions', params)
+
+    def remove_contacts(self, contacts, group=None, group_uuid=None):
+        """
+        Removes a label from the given messages. Label can be specified by name or by UUID.
+
+        :param list[str] contacts: the contact UUIDs
+        :param str group: the group name
+        :param str group_uuid: the group UUID
+        """
+        params = self._build_params(contacts=contacts, action='remove', group=group, group_uuid=group_uuid)
+        self._post('contact_actions', params)
+
+    def block_contacts(self, contacts):
+        """
+        Blocks the given contacts.
+
+        :param list[str] contacts: the contact UUIDs
+        """
+        self._post('contact_actions', self._build_params(contacts=contacts, action='block'))
+
+    def unblock_contacts(self, contacts):
+        """
+        Unblocks the given contacts.
+
+        :param list[str] contacts: the contact UUIDs
+        """
+        self._post('contact_actions', self._build_params(contacts=contacts, action='unblock'))
+
+    def delete_contacts(self, contacts):
+        """
+        Permanently deletes the given contacts.
+
+        :param list[str] contacts: the contact UUIDs
+        """
+        self._post('contact_actions', self._build_params(contacts=contacts, action='delete'))
+
+    # ==================================================================================================================
     # Bulk message operations
     # ==================================================================================================================
 

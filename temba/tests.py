@@ -48,19 +48,33 @@ class TembaClientTest(unittest.TestCase):
 
     def test_init(self, mock_request):
         # by host and token
-        client = TembaClient('example.com', '1234567890')
+        client = TembaClient('example.com', '1234567890', user_agent='test/0.1')
         self.assertEqual(client.root_url, 'https://example.com/api/v1')
-        self.assertEqual(client.token, '1234567890')
+        self.assertEqual(client.headers, {'Content-type': 'application/json',
+                                          'Accept': 'application/json',
+                                          'Authorization': 'Token 1234567890',
+                                          'User-Agent': 'test/0.1 rapidpro-python/1.0'})
 
-        # by URL and token
+        # by URL
         client = TembaClient('http://example.com/api/v1', '1234567890')
         self.assertEqual(client.root_url, 'http://example.com/api/v1')
-        self.assertEqual(client.token, '1234567890')
+        self.assertEqual(client.headers, {'Content-type': 'application/json',
+                                          'Accept': 'application/json',
+                                          'Authorization': 'Token 1234567890',
+                                          'User-Agent': 'rapidpro-python/1.0'})
 
-        # by URL with trailing / and token
+        # by URL with trailing /
         client = TembaClient('http://example.com/api/v1/', '1234567890')
         self.assertEqual(client.root_url, 'http://example.com/api/v1')
-        self.assertEqual(client.token, '1234567890')
+
+    def test_add_contacts(self, mock_request):
+        mock_request.return_value = MockResponse(204)
+        self.client.add_contacts(contacts=['bfff9984-38f4-4e59-998d-3663ec3c650d',
+                                           '7a165fe9-575b-4d15-b2ac-58fec913d603'], group='Testers')
+
+        expected_body = {'contacts': ['bfff9984-38f4-4e59-998d-3663ec3c650d', '7a165fe9-575b-4d15-b2ac-58fec913d603'],
+                         'action': 'add', 'group': 'Testers'}
+        self.assert_request(mock_request, 'post', 'contact_actions', data=expected_body)
 
     def test_archive_messages(self, mock_request):
         mock_request.return_value = MockResponse(204)
@@ -68,6 +82,15 @@ class TembaClientTest(unittest.TestCase):
 
         expected_body = {'messages': [123, 234, 345], 'action': 'archive'}
         self.assert_request(mock_request, 'post', 'message_actions', data=expected_body)
+
+    def test_block_contacts(self, mock_request):
+        mock_request.return_value = MockResponse(204)
+        self.client.block_contacts(contacts=['bfff9984-38f4-4e59-998d-3663ec3c650d',
+                                             '7a165fe9-575b-4d15-b2ac-58fec913d603'])
+
+        expected_body = {'contacts': ['bfff9984-38f4-4e59-998d-3663ec3c650d', '7a165fe9-575b-4d15-b2ac-58fec913d603'],
+                         'action': 'block'}
+        self.assert_request(mock_request, 'post', 'contact_actions', data=expected_body)
 
     def test_create_broadcast(self, mock_request):
         # check by group UUID
@@ -177,6 +200,15 @@ class TembaClientTest(unittest.TestCase):
         # check deleting a non-existent contact
         mock_request.return_value = MockResponse(404, 'NOT FOUND')
         self.assertRaises(TembaAPIError, self.client.delete_contact, 'bfff9984-38f4-4e59-998d-3663ec3c650d')
+
+    def test_delete_contacts(self, mock_request):
+        mock_request.return_value = MockResponse(204)
+        self.client.delete_contacts(contacts=['bfff9984-38f4-4e59-998d-3663ec3c650d',
+                                              '7a165fe9-575b-4d15-b2ac-58fec913d603'])
+
+        expected_body = {'contacts': ['bfff9984-38f4-4e59-998d-3663ec3c650d', '7a165fe9-575b-4d15-b2ac-58fec913d603'],
+                         'action': 'delete'}
+        self.assert_request(mock_request, 'post', 'contact_actions', data=expected_body)
 
     def test_delete_event(self, mock_request):
         mock_request.return_value = MockResponse(204, '')
@@ -685,12 +717,30 @@ class TembaClientTest(unittest.TestCase):
         expected_body = {'messages': [123, 234, 345], 'action': 'label', 'label': "Test"}
         self.assert_request(mock_request, 'post', 'message_actions', data=expected_body)
 
+    def test_remove_contacts(self, mock_request):
+        mock_request.return_value = MockResponse(204)
+        self.client.remove_contacts(contacts=['bfff9984-38f4-4e59-998d-3663ec3c650d',
+                                              '7a165fe9-575b-4d15-b2ac-58fec913d603'], group='Testers')
+
+        expected_body = {'contacts': ['bfff9984-38f4-4e59-998d-3663ec3c650d', '7a165fe9-575b-4d15-b2ac-58fec913d603'],
+                         'action': 'remove', 'group': 'Testers'}
+        self.assert_request(mock_request, 'post', 'contact_actions', data=expected_body)
+
     def test_unarchive_messages(self, mock_request):
         mock_request.return_value = MockResponse(204)
         self.client.unarchive_messages(messages=[123, 234, 345])
 
         expected_body = {'messages': [123, 234, 345], 'action': 'unarchive'}
         self.assert_request(mock_request, 'post', 'message_actions', data=expected_body)
+
+    def test_unblock_contacts(self, mock_request):
+        mock_request.return_value = MockResponse(204)
+        self.client.unblock_contacts(contacts=['bfff9984-38f4-4e59-998d-3663ec3c650d',
+                                               '7a165fe9-575b-4d15-b2ac-58fec913d603'])
+
+        expected_body = {'contacts': ['bfff9984-38f4-4e59-998d-3663ec3c650d', '7a165fe9-575b-4d15-b2ac-58fec913d603'],
+                         'action': 'unblock'}
+        self.assert_request(mock_request, 'post', 'contact_actions', data=expected_body)
 
     def test_unlabel_messages(self, mock_request):
         mock_request.return_value = MockResponse(204)

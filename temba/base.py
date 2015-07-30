@@ -212,8 +212,19 @@ class AbstractTembaClient(object):
         else:
             self.root_url = 'https://%s/api/v1' % host
 
-        self.token = token
-        self.user_agent = user_agent
+        self.headers = self._headers(token, user_agent)
+
+    @staticmethod
+    def _headers(token, user_agent):
+        if user_agent:
+            user_agent_header = '%s rapidpro-python/%s' % (user_agent, __version__)
+        else:
+            user_agent_header = 'rapidpro-python/%s' % __version__
+
+        return {'Content-type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': 'Token %s' % token,
+                'User-Agent': user_agent_header}
 
     def pager(self, start_page=1):
         """
@@ -299,20 +310,10 @@ class AbstractTembaClient(object):
         """
         Makes a GET or POST request to the given URL and returns the parsed JSON
         """
-        if self.user_agent:
-            user_agent_header = '%s rapidpro-python/%s' % (self.user_agent, __version__)
-        else:
-            user_agent_header = 'rapidpro-python/%s' % __version__
-
-        headers = {'Content-type': 'application/json',
-                   'Accept': 'application/json',
-                   'Authorization': 'Token %s' % self.token,
-                   'User-Agent': user_agent_header}
-
         logger.debug("%s %s %s" % (method.upper(), url, json.dumps(params if params else body)))
 
         try:
-            kwargs = {'headers': headers}
+            kwargs = {'headers': self.headers}
             if body:
                 kwargs['data'] = body
             if params:
