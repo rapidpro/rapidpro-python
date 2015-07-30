@@ -27,7 +27,9 @@
                 "type": "R"
             }
         ],
-        "created_on": "2014-12-12T22:56:58.917Z"
+        "created_on": "2014-12-12T22:56:58.917Z",
+        "expires_on": "2015-07-08T01:10:43.111Z",
+        "expired_on": null
     },
     {
         "flow_uuid": "a68567fa-ad95-45fc-b5f7-3ce90ebbd46d",
@@ -57,6 +59,8 @@
                 "type": "R"
             }
         ],
-        "created_on": "2014-12-12T22:58:04.456Z"
+        "created_on": "2014-12-12T22:58:04.456Z",
+        "expires_on": "2015-07-08T01:10:43.111Z",
+        "expired_on": null
     }
 ]

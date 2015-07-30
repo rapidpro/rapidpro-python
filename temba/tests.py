@@ -469,6 +469,7 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(flow.participants, 5)
         self.assertEqual(flow.runs, 6)
         self.assertEqual(flow.completed_runs, 4)
+        self.assertEqual(flow.expires, 720)
         self.assertEqual(len(flow.rulesets), 1)
         self.assertEqual(flow.rulesets[0].uuid, 'e16ff762-6051-4940-964a-9b2efcb670ca')
         self.assertEqual(flow.rulesets[0].label, "Rule 1")
@@ -681,6 +682,8 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(run.values[0].label, "Number of Sheep")
         self.assertEqual(run.values[0].time, datetime.datetime(2015, 1, 26, 13, 57, 55, 704000, pytz.utc))
         self.assertEqual(run.created_on, datetime.datetime(2015, 1, 26, 13, 56, 18, 689000, pytz.utc))
+        self.assertEqual(run.expires_on, datetime.datetime(2015, 7, 8, 1, 10, 43, 111000, pytz.utc))
+        self.assertEqual(run.expired_on, None)
 
         # check empty response
         mock_request.return_value = MockResponse(200, _read_json('empty'))
