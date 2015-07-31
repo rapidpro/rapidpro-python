@@ -223,6 +223,15 @@ class TembaClientTest(unittest.TestCase):
         expected_body = {'messages': [123, 234, 345], 'action': 'delete'}
         self.assert_request(mock_request, 'post', 'message_actions', data=expected_body)
 
+    def test_expire_contacts(self, mock_request):
+        mock_request.return_value = MockResponse(204)
+        self.client.expire_contacts(contacts=['bfff9984-38f4-4e59-998d-3663ec3c650d',
+                                              '7a165fe9-575b-4d15-b2ac-58fec913d603'])
+
+        expected_body = {'contacts': ['bfff9984-38f4-4e59-998d-3663ec3c650d', '7a165fe9-575b-4d15-b2ac-58fec913d603'],
+                         'action': 'expire'}
+        self.assert_request(mock_request, 'post', 'contact_actions', data=expected_body)
+
     def test_get_boundaries(self, mock_request):
         mock_request.return_value = MockResponse(200, _read_json('boundaries_multiple'))
         boundaries = self.client.get_boundaries()

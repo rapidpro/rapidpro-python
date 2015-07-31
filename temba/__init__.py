@@ -479,6 +479,14 @@ class TembaClient(AbstractTembaClient):
         """
         self._post('contact_actions', self._build_params(contacts=contacts, action='unblock'))
 
+    def expire_contacts(self, contacts):
+        """
+        Forces expiration of the given contacts' active flow runs.
+
+        :param list[str] contacts: the contact UUIDs
+        """
+        self._post('contact_actions', self._build_params(contacts=contacts, action='expire'))
+
     def delete_contacts(self, contacts):
         """
         Permanently deletes the given contacts.
