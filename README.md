@@ -24,7 +24,7 @@ for contact in client.get_contacts():
     print(contact.name)
 
 client.create_broadcast(text="Howdy", contacts=contacts[0:5])
-client.block_contact(contacts[0])
+client.block_contacts(contacts[1:3])
 ```
 
 If you don't know your API token then visit the [API Explorer](http://rapidpro.io/api/v1/explorer)
