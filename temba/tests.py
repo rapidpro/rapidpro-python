@@ -8,7 +8,7 @@ import six
 import unittest
 
 from mock import patch
-from . import TembaClient
+from . import TembaClient, __version__
 from .base import TembaObject, SimpleField, IntegerField, DatetimeField, ObjectListField, TembaException
 from .base import TembaNoSuchObjectError, TembaMultipleResultsError, TembaAPIError, TembaConnectionError
 from .types import Group, Broadcast
@@ -53,7 +53,7 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(client.headers, {'Content-type': 'application/json',
                                           'Accept': 'application/json',
                                           'Authorization': 'Token 1234567890',
-                                          'User-Agent': 'test/0.1 rapidpro-python/1.0'})
+                                          'User-Agent': 'test/0.1 rapidpro-python/%s' % __version__})
 
         # by URL
         client = TembaClient('http://example.com/api/v1', '1234567890')
@@ -61,7 +61,7 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(client.headers, {'Content-type': 'application/json',
                                           'Accept': 'application/json',
                                           'Authorization': 'Token 1234567890',
-                                          'User-Agent': 'rapidpro-python/1.0'})
+                                          'User-Agent': 'rapidpro-python/%s' % __version__})
 
         # by URL with trailing /
         client = TembaClient('http://example.com/api/v1/', '1234567890')
@@ -839,7 +839,7 @@ class TembaClientTest(unittest.TestCase):
                                 headers={'Content-type': 'application/json',
                                          'Authorization': 'Token 1234567890',
                                          'Accept': u'application/json',
-                                         'User-Agent': 'test/0.1 rapidpro-python/1.0'}, **kwargs)
+                                         'User-Agent': 'test/0.1 rapidpro-python/%s' % __version__}, **kwargs)
 
 
 class UtilsTest(unittest.TestCase):
@@ -859,7 +859,6 @@ class UtilsTest(unittest.TestCase):
 
         d = datetime.datetime(2014, 1, 2, 0, 0, 0, 0, pytz.UTC)
         self.assertEqual(parse_iso8601('2014-01-02'), d)
-
 
 
 class TestSubType(TembaObject):
