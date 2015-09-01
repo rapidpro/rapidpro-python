@@ -363,6 +363,26 @@ class TembaClientTest(unittest.TestCase):
 
         self.assert_request(mock_request, 'get', 'contacts', params={'group_uuids': ['xyz']})
 
+        # check filtering modified after a date
+        mock_request.return_value = MockResponse(200, _read_json('contacts_multiple'))
+        self.client.get_contacts(after=datetime.datetime(2014, 12, 12, 22, 34, 36, 123000, pytz.utc))
+
+        self.assert_request(mock_request, 'get', 'contacts', params={'after': '2014-12-12T22:34:36.123000'})
+
+        # check filtering modified before a date
+        mock_request.return_value = MockResponse(200, _read_json('contacts_multiple'))
+        self.client.get_contacts(before=datetime.datetime(2014, 12, 12, 22, 34, 36, 123000, pytz.utc))
+
+        self.assert_request(mock_request, 'get', 'contacts', params={'before': '2014-12-12T22:34:36.123000'})
+
+        # check filtering modified between dates
+        mock_request.return_value = MockResponse(200, _read_json('contacts_multiple'))
+        self.client.get_contacts(after=datetime.datetime(2014, 12, 12, 22, 34, 36, 123000, pytz.utc),
+                                 before=datetime.datetime(2014, 12, 12, 22, 34, 36, 123000, pytz.utc))
+
+        self.assert_request(mock_request, 'get', 'contacts', params={'after': '2014-12-12T22:34:36.123000',
+                                                                     'before': '2014-12-12T22:34:36.123000'})
+
         # check multiple pages
         mock_request.side_effect = (MockResponse(200, _read_json('contacts_multipage_1')),
                                     MockResponse(200, _read_json('contacts_multipage_2')),

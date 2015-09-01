@@ -203,7 +203,7 @@ class TembaClient(AbstractTembaClient):
         """
         return Contact.deserialize(self._get_single('contacts', {'uuid': uuid}))
 
-    def get_contacts(self, uuids=None, urns=None, groups=None, pager=None):
+    def get_contacts(self, uuids=None, urns=None, groups=None, after=None, before=None, pager=None):
         """
         Gets all matching contacts
 
@@ -213,7 +213,7 @@ class TembaClient(AbstractTembaClient):
         :param object pager: pager for paged results
         :return: list of contacts
         """
-        params = self._build_params(uuid=uuids, urns=urns, group_uuids=groups)
+        params = self._build_params(uuid=uuids, urns=urns, group_uuids=groups, after=after, before=before)
         return Contact.deserialize_list(self._get_multiple('contacts', params, pager))
 
     def get_event(self, uuid):
