@@ -389,8 +389,10 @@ class TembaClientTest(unittest.TestCase):
         mock_request.side_effect = (MockResponse(200, _read_json('contacts_multipage_1')),
                                     MockResponse(200, _read_json('contacts_multipage_2')),
                                     MockResponse(200, _read_json('contacts_multipage_3')))
-        contacts = self.client.get_contacts()
+        contacts = self.client.get_contacts(after=datetime.datetime(2014, 12, 12, 22, 34, 36, 123000, pytz.utc))
         self.assertEqual(len(contacts), 21)
+        self.assert_request_url(mock_request, 'get',
+                                'https://example.com/api/v1/contacts.json?page=3&before=2014-12-12T22:34:36.123')
 
         # test with paging
         mock_request.side_effect = (MockResponse(200, _read_json('contacts_multipage_1')),
@@ -852,6 +854,16 @@ class TembaClientTest(unittest.TestCase):
             self.assertEqual(six.text_type(ex), "API request error. Caused by: 400 Client Error: ...")
         else:
             self.fail("Should have thrown exception")
+
+    def assert_request_url(self, mock, method, url, **kwargs):
+        """
+        Asserts that a request was made to the given url with the given parameters
+        """
+        mock.assert_called_with(method, url,
+                                headers={'Content-type': 'application/json',
+                                         'Authorization': 'Token 1234567890',
+                                         'Accept': u'application/json',
+                                         'User-Agent': 'test/0.1 rapidpro-python/%s' % __version__}, **kwargs)
 
     def assert_request(self, mock, method, endpoint, **kwargs):
         """

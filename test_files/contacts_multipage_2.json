@@ -1,7 +1,7 @@
 {
     "count": 21,
-    "next": "https://example.com/api/v1/contacts?page=3",
-    "previous": "https://example.com/api/v1/contacts?page=1",
+    "next": "https://example.com/api/v1/contacts.json?page=3&before=2014-12-12T22:34:36.123",
+    "previous": "https://example.com/api/v1/contacts.json?page=1&before=2014-12-12T22:34:36.123",
     "results": [
         {
             "uuid": "bfff9984-38f4-4e59-998d-000000000011",

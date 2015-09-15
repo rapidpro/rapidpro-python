@@ -289,6 +289,7 @@ class AbstractTembaClient(object):
             response = self._request('get', url, params=params)
             results += response['results']
             url = response.get('next', None)
+            params = None
 
         return results
 
