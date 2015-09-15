@@ -12,6 +12,8 @@
                 "tel:+250700000021"
             ],
             "fields": {},
+            "blocked": false,
+            "failed": false,
             "modified_on": "2014-10-01T06:54:09.817Z",
             "phone": "+250700000021",
             "groups": []

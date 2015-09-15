@@ -12,6 +12,8 @@
                 "tel:+250700000011"
             ],
             "fields": {},
+            "blocked": false,
+            "failed": false,
             "modified_on": "2014-10-01T06:54:09.817Z",
             "phone": "+250700000011",
             "groups": []
@@ -25,6 +27,8 @@
                 "tel:+250700000012"
             ],
             "fields": {},
+            "blocked": false,
+            "failed": false,
             "modified_on": "2014-10-01T06:54:09.817Z",
             "phone": "+250700000012",
             "groups": []
@@ -37,6 +41,8 @@
                 "tel:+250700000013"
             ],
             "fields": {},
+            "blocked": false,
+            "failed": false,
             "modified_on": "2014-10-01T06:54:09.817Z",
             "phone": "+250700000013",
             "groups": []
@@ -49,6 +55,8 @@
                 "tel:+250700000014"
             ],
             "fields": {},
+            "blocked": false,
+            "failed": false,
             "modified_on": "2014-10-01T06:54:09.817Z",
             "phone": "+250700000014",
             "groups": []
@@ -62,6 +70,8 @@
                 "tel:+250700000015"
             ],
             "fields": {},
+            "blocked": false,
+            "failed": false,
             "modified_on": "2014-10-01T06:54:09.817Z",
             "phone": "+250700000015",
             "groups": []
@@ -75,6 +85,8 @@
                 "tel:+250700000016"
             ],
             "fields": {},
+            "blocked": false,
+            "failed": false,
             "modified_on": "2014-10-01T06:54:09.817Z",
             "phone": "+250700000016",
             "groups": []
@@ -88,6 +100,8 @@
                 "tel:+250700000017"
             ],
             "fields": {},
+            "blocked": false,
+            "failed": false,
             "modified_on": "2014-10-01T06:54:09.817Z",
             "phone": "+250700000017",
             "groups": []
@@ -101,6 +115,8 @@
                 "tel:+250700000018"
             ],
             "fields": {},
+            "blocked": false,
+            "failed": false,
             "modified_on": "2014-10-01T06:54:09.817Z",
             "phone": "+250700000018",
             "groups": []
@@ -114,6 +130,8 @@
                 "tel:+250700000019"
             ],
             "fields": {},
+            "blocked": false,
+            "failed": false,
             "modified_on": "2014-10-01T06:54:09.817Z",
             "phone": "+250700000019",
             "groups": []
@@ -127,6 +145,8 @@
                 "tel:+250700000020"
             ],
             "fields": {},
+            "blocked": false,
+            "failed": false,
             "modified_on": "2014-10-01T06:54:09.817Z",
             "phone": "+250700000020",
             "groups": []

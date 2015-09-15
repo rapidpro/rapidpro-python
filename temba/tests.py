@@ -330,6 +330,8 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(contact.groups, ['04a4752b-0f49-480e-ae60-3a3f2bea485c'])
         self.assertEqual(contact.fields, {'nickname': 'Hannibal'})
         self.assertEqual(contact.language, None)
+        self.assertEqual(contact.blocked, False)
+        self.assertEqual(contact.failed, False)
         self.assertEqual(contact.modified_on, datetime.datetime(2014, 10, 1, 6, 54, 9, 817000, pytz.utc))
 
         # check empty response

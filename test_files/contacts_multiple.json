@@ -16,6 +16,8 @@
             "fields": {
                 "nickname": "Hannibal"
             },
+            "blocked": false,
+            "failed": false,
             "modified_on": "2014-10-01T06:54:09.817Z",
             "phone": "+250700000001",
             "groups": [
@@ -35,6 +37,8 @@
             "fields": {
                 "nickname": "Face"
             },
+            "blocked": false,
+            "failed": false,
             "modified_on": "2014-10-01T06:54:09.817Z",
             "phone": "+250700000002",
             "groups": [
@@ -54,6 +58,8 @@
             "fields": {
                 "nickname": "B.A."
             },
+            "blocked": false,
+            "failed": false,
             "modified_on": "2014-10-01T06:54:09.817Z",
             "phone": "+250700000003",
             "groups": [
@@ -73,6 +79,8 @@
             "fields": {
                 "nickname": "Murdock"
             },
+            "blocked": false,
+            "failed": false,
             "modified_on": "2014-10-01T06:54:09.817Z",
             "phone": "+250700000004",
             "groups": [

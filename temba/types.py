@@ -27,6 +27,8 @@ class Contact(TembaObject):
     groups = SimpleField(src='group_uuids')
     fields = SimpleField()
     language = SimpleField()
+    blocked = SimpleField()
+    failed = SimpleField()
     modified_on = DatetimeField()
 
 
