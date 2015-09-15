@@ -6,7 +6,7 @@ here = path.abspath(path.dirname(__file__))
 
 setup(
     name='rapidpro-python',
-    version='1.2',
+    version='1.3',
     description='Python client library for the RapidPro',
     url='https://github.com/rapidpro',
 
