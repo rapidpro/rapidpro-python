@@ -1,6 +1,6 @@
 {
     "count": 21,
-    "next": "https://example.com/api/v1/contacts?page=2",
+    "next": "https://example.com/api/v1/contacts.json?page=2&before=2014-12-12T22:34:36.123",
     "previous": null,
     "results": [
         {
