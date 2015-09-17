@@ -1,8 +1,10 @@
 from os import path
+from pip.req import parse_requirements
 from setuptools import setup
 
 here = path.abspath(path.dirname(__file__))
-
+install_requires = [str(r.req) for r in parse_requirements('%s/requirements/base.txt' % here)]
+tests_requires = [str(r.req) for r in parse_requirements('%s/requirements/tests.txt' % here)]
 
 setup(
     name='rapidpro-python',
@@ -27,8 +29,8 @@ setup(
 
     keywords='rapidpro client',
     packages=['temba'],
-    install_requires=['pytz', 'requests', 'six'],
+    install_requires=install_requires,
 
     test_suite='nose.collector',
-    tests_require=['nose', 'mock', 'coverage'],
+    tests_require=tests_requires,
 )
