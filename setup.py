@@ -1,10 +1,12 @@
 from os import path
+from pip.download import PipSession
 from pip.req import parse_requirements
 from setuptools import setup
 
 here = path.abspath(path.dirname(__file__))
-install_requires = [str(r.req) for r in parse_requirements('%s/requirements/base.txt' % here)]
-tests_requires = [str(r.req) for r in parse_requirements('%s/requirements/tests.txt' % here)]
+session = PipSession()
+install_requires = [str(r.req) for r in parse_requirements('%s/requirements/base.txt' % here, session=session)]
+tests_requires = [str(r.req) for r in parse_requirements('%s/requirements/tests.txt' % here, session=session)]
 
 setup(
     name='rapidpro-python',
@@ -23,8 +25,7 @@ setup(
         'Topic :: Software Development :: Libraries',
         'License :: OSI Approved :: BSD License',
         'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
     ],
 
     keywords='rapidpro client',
