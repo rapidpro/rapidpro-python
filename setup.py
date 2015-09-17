@@ -1,12 +1,10 @@
-from os import path
 from pip.download import PipSession
 from pip.req import parse_requirements
 from setuptools import setup
 
-here = path.abspath(path.dirname(__file__))
 session = PipSession()
-install_requires = [str(r.req) for r in parse_requirements('%s/requirements/base.txt' % here, session=session)]
-tests_requires = [str(r.req) for r in parse_requirements('%s/requirements/tests.txt' % here, session=session)]
+install_requires = [str(r.req) for r in parse_requirements('requirements/base.txt', session=session)]
+tests_requires = [str(r.req) for r in parse_requirements('requirements/tests.txt', session=session)]
 
 setup(
     name='rapidpro-python',
