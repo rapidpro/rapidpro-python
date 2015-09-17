@@ -1,10 +1,21 @@
-from pip.download import PipSession
-from pip.req import parse_requirements
 from setuptools import setup
 
-session = PipSession()
-install_requires = [str(r.req) for r in parse_requirements('requirements/base.txt', session=session)]
-tests_requires = [str(r.req) for r in parse_requirements('requirements/tests.txt', session=session)]
+
+def _is_requirement(line):
+    """Returns whether the line is a valid package requirement."""
+    line = line.strip()
+    return line and not (line.startswith("-r") or line.startswith("#"))
+
+
+def _read_requirements(filename):
+    """Returns a list of package requirements read from the file."""
+    requirements_file = open(filename).read()
+    return [line.strip() for line in requirements_file.splitlines()
+            if _is_requirement(line)]
+
+
+required_packages = _read_requirements("requirements/base.txt")
+test_packages = _read_requirements("requirements/tests.txt")
 
 setup(
     name='rapidpro-python',
@@ -28,8 +39,8 @@ setup(
 
     keywords='rapidpro client',
     packages=['temba'],
-    install_requires=install_requires,
+    install_requires=required_packages,
 
     test_suite='nose.collector',
-    tests_require=tests_requires,
+    tests_require=required_packages + test_packages,
 )
