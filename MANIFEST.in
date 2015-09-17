@@ -1,4 +1,4 @@
 include LICENSE
 include README.md
-include pip-requires.txt
-recursive-include temba .
+recursive-include requirements *.txt
+recursive-include temba *.py
