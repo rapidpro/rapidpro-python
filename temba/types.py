@@ -97,6 +97,16 @@ class Message(TembaObject):
     sent_on = DatetimeField()
 
 
+class Org(TembaObject):
+    name = SimpleField()
+    country = SimpleField()
+    languages = SimpleField()
+    primary_language = SimpleField()
+    timezone = SimpleField()
+    date_style = SimpleField()
+    anon = SimpleField()
+
+
 class RunValueSet(TembaObject):
     node = SimpleField()
     category = SimpleField()

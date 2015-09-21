@@ -235,21 +235,24 @@ class AbstractTembaClient(object):
         """
         return TembaPager(start_page)
 
-    def _get_single(self, endpoint, params):
+    def _get_single(self, endpoint, params, from_results=True):
         """
         GETs a single result from the given endpoint. Throws an exception if there are no or multiple results.
         """
         url = '%s/%s.json' % (self.root_url, endpoint)
         response = self._request('get', url, params=params)
 
-        num_results = len(response['results'])
+        if from_results:
+            num_results = len(response['results'])
 
-        if num_results > 1:
-            raise TembaMultipleResultsError()
-        elif num_results == 0:
-            raise TembaNoSuchObjectError()
+            if num_results > 1:
+                raise TembaMultipleResultsError()
+            elif num_results == 0:
+                raise TembaNoSuchObjectError()
+            else:
+                return response['results'][0]
         else:
-            return response['results'][0]
+            return response
 
     def _get_multiple(self, endpoint, params, pager):
         """

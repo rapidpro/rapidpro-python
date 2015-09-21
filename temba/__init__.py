@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 __version__ = '1.3'
 
 from .base import AbstractTembaClient
-from .types import Boundary, Broadcast, Campaign, Contact, Group, Event, Field, Flow, Label, Message, Result, Run
+from .types import Boundary, Broadcast, Campaign, Contact, Group, Event, Field, Flow, Label, Message, Org, Result, Run
 
 
 class TembaClient(AbstractTembaClient):
@@ -358,6 +358,14 @@ class TembaClient(AbstractTembaClient):
                                     status=statuses, direction=direction, type=_types, label=labels,
                                     before=before, after=after, text=text, archived=archived, reverse=reverse)
         return Message.deserialize_list(self._get_multiple('messages', params, pager))
+
+    def get_org(self):
+        """
+        Gets the current organization
+
+        :return: the org
+        """
+        return Org.deserialize(self._get_single('org', {}, from_results=False))
 
     def get_results(self, ruleset=None, contact_field=None, segment=None):
         """

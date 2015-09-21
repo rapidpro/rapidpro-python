@@ -669,6 +669,20 @@ class TembaClientTest(unittest.TestCase):
 
         self.assert_request(mock_request, 'get', 'messages', params={'broadcast': [123]})
 
+    def test_get_org(self, mock_request):
+        mock_request.return_value = MockResponse(200, _read_json('org'))
+        org = self.client.get_org()
+
+        self.assert_request(mock_request, 'get', 'org')
+
+        self.assertEqual(org.name, "Nyaruka")
+        self.assertEqual(org.country, "RW")
+        self.assertEqual(org.languages, ["eng", "fre"])
+        self.assertEqual(org.primary_language, "eng")
+        self.assertEqual(org.timezone, "Africa/Kigali")
+        self.assertEqual(org.date_style, "day_first")
+        self.assertEqual(org.anon, False)
+
     def test_get_results(self, mock_request):
         mock_request.return_value = MockResponse(200, _read_json('results_missing_optional'))
         results = self.client.get_results(ruleset='aabe7d0f-bf27-4e76-a6b3-4d26ec18dd58')
