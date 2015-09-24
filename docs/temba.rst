@@ -1,12 +1,12 @@
-temba package
+temba_client package
 =============
 
-This package contains the :class:`temba.TembaClient` client class.
+This package contains the :class:`temba_client.TembaClient` client class.
 
 Module contents
 ---------------
 
-.. automodule:: temba
+.. automodule:: temba_client
     :members:
     :undoc-members:
     :inherited-members:

@@ -8,11 +8,12 @@ import six
 import unittest
 
 from mock import patch
-from . import TembaClient, __version__
+from . import TembaClient
 from .base import TembaObject, SimpleField, IntegerField, DatetimeField, ObjectListField, TembaException
 from .base import TembaNoSuchObjectError, TembaMultipleResultsError, TembaAPIError, TembaConnectionError
 from .types import Group, Broadcast
 from .utils import format_iso8601, parse_iso8601
+from .version import __version__
 
 
 class MockResponse(object):
@@ -39,7 +40,7 @@ class MockResponse(object):
         return json.loads(self.content)
 
 
-@patch('temba.base.request')
+@patch('temba_client.base.request')
 @patch('requests.models.Response', MockResponse)
 class TembaClientTest(unittest.TestCase):
 

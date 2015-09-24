@@ -19,7 +19,7 @@ test_packages = _read_requirements("requirements/tests.txt")
 
 setup(
     name='rapidpro-python',
-    version='1.3',
+    version=__import__('temba_client.version').__version__,
     description='Python client library for the RapidPro',
     url='https://github.com/rapidpro',
 
@@ -38,7 +38,7 @@ setup(
     ],
 
     keywords='rapidpro client',
-    packages=['temba'],
+    packages=['temba_client'],
     install_requires=required_packages,
 
     test_suite='nose.collector',

@@ -1,7 +1,5 @@
 from __future__ import unicode_literals
 
-__version__ = '1.3'
-
 from .base import AbstractTembaClient
 from .types import Boundary, Broadcast, Campaign, Contact, Group, Event, Field, Flow, Label, Message, Org, Result, Run
 
