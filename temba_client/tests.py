@@ -8,12 +8,12 @@ import six
 import unittest
 
 from mock import patch
-from . import TembaClient
+from . import __version__
+from .client import TembaClient
 from .base import TembaObject, SimpleField, IntegerField, DatetimeField, ObjectListField, TembaException
 from .base import TembaNoSuchObjectError, TembaMultipleResultsError, TembaAPIError, TembaConnectionError
 from .types import Group, Broadcast
 from .utils import format_iso8601, parse_iso8601
-from .version import __version__
 
 
 class MockResponse(object):

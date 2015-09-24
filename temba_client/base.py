@@ -7,8 +7,8 @@ import requests
 import six
 
 from abc import ABCMeta, abstractmethod
+from . import __version__
 from .utils import format_iso8601, parse_iso8601
-from .version import __version__
 
 
 logger = logging.getLogger(__name__)
