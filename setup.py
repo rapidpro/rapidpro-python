@@ -19,7 +19,7 @@ test_packages = _read_requirements("requirements/tests.txt")
 
 setup(
     name='rapidpro-python',
-    version=__import__('temba_client.version').__version__,
+    version=__import__('temba_client').version.__version__,
     description='Python client library for the RapidPro',
     url='https://github.com/rapidpro',
 
