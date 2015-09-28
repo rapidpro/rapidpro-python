@@ -330,7 +330,7 @@ class TembaClient(AbstractTembaClient):
 
     def get_messages(self, ids=None, broadcasts=None, urns=None, contacts=None, groups=None, statuses=None,
                      direction=None, _types=None, labels=None, before=None, after=None, text=None,
-                     archived=None, reverse=None, pager=None):
+                     archived=None, pager=None):
         """
         Gets all matching messages
 
@@ -347,14 +347,13 @@ class TembaClient(AbstractTembaClient):
         :param datetime after: created after
         :param str text: containing text
         :param bool archived: include or don't include archived messages
-        :param bool reverse: oldest messages first
         :param object pager: pager for paged results
         :return: list of messages
         """
         params = self._build_params(id=ids, broadcast=broadcasts,
                                     urns=urns, contact=contacts, group_uuids=groups,
                                     status=statuses, direction=direction, type=_types, label=labels,
-                                    before=before, after=after, text=text, archived=archived, reverse=reverse)
+                                    before=before, after=after, text=text, archived=archived)
         return Message.deserialize_list(self._get_multiple('messages', params, pager))
 
     def get_org(self):
