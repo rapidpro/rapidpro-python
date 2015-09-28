@@ -7,7 +7,7 @@ import requests
 import six
 
 from abc import ABCMeta, abstractmethod
-from . import __version__
+from . import __version__, CLIENT_NAME
 from .utils import format_iso8601, parse_iso8601
 
 
@@ -217,9 +217,9 @@ class AbstractTembaClient(object):
     @staticmethod
     def _headers(token, user_agent):
         if user_agent:
-            user_agent_header = '%s rapidpro-python/%s' % (user_agent, __version__)
+            user_agent_header = '%s %s/%s' % (user_agent, CLIENT_NAME, __version__)
         else:
-            user_agent_header = 'rapidpro-python/%s' % __version__
+            user_agent_header = '%s/%s' % (CLIENT_NAME, __version__)
 
         return {'Content-type': 'application/json',
                 'Accept': 'application/json',
