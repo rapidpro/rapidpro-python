@@ -863,8 +863,8 @@ class TembaClientTest(unittest.TestCase):
         try:
             self.client.update_label('12345678', "Really High Priority")
         except TembaAPIError as ex:
-            self.assertEqual(ex.errors, {})
-            self.assertEqual(six.text_type(ex), "API request error. Caused by: 400 Client Error: ...")
+            self.assertEqual(ex.errors, {'non_field_errors': ['xyz']})
+            self.assertEqual(six.text_type(ex), "API request error. Caused by: xyz")
         else:
             self.fail("Should have thrown exception")
 
