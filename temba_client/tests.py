@@ -158,6 +158,16 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(field.label, "Chat Name")
         self.assertEqual(field.value_type, 'T')
 
+        # with key provided
+        field = self.client.create_field("Chat Name", 'T', key='chat_name')
+
+        expected_body = {'label': "Chat Name", 'value_type': 'T', 'key': 'chat_name'}
+        self.assert_request(mock_request, 'post', 'fields', data=expected_body)
+
+        self.assertEqual(field.key, 'chat_name')
+        self.assertEqual(field.label, "Chat Name")
+        self.assertEqual(field.value_type, 'T')
+
     def test_create_flow(self, mock_request):
         mock_request.return_value = MockResponse(200, _read_json('flows_created'))
         flow = self.client.create_flow("Ping", 'F')

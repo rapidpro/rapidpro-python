@@ -73,15 +73,16 @@ class TembaClient(AbstractTembaClient):
                                     delivery_hour=delivery_hour, message=message, flow_uuid=flow)
         return Event.deserialize(self._post('events', params))
 
-    def create_field(self, label, value_type):
+    def create_field(self, label, value_type, key=None):
         """
         Creates a new contact field
 
         :param str label: field label
         :param str value_type: one of 'T' (text), 'N' (decimal), 'D' (datetime), 'S' (state), 'I' (district)
+        :param str key: field key (optional)
         :return: the new field
         """
-        params = self._build_params(label=label, value_type=value_type)
+        params = self._build_params(label=label, value_type=value_type, key=key)
         return Field.deserialize(self._post('fields', params))
 
     def create_flow(self, name, _type):
