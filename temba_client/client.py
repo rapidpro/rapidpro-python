@@ -1,7 +1,8 @@
 from __future__ import absolute_import, unicode_literals
 
 from .base import AbstractTembaClient
-from .types import Boundary, Broadcast, Campaign, Contact, Group, Event, Field, Flow, Label, Message, Org, Result, Run
+from .types import Boundary, Broadcast, Campaign, Contact, Group, Event, Field, Flow, FlowDefinition, Label
+from .types import Message, Org, Result, Run
 
 
 class TembaClient(AbstractTembaClient):
@@ -84,17 +85,6 @@ class TembaClient(AbstractTembaClient):
         """
         params = self._build_params(label=label, value_type=value_type, key=key)
         return Field.deserialize(self._post('fields', params))
-
-    def create_flow(self, name, _type):
-        """
-        Creates a new flow
-
-        :param str name: flow name
-        :param str _type: flow type: F, M or V
-        :return: the new flow
-        """
-        params = self._build_params(name=name, flow_type=_type)
-        return Flow.deserialize(self._post('flows', params))
 
     def create_label(self, name):
         """
@@ -278,6 +268,15 @@ class TembaClient(AbstractTembaClient):
         params = self._build_params(uuid=uuids, archived=archived, label=labels, before=before, after=after)
         return Flow.deserialize_list(self._get_multiple('flows', params, pager))
 
+    def get_flow_definition(self, uuid):
+        """
+        Gets a single flow definition by its UUID
+
+        :param str uuid: flow UUID
+        :return: the flow definition
+        """
+        return FlowDefinition.deserialize(self._get_single('flow_definition', {'uuid': uuid}, from_results=False))
+
     def get_group(self, uuid):
         """
         Gets a single group by its UUID
@@ -405,6 +404,18 @@ class TembaClient(AbstractTembaClient):
         return Run.deserialize_list(self._get_multiple('runs', params, pager))
 
     # ==================================================================================================================
+    # Save object operations
+    # ==================================================================================================================
+
+    def save_flow_definition(self, definition):
+        """
+        Saves a flow definition. If updating an existing definition then definition metadata should include UUID.
+        :param definition: the flow definition
+        :return: the saved definition
+        """
+        return FlowDefinition.deserialize(self._post('flow_definition', definition.serialize()))
+
+    # ==================================================================================================================
     # Update object operations
     # ==================================================================================================================
 
@@ -421,18 +432,6 @@ class TembaClient(AbstractTembaClient):
         """
         params = self._build_params(uuid=uuid, name=name, urns=urns, fields=fields, group_uuids=groups)
         return Contact.deserialize(self._post('contacts', params))
-
-    def update_flow(self, uuid, name, _type):
-        """
-        Updates an existing flow
-
-        :param str uuid: flow UUID
-        :param str name: flow name
-        :param str _type: flow type: F, M or V
-        :return: the updated flow
-        """
-        params = self._build_params(uuid=uuid, name=name, flow_type=_type)
-        return Flow.deserialize(self._post('flows', params))
 
     def update_label(self, uuid, name):
         """

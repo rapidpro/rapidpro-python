@@ -75,6 +75,16 @@ class Flow(TembaObject):
     created_on = DatetimeField()
 
 
+class FlowDefinition(TembaObject):
+    metadata = SimpleField()
+    version = IntegerField()
+    base_language = SimpleField()
+    flow_type = SimpleField()
+    action_sets = SimpleField()
+    rule_sets = SimpleField()
+    entry = SimpleField()
+
+
 class Label(TembaObject):
     uuid = SimpleField()
     name = SimpleField()

@@ -140,6 +140,18 @@ class TembaObject(object):
     def deserialize_list(cls, item_list):
         return [cls.deserialize(item) for item in item_list]
 
+    def serialize(self):
+        item = {}
+
+        for attr_name, field in six.iteritems(self._get_fields()):
+            attr_value = getattr(self, attr_name, None)
+            field_value = field.serialize(attr_value)
+
+            field_source = field.src if field.src else six.text_type(attr_name)
+            item[field_source] = field_value
+
+        return item
+
     @classmethod
     def _get_fields(cls):
         return {k: v for k, v in six.iteritems(cls.__dict__) if isinstance(v, TembaField)}
@@ -160,14 +172,20 @@ class TembaField(object):
     def deserialize(self, value):  # pragma: no cover
         pass
 
+    @abstractmethod
+    def serialize(self, value):  # pragma: no cover
+        pass
+
 
 class SimpleField(TembaField):
     def deserialize(self, value):
+        return value
 
+    def serialize(self, value):
         return value
 
 
-class IntegerField(TembaField):
+class IntegerField(SimpleField):
     def deserialize(self, value):
         if value and type(value) not in six.integer_types:
             raise TembaException("Value '%s' field is not an integer" % six.text_type(value))
@@ -178,6 +196,9 @@ class DatetimeField(TembaField):
     def deserialize(self, value):
         return parse_iso8601(value)
 
+    def serialize(self, value):
+        return format_iso8601(value)
+
 
 class ObjectField(TembaField):
     def __init__(self, item_class, src=None):
@@ -187,6 +208,9 @@ class ObjectField(TembaField):
     def deserialize(self, value):
         return self.item_class.deserialize(value)
 
+    def serialize(self, value):
+        return self.item_class.serialize(value)
+
 
 class ObjectListField(ObjectField):
     def deserialize(self, value):
@@ -194,6 +218,12 @@ class ObjectListField(ObjectField):
             raise TembaException("Value '%s' field is not a list" % six.text_type(value))
 
         return self.item_class.deserialize_list(value)
+
+    def serialize(self, value):
+        if not isinstance(value, list):
+            raise TembaException("Value '%s' field is not a list" % six.text_type(value))
+
+        return [self.item_class.serialize(item) for item in value]
 
 
 # =====================================================================

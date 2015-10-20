@@ -12,7 +12,7 @@ from . import __version__
 from .client import TembaClient
 from .base import TembaObject, SimpleField, IntegerField, DatetimeField, ObjectListField, TembaException
 from .base import TembaNoSuchObjectError, TembaMultipleResultsError, TembaAPIError, TembaConnectionError
-from .types import Group, Broadcast
+from .types import Broadcast, Group, FlowDefinition
 from .utils import format_iso8601, parse_iso8601
 
 
@@ -167,16 +167,6 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(field.key, 'chat_name')
         self.assertEqual(field.label, "Chat Name")
         self.assertEqual(field.value_type, 'T')
-
-    def test_create_flow(self, mock_request):
-        mock_request.return_value = MockResponse(200, _read_json('flows_created'))
-        flow = self.client.create_flow("Ping", 'F')
-
-        expected_body = {'name': "Ping", 'flow_type': 'F'}
-        self.assert_request(mock_request, 'post', 'flows', data=expected_body)
-
-        self.assertEqual(flow.uuid, 'a68567fa-ad95-45fc-b5f7-3ce90ebbd46d')
-        self.assertEqual(flow.name, "Ping")
 
     def test_create_label(self, mock_request):
         mock_request.return_value = MockResponse(200, _read_json('labels_created'))
@@ -785,6 +775,23 @@ class TembaClientTest(unittest.TestCase):
                          'action': 'remove', 'group': 'Testers'}
         self.assert_request(mock_request, 'post', 'contact_actions', data=expected_body)
 
+    def test_save_flow_definition(self, mock_request):
+        mock_request.return_value = MockResponse(200, _read_json('flow_definition_created'))
+
+        definition = FlowDefinition.create(metadata={'name': "Empty Flow"},
+                                           version=7,
+                                           base_language='eng',
+                                           flow_type='F',
+                                           action_sets=[],
+                                           rule_sets=[],
+                                           entry=None)
+        self.client.save_flow_definition(definition)
+
+        expected_body = {'metadata': {'name': "Empty Flow"}, 'version': 7,
+                         'base_language': 'eng', 'flow_type': 'F',
+                         'action_sets': [], 'rule_sets': [], 'entry': None}
+        self.assert_request(mock_request, 'post', 'flow_definition', data=expected_body)
+
     def test_unarchive_messages(self, mock_request):
         mock_request.return_value = MockResponse(204)
         self.client.unarchive_messages(messages=[123, 234, 345])
@@ -831,18 +838,6 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(contact.fields, {'nickname': 'Triple A'})
         self.assertEqual(contact.language, None)
         self.assertEqual(contact.modified_on, datetime.datetime(2014, 10, 1, 6, 54, 9, 817000, pytz.utc))
-
-    def test_update_flow(self, mock_request):
-        mock_request.return_value = MockResponse(200, _read_json('flows_created'))
-        flow = self.client.update_flow('a68567fa-ad95-45fc-b5f7-3ce90ebbd46d', "Ping", 'F')
-
-        expected_body = {'uuid': 'a68567fa-ad95-45fc-b5f7-3ce90ebbd46d',
-                         'name': "Ping",
-                         'flow_type': 'F'}
-        self.assert_request(mock_request, 'post', 'flows', data=expected_body)
-
-        self.assertEqual(flow.uuid, 'a68567fa-ad95-45fc-b5f7-3ce90ebbd46d')
-        self.assertEqual(flow.name, "Ping")
 
     def test_update_label(self, mock_request):
         mock_request.return_value = MockResponse(200, _read_json('labels_created'))
@@ -956,6 +951,13 @@ class TembaObjectTest(unittest.TestCase):
         # exception when object list field receives non-list
         self.assertRaises(TembaException, TestType.deserialize,
                           {'foo': 'a', 'bar': 'x', 'doh': '2014-01-02T03:04:05', 'hum': {}})
+
+    def test_serialize(self):
+        obj = TestType.create(foo='a', bar=123, doh=datetime.datetime(2014, 1, 2, 3, 4, 5, 0, pytz.UTC),
+                              hum=[TestSubType.create(zed='b')])
+
+        json_obj = obj.serialize()
+        self.assertEqual(json_obj, {'foo': 'a', 'bar': 123, 'doh': '2014-01-02T03:04:05.000000', 'hum': [{'zed': 'b'}]})
 
 
 def _read_json(filename):

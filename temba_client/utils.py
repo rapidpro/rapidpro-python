@@ -2,6 +2,7 @@ from __future__ import absolute_import, unicode_literals
 
 import datetime
 import pytz
+import six
 
 
 ISO8601_DATE_FORMAT = '%Y-%m-%d'
@@ -28,10 +29,10 @@ def parse_iso8601(value):
     return datetime.datetime.strptime(value, _format).replace(tzinfo=pytz.utc)
 
 
-def format_iso8601(_datetime):
+def format_iso8601(value):
     """
     Formats a datetime as a UTC ISO8601 date
     """
     _format = ISO8601_DATETIME_FORMAT + '.%f'
 
-    return _datetime.astimezone(pytz.UTC).strftime(_format)
+    return six.text_type(value.astimezone(pytz.UTC).strftime(_format))
