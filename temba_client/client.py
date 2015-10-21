@@ -192,7 +192,7 @@ class TembaClient(AbstractTembaClient):
         """
         return Contact.deserialize(self._get_single('contacts', {'uuid': uuid}))
 
-    def get_contacts(self, uuids=None, urns=None, groups=None, before=None, after=None, pager=None):
+    def get_contacts(self, uuids=None, urns=None, groups=None, before=None, after=None, deleted=None, pager=None):
         """
         Gets all matching contacts
 
@@ -201,10 +201,12 @@ class TembaClient(AbstractTembaClient):
         :param list groups: list of group objects or UUIDs
         :param datetime before: modified before this datetime
         :param datetime after: modified after this datetime
+        :param bool deleted: whether to return deleted contacts
         :param object pager: pager for paged results
         :return: list of contacts
         """
-        params = self._build_params(uuid=uuids, urns=urns, group_uuids=groups, before=before, after=after)
+        params = self._build_params(uuid=uuids, urns=urns, group_uuids=groups, before=before, after=after,
+                                    deleted=deleted)
         return Contact.deserialize_list(self._get_multiple('contacts', params, pager))
 
     def get_event(self, uuid):
