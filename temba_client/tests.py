@@ -728,6 +728,7 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(run.values[0].label, "Number of Sheep")
         self.assertEqual(run.values[0].time, datetime.datetime(2015, 1, 26, 13, 57, 55, 704000, pytz.utc))
         self.assertEqual(run.created_on, datetime.datetime(2015, 1, 26, 13, 56, 18, 689000, pytz.utc))
+        self.assertEqual(run.modified_on, datetime.datetime(2015, 1, 26, 13, 56, 18, 689000, pytz.utc))
         self.assertEqual(run.expires_on, datetime.datetime(2015, 7, 8, 1, 10, 43, 111000, pytz.utc))
         self.assertEqual(run.expired_on, None)
 

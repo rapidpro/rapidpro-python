@@ -143,6 +143,7 @@ class Run(TembaObject):
     steps = ObjectListField(item_class=FlowStep)
     values = ObjectListField(item_class=RunValueSet)
     created_on = DatetimeField()
+    modified_on = DatetimeField()
     expires_on = DatetimeField()
     expired_on = DatetimeField()
     completed = SimpleField()
