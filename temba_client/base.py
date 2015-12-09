@@ -347,7 +347,8 @@ class AbstractTembaClient(object):
         """
         Makes a GET or POST request to the given URL and returns the parsed JSON
         """
-        logger.debug("%s %s %s" % (method.upper(), url, json.dumps(params if params else body)))
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug("%s %s %s" % (method.upper(), url, json.dumps(params if params else body)))
 
         try:
             kwargs = {'headers': self.headers}
@@ -357,8 +358,6 @@ class AbstractTembaClient(object):
                 kwargs['params'] = params
 
             response = request(method, url, **kwargs)
-
-            logger.debug(" -> %s" % response.content)
 
             response.raise_for_status()
 

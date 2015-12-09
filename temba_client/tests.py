@@ -1,5 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 
+import codecs
 import datetime
 import json
 import pytz
@@ -621,7 +622,7 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(message.type, 'F')
         self.assertEqual(message.labels, ["Important"])
         self.assertEqual(message.direction, 'I')
-        self.assertEqual(message.text, "Hello \u0633.")
+        self.assertEqual(message.text, "Hello \u0633\u0644\u0645")
         self.assertEqual(message.created_on, datetime.datetime(2014, 12, 12, 13, 34, 44, 0, pytz.utc))
         self.assertEqual(message.sent_on, None)
         self.assertEqual(message.delivered_on, datetime.datetime(2014, 12, 12, 13, 35, 12, 861000, pytz.utc))
@@ -962,7 +963,7 @@ class TembaObjectTest(unittest.TestCase):
 
 
 def _read_json(filename):
-    handle = open('test_files/%s.json' % filename)
+    handle = codecs.open('test_files/%s.json' % filename, 'r', 'utf-8')
     contents = six.text_type(handle.read())
     handle.close()
     return contents
