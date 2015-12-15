@@ -397,8 +397,8 @@ class TembaClient(AbstractTembaClient):
         :param list[int] ids: list of run ids
         :param list[str] flows: list of flow objects or UUIDs
         :param list groups: list of group objects or UUIDs
-        :param datetime before: created before
-        :param datetime after: created after
+        :param datetime before: modified before
+        :param datetime after: modified after
         :param object pager: pager for paged results
         :return: list of flow runs
         """
