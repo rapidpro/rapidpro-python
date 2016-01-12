@@ -1,11 +1,11 @@
 from __future__ import absolute_import, unicode_literals
 
-from .base import AbstractTembaClient
+from .base import BasePagingClient
 from .types import Boundary, Broadcast, Campaign, Contact, Group, Event, Field, Flow, FlowDefinition, Label
 from .types import Message, Org, Result, Run
 
 
-class TembaClient(AbstractTembaClient):
+class TembaClient(BasePagingClient):
     """
     Client for the Temba API v1
 

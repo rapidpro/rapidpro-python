@@ -8,12 +8,12 @@ Welcome to rapidpro-python's documentation!
 
 This is the official Python client library for `RapidPro <http://rapidpro.github.io/rapidpro/>`_.
 
-To create a :class:`temba_client.client.TembaClient` instance, you need to know the name of the host server, and your API token.
+To create a :class:`temba_client.v1.TembaClient` instance, you need to know the name of the host server, and your API token.
 If you don't know your API token then visit the `API Explorer <http://rapidpro.io/api/v1/explorer>`_. For example:
 
 .. code-block:: python
 
-    from temba_client.client import TembaClient
+    from temba_client.v1 import TembaClient
     client = TembaClient('rapidpro.io', <YOUR-API-TOKEN>)
 
 Alternatively you can create a client from the complete URL of the API root. You can use this if you need to connect to

@@ -18,7 +18,7 @@ Example
 -------
 
 ```python
-from temba_client.client import TembaClient
+from temba_client.v1 import TembaClient
 client = TembaClient('rapidpro.io', 'your-api-token')
 for contact in client.get_contacts():
     print(contact.name)

@@ -6,67 +6,14 @@ import logging
 import requests
 import six
 
-from abc import ABCMeta, abstractmethod
-from . import __version__, CLIENT_NAME
-from .utils import format_iso8601, parse_iso8601
+from abc import ABCMeta
+from .. import __version__, CLIENT_NAME
+from ..exceptions import TembaMultipleResultsError, TembaNoSuchObjectError, TembaAPIError, TembaConnectionError
+from ..serialization import TembaObject
+from ..utils import format_iso8601
 
 
 logger = logging.getLogger(__name__)
-
-
-# =====================================================================
-# Exceptions
-# =====================================================================
-
-class TembaException(Exception):
-    def __unicode__(self):  # pragma: no cover
-        return self.message
-
-    def __str__(self):
-        return str(self.__unicode__())
-
-
-class TembaNoSuchObjectError(TembaException):
-    message = "Request for single object returned no objects"
-
-
-class TembaMultipleResultsError(TembaException):
-    message = "Request for single object returned multiple objects"
-
-
-class TembaAPIError(TembaException):
-    """
-    Errors returned by the Temba API
-    """
-    message = "API request error"
-
-    def __init__(self, caused_by):
-        self.caused_by = caused_by
-        self.errors = {}
-
-        # if error was caused by a HTTP 400 response, we may have a useful validation error
-        if isinstance(caused_by, requests.HTTPError) and caused_by.response.status_code == 400:
-            try:
-                self.errors = caused_by.response.json()
-            except ValueError:
-                self.errors = {'non_field_errors': [caused_by.response.content]}
-                pass
-
-    def __unicode__(self):
-        if self.errors:
-            msgs = []
-            for field, field_errors in six.iteritems(self.errors):
-                for error in field_errors:
-                    msgs.append(error)
-            cause = msgs[0] if len(msgs) == 1 else ". ".join(msgs)
-
-            return "%s. Caused by: %s" % (self.message, cause)
-        else:
-            return "%s. Caused by: %s" % (self.message, six.text_type(self.caused_by))
-
-
-class TembaConnectionError(TembaException):
-    message = "Unable to connect to host"
 
 
 # =====================================================================
@@ -92,147 +39,12 @@ class TembaPager(object):
 
 
 # =====================================================================
-# Domain objects
-# =====================================================================
-
-class TembaObject(object):
-    """
-    Base class for objects returned by the Temba API
-    """
-    __metaclass__ = ABCMeta
-
-    @classmethod
-    def create(cls, **kwargs):
-        source = kwargs.copy()
-        instance = cls()
-
-        for attr_name, field in six.iteritems(cls._get_fields()):
-            if attr_name in source:
-                field_value = source.pop(attr_name)
-            else:
-                field_value = None
-
-            setattr(instance, attr_name, field_value)
-
-        for remaining in source:
-            raise ValueError("Class %s has no attribute '%s'" % (cls.__name__, remaining))
-
-        return instance
-
-    @classmethod
-    def deserialize(cls, item):
-        instance = cls()
-
-        for attr_name, field in six.iteritems(cls._get_fields()):
-            field_source = field.src if field.src else attr_name
-
-            if field_source not in item and not field.optional:
-                raise TembaException("Serialized %s item is missing field '%s'" % (cls.__name__, field_source))
-
-            field_value = item.get(field_source, None)
-            attr_value = field.deserialize(field_value)
-
-            setattr(instance, attr_name, attr_value)
-
-        return instance
-
-    @classmethod
-    def deserialize_list(cls, item_list):
-        return [cls.deserialize(item) for item in item_list]
-
-    def serialize(self):
-        item = {}
-
-        for attr_name, field in six.iteritems(self._get_fields()):
-            attr_value = getattr(self, attr_name, None)
-            field_value = field.serialize(attr_value)
-
-            field_source = field.src if field.src else six.text_type(attr_name)
-            item[field_source] = field_value
-
-        return item
-
-    @classmethod
-    def _get_fields(cls):
-        return {k: v for k, v in six.iteritems(cls.__dict__) if isinstance(v, TembaField)}
-
-
-# =====================================================================
-# Field types
-# =====================================================================
-
-class TembaField(object):
-    __metaclass__ = ABCMeta
-
-    def __init__(self, src=None, optional=False):
-        self.src = src
-        self.optional = optional
-
-    @abstractmethod
-    def deserialize(self, value):  # pragma: no cover
-        pass
-
-    @abstractmethod
-    def serialize(self, value):  # pragma: no cover
-        pass
-
-
-class SimpleField(TembaField):
-    def deserialize(self, value):
-        return value
-
-    def serialize(self, value):
-        return value
-
-
-class IntegerField(SimpleField):
-    def deserialize(self, value):
-        if value and type(value) not in six.integer_types:
-            raise TembaException("Value '%s' field is not an integer" % six.text_type(value))
-        return value
-
-
-class DatetimeField(TembaField):
-    def deserialize(self, value):
-        return parse_iso8601(value)
-
-    def serialize(self, value):
-        return format_iso8601(value)
-
-
-class ObjectField(TembaField):
-    def __init__(self, item_class, src=None):
-        super(ObjectField, self).__init__(src)
-        self.item_class = item_class
-
-    def deserialize(self, value):
-        return self.item_class.deserialize(value)
-
-    def serialize(self, value):
-        return self.item_class.serialize(value)
-
-
-class ObjectListField(ObjectField):
-    def deserialize(self, value):
-        if not isinstance(value, list):
-            raise TembaException("Value '%s' field is not a list" % six.text_type(value))
-
-        return self.item_class.deserialize_list(value)
-
-    def serialize(self, value):
-        if not isinstance(value, list):
-            raise TembaException("Value '%s' field is not a list" % six.text_type(value))
-
-        return [self.item_class.serialize(item) for item in value]
-
-
-# =====================================================================
 # Client base
 # =====================================================================
 
-class AbstractTembaClient(object):
+class BasePagingClient(object):
     """
-    Abstract and version agnostic base client class
+    Abstract base client class for paged endpoint access
     """
     __metaclass__ = ABCMeta
 
