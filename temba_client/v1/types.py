@@ -1,6 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 
-from ..serialization import TembaObject, SimpleField, IntegerField, DatetimeField, ObjectListField, ObjectField
+from ..serialization import TembaObject, SimpleField, BooleanField, IntegerField, DatetimeField, ObjectListField, ObjectField
 
 
 class Broadcast(TembaObject):
@@ -93,7 +93,7 @@ class Label(TembaObject):
 
 class Message(TembaObject):
     id = IntegerField()
-    broadcast = IntegerField()
+    broadcast = IntegerField(optional=True)
     contact = SimpleField()
     urn = SimpleField()
     status = SimpleField()
@@ -146,7 +146,7 @@ class Run(TembaObject):
     modified_on = DatetimeField()
     expires_on = DatetimeField()
     expired_on = DatetimeField()
-    completed = SimpleField()
+    completed = BooleanField()
 
     @classmethod
     def deserialize(cls, item):

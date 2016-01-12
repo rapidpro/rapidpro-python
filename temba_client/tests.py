@@ -4,8 +4,8 @@ import datetime
 import pytz
 import unittest
 
-from .exceptions import TembaException
-from .serialization import TembaObject, SimpleField, IntegerField, DatetimeField, ObjectListField
+from .exceptions import TembaSerializationException
+from .serialization import TembaObject, SimpleField, BooleanField, IntegerField, DatetimeField, ObjectListField
 from .utils import format_iso8601, parse_iso8601
 
 
@@ -26,6 +26,16 @@ class UtilsTest(unittest.TestCase):
 
         d = datetime.datetime(2014, 1, 2, 0, 0, 0, 0, pytz.UTC)
         self.assertEqual(parse_iso8601('2014-01-02'), d)
+
+
+class FieldsTest(unittest.TestCase):
+    def test_boolean(self):
+        field = BooleanField()
+        self.assertEqual(field.serialize(True), True)
+        self.assertEqual(field.deserialize(True), True)
+        self.assertEqual(field.deserialize(False), False)
+        self.assertRaises(TembaSerializationException, field.deserialize, "")
+        self.assertRaises(TembaSerializationException, field.deserialize, [])
 
 
 class TestSubType(TembaObject):
@@ -60,11 +70,11 @@ class TembaObjectTest(unittest.TestCase):
         self.assertEqual(obj.hum[0].zed, 'b')
 
         # exception when integer field receives non-number
-        self.assertRaises(TembaException, TestType.deserialize,
+        self.assertRaises(TembaSerializationException, TestType.deserialize,
                           {'foo': 'a', 'bar': 'x', 'doh': '2014-01-02T03:04:05', 'hum': []})
 
         # exception when object list field receives non-list
-        self.assertRaises(TembaException, TestType.deserialize,
+        self.assertRaises(TembaSerializationException, TestType.deserialize,
                           {'foo': 'a', 'bar': 'x', 'doh': '2014-01-02T03:04:05', 'hum': {}})
 
     def test_serialize(self):

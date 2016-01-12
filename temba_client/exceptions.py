@@ -53,3 +53,7 @@ class TembaAPIError(TembaException):
 
 class TembaConnectionError(TembaException):
     message = "Unable to connect to host"
+
+
+class TembaSerializationException(TembaException):
+    pass
