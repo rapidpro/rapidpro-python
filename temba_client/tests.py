@@ -1,9 +1,15 @@
 from __future__ import absolute_import, unicode_literals
 
+import codecs
 import datetime
+import json
 import pytz
+import requests
+import six
 import unittest
 
+from . import __version__
+from .clients import BaseClient
 from .exceptions import TembaSerializationException
 from .serialization import TembaObject, SimpleField, BooleanField, IntegerField, DatetimeField, ObjectListField
 from .utils import format_iso8601, parse_iso8601
@@ -83,3 +89,67 @@ class TembaObjectTest(unittest.TestCase):
 
         json_obj = obj.serialize()
         self.assertEqual(json_obj, {'foo': 'a', 'bar': 123, 'doh': '2014-01-02T03:04:05.000000', 'hum': [{'zed': 'b'}]})
+
+
+class BaseClientTest(unittest.TestCase):
+    class Client(BaseClient):
+        pass
+
+    def test_init(self):
+        # by host and token
+        client = BaseClientTest.Client('example.com', '1234567890', user_agent='test/0.1', api_version=3)
+        self.assertEqual(client.root_url, 'https://example.com/api/v3')
+        self.assertEqual(client.headers, {'Content-type': 'application/json',
+                                          'Accept': 'application/json',
+                                          'Authorization': 'Token 1234567890',
+                                          'User-Agent': 'test/0.1 rapidpro-python/%s' % __version__})
+
+        # by URL
+        client = BaseClientTest.Client('http://example.com/api/v1', '1234567890')
+        self.assertEqual(client.root_url, 'http://example.com/api/v1')
+        self.assertEqual(client.headers, {'Content-type': 'application/json',
+                                          'Accept': 'application/json',
+                                          'Authorization': 'Token 1234567890',
+                                          'User-Agent': 'rapidpro-python/%s' % __version__})
+
+        # by URL with trailing /
+        client = BaseClientTest.Client('http://example.com/api/v1/', '1234567890')
+        self.assertEqual(client.root_url, 'http://example.com/api/v1')
+
+
+# ====================================================================================
+# Test utilities
+# ====================================================================================
+
+class MockResponse(object):
+    """
+    Mock response object with a status code and some content
+    """
+    def __init__(self, status_code, content=''):
+        self.status_code = status_code
+        self.content = content
+
+    def raise_for_status(self):
+        http_error_msg = ''
+
+        if 400 <= self.status_code < 500:
+            http_error_msg = '%s Client Error: ...' % self.status_code
+
+        elif 500 <= self.status_code < 600:
+            http_error_msg = '%s Server Error: ...' % self.status_code
+
+        if http_error_msg:
+            raise requests.HTTPError(http_error_msg, response=self)
+
+    def json(self, **kwargs):
+        return json.loads(self.content)
+
+
+def read_json(filename):
+    """
+    Test utility method to load JSON from the given test file
+    """
+    handle = codecs.open('test_files/%s.json' % filename, 'r', 'utf-8')
+    contents = six.text_type(handle.read())
+    handle.close()
+    return contents

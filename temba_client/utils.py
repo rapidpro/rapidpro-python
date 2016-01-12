@@ -1,7 +1,9 @@
 from __future__ import absolute_import, unicode_literals
 
 import datetime
+import json
 import pytz
+import requests
 import six
 
 
@@ -36,3 +38,14 @@ def format_iso8601(value):
     _format = ISO8601_DATETIME_FORMAT + '.%f'
 
     return six.text_type(value.astimezone(pytz.UTC).strftime(_format))
+
+
+def request(method, url, **kwargs):  # pragma: no cover
+    """
+    For the purposes of testing, all calls to requests.request go through here before JSON bodies are encoded. It's
+    easier to mock this and verify request data before it's encoded.
+    """
+    if 'data' in kwargs:
+        kwargs['data'] = json.dumps(kwargs['data'])
+
+    return requests.request(method, url, **kwargs)

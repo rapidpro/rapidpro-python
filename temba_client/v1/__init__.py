@@ -1,8 +1,8 @@
 from __future__ import absolute_import, unicode_literals
 
-from .base import BasePagingClient
 from .types import Boundary, Broadcast, Campaign, Contact, Group, Event, Field, Flow, FlowDefinition, Label
 from .types import Message, Org, Result, Run
+from ..clients import BasePagingClient
 
 
 class TembaClient(BasePagingClient):
@@ -14,7 +14,7 @@ class TembaClient(BasePagingClient):
     :param str user_agent: string to be included in the User-Agent header
     """
     def __init__(self, host, token, user_agent=None):
-        super(TembaClient, self).__init__(host, token, user_agent)
+        super(TembaClient, self).__init__(host, token, user_agent, api_version=1)
 
     # ==================================================================================================================
     # Create object operations
