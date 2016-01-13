@@ -8,7 +8,7 @@ import six
 
 from abc import ABCMeta
 from . import __version__, CLIENT_NAME
-from .exceptions import TembaMultipleResultsError, TembaNoSuchObjectError, TembaAPIError, TembaConnectionError
+from .exceptions import TembaMultipleResultsError, TembaNoSuchObjectError, TembaAPIError, TembaConnectionError, TembaRateLimitError
 from .serialization import TembaObject
 from .utils import format_iso8601, request
 
@@ -73,6 +73,10 @@ class BaseClient(object):
                 kwargs['params'] = params
 
             response = request(method, url, **kwargs)
+
+            if response.status_code == 429:  # have we exceeded our allowed rate?
+                retry_after = response.headers.get('retry-after')
+                raise TembaRateLimitError(int(retry_after) if retry_after else 0)
 
             response.raise_for_status()
 
