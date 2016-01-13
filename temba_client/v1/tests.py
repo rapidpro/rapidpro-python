@@ -4,18 +4,17 @@ import datetime
 import pytz
 import requests
 import six
-import unittest
 
 from mock import patch
 from . import TembaClient
 from .types import Broadcast, Group, FlowDefinition
-from .. import __version__
 from ..exceptions import TembaException, TembaNoSuchObjectError, TembaMultipleResultsError, TembaAPIError, TembaConnectionError
-from ..tests import MockResponse, read_json
+from ..tests import TembaTest, MockResponse
 
 
 @patch('temba_client.clients.request')
-class TembaClientTest(unittest.TestCase):
+class TembaClientTest(TembaTest):
+    API_VERSION = 1
 
     def setUp(self):
         self.client = TembaClient('example.com', '1234567890', user_agent='test/0.1')
@@ -47,7 +46,7 @@ class TembaClientTest(unittest.TestCase):
 
     def test_create_broadcast(self, mock_request):
         # check by group UUID
-        mock_request.return_value = MockResponse(200, read_json('v1/broadcasts_created'))
+        mock_request.return_value = MockResponse(200, self.read_json('broadcasts_created'))
         broadcast = self.client.create_broadcast("Howdy", groups=['04a4752b-0f49-480e-ae60-3a3f2bea485c'])
 
         expected_body = {'text': "Howdy", 'groups': ['04a4752b-0f49-480e-ae60-3a3f2bea485c']}
@@ -62,7 +61,7 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(broadcast.created_on, datetime.datetime(2014, 12, 12, 22, 56, 58, 917000, pytz.utc))
 
     def test_create_campaign(self, mock_request):
-        mock_request.return_value = MockResponse(200, read_json('v1/campaigns_created'))
+        mock_request.return_value = MockResponse(200, self.read_json('campaigns_created'))
         campaign = self.client.create_campaign("Reminders", group='591de2c3-66bb-471b-9c9a-761b49a5ca69')
 
         expected_body = {'name': "Reminders", 'group_uuid': '591de2c3-66bb-471b-9c9a-761b49a5ca69'}
@@ -71,7 +70,7 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(campaign.uuid, '9ccae91f-b3f8-4c18-ad92-e795a2332c11')
 
     def test_create_contact(self, mock_request):
-        mock_request.return_value = MockResponse(200, read_json('v1/contacts_created'))
+        mock_request.return_value = MockResponse(200, self.read_json('contacts_created'))
         contact = self.client.create_contact("Amy Amanda Allen", ['tel:+250700000005'],
                                              {'nickname': "Triple A"}, ['04a4752b-0f49-480e-ae60-3a3f2bea485c'])
 
@@ -90,7 +89,7 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(contact.modified_on, datetime.datetime(2014, 10, 1, 6, 54, 9, 817000, pytz.utc))
 
     def test_create_event(self, mock_request):
-        mock_request.return_value = MockResponse(200, read_json('v1/events_created'))
+        mock_request.return_value = MockResponse(200, self.read_json('events_created'))
         event = self.client.create_event('9ccae91f-b3f8-4c18-ad92-e795a2332c11', "EDD", 14, 'D', -1, "Howdy")
 
         expected_body = {'campaign_uuid': '9ccae91f-b3f8-4c18-ad92-e795a2332c11', 'relative_to': "EDD",
@@ -100,7 +99,7 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(event.uuid, '9e6beda-0ce2-46cd-8810-91157f261cbd')
 
     def test_create_field(self, mock_request):
-        mock_request.return_value = MockResponse(200, read_json('v1/fields_created'))
+        mock_request.return_value = MockResponse(200, self.read_json('fields_created'))
         field = self.client.create_field("Chat Name", 'T')
 
         expected_body = {'label': "Chat Name", 'value_type': 'T'}
@@ -121,7 +120,7 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(field.value_type, 'T')
 
     def test_create_label(self, mock_request):
-        mock_request.return_value = MockResponse(200, read_json('v1/labels_created'))
+        mock_request.return_value = MockResponse(200, self.read_json('labels_created'))
         label = self.client.create_label("Really High Priority")
 
         expected_body = {'name': "Really High Priority"}
@@ -132,7 +131,7 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(label.count, 0)
 
     def test_create_runs(self, mock_request):
-        mock_request.return_value = MockResponse(200, read_json('v1/runs_created'))
+        mock_request.return_value = MockResponse(200, self.read_json('runs_created'))
         runs = self.client.create_runs('04a4752b-0f49-480e-ae60-3a3f2bea485c',
                                        ['bfff9984-38f4-4e59-998d-3663ec3c650d'], True)
 
@@ -186,7 +185,7 @@ class TembaClientTest(unittest.TestCase):
         self.assert_request(mock_request, 'post', 'contact_actions', data=expected_body)
 
     def test_get_boundaries(self, mock_request):
-        mock_request.return_value = MockResponse(200, read_json('v1/boundaries_multiple'))
+        mock_request.return_value = MockResponse(200, self.read_json('boundaries_multiple'))
         boundaries = self.client.get_boundaries()
 
         self.assert_request(mock_request, 'get', 'boundaries')
@@ -207,7 +206,7 @@ class TembaClientTest(unittest.TestCase):
 
     def test_get_broadcast(self, mock_request):
         # check single item response
-        mock_request.return_value = MockResponse(200, read_json('v1/broadcasts_single'))
+        mock_request.return_value = MockResponse(200, self.read_json('broadcasts_single'))
         broadcast = self.client.get_broadcast(1234)
 
         self.assert_request(mock_request, 'get', 'broadcasts', params={'id': 1234})
@@ -222,7 +221,7 @@ class TembaClientTest(unittest.TestCase):
 
     def test_get_broadcasts(self, mock_request):
         # check no params
-        mock_request.return_value = MockResponse(200, read_json('v1/broadcasts_multiple'))
+        mock_request.return_value = MockResponse(200, self.read_json('broadcasts_multiple'))
         broadcasts = self.client.get_broadcasts()
 
         self.assert_request(mock_request, 'get', 'broadcasts')
@@ -242,7 +241,7 @@ class TembaClientTest(unittest.TestCase):
 
     def test_get_campaign(self, mock_request):
         # check single item response
-        mock_request.return_value = MockResponse(200, read_json('v1/campaigns_single'))
+        mock_request.return_value = MockResponse(200, self.read_json('campaigns_single'))
         campaign = self.client.get_campaign('9ccae91f-b3f8-4c18-ad92-e795a2332c11')
 
         self.assert_request(mock_request, 'get', 'campaigns', params={'uuid': '9ccae91f-b3f8-4c18-ad92-e795a2332c11'})
@@ -253,16 +252,16 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(campaign.created_on, datetime.datetime(2015, 6, 8, 12, 18, 7, 671000, pytz.utc))
 
         # check empty response
-        mock_request.return_value = MockResponse(200, read_json('v1/empty'))
+        mock_request.return_value = MockResponse(200, self.read_json('empty'))
         self.assertRaises(TembaNoSuchObjectError, self.client.get_campaign, 'xyz')
 
         # check multiple item response
-        mock_request.return_value = MockResponse(200, read_json('v1/campaigns_multiple'))
+        mock_request.return_value = MockResponse(200, self.read_json('campaigns_multiple'))
         self.assertRaises(TembaMultipleResultsError, self.client.get_campaign, '9ccae91f-b3f8-4c18-ad92-e795a2332c11')
 
     def test_get_campaigns(self, mock_request):
         # check no params
-        mock_request.return_value = MockResponse(200, read_json('v1/campaigns_multiple'))
+        mock_request.return_value = MockResponse(200, self.read_json('campaigns_multiple'))
         campaigns = self.client.get_campaigns()
 
         self.assert_request(mock_request, 'get', 'campaigns')
@@ -272,7 +271,7 @@ class TembaClientTest(unittest.TestCase):
 
     def test_get_contact(self, mock_request):
         # check single item response
-        mock_request.return_value = MockResponse(200, read_json('v1/contacts_single'))
+        mock_request.return_value = MockResponse(200, self.read_json('contacts_single'))
         contact = self.client.get_contact('bfff9984-38f4-4e59-998d-3663ec3c650d')
 
         self.assert_request(mock_request, 'get', 'contacts', params={'uuid': 'bfff9984-38f4-4e59-998d-3663ec3c650d'})
@@ -288,16 +287,16 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(contact.modified_on, datetime.datetime(2014, 10, 1, 6, 54, 9, 817000, pytz.utc))
 
         # check empty response
-        mock_request.return_value = MockResponse(200, read_json('v1/empty'))
+        mock_request.return_value = MockResponse(200, self.read_json('empty'))
         self.assertRaises(TembaNoSuchObjectError, self.client.get_contact, 'xyz')
 
         # check multiple item response
-        mock_request.return_value = MockResponse(200, read_json('v1/contacts_multiple'))
+        mock_request.return_value = MockResponse(200, self.read_json('contacts_multiple'))
         self.assertRaises(TembaMultipleResultsError, self.client.get_contact, 'bfff9984-38f4-4e59-998d-3663ec3c650d')
 
     def test_get_contacts(self, mock_request):
         # check no params
-        mock_request.return_value = MockResponse(200, read_json('v1/contacts_multiple'))
+        mock_request.return_value = MockResponse(200, self.read_json('contacts_multiple'))
         contacts = self.client.get_contacts()
 
         self.assert_request(mock_request, 'get', 'contacts')
@@ -306,32 +305,32 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(contacts[0].uuid, "bfff9984-38f4-4e59-998d-3663ec3c650d")
 
         # check filtering by group_uuids
-        mock_request.return_value = MockResponse(200, read_json('v1/contacts_multiple'))
+        mock_request.return_value = MockResponse(200, self.read_json('contacts_multiple'))
         self.client.get_contacts(groups=["abc"])
 
         self.assert_request(mock_request, 'get', 'contacts', params={'group_uuids': ['abc']})
 
         # check filtering by group object
         group1 = Group.create(name="A-Team", uuid='xyz', size=4)
-        mock_request.return_value = MockResponse(200, read_json('v1/contacts_multiple'))
+        mock_request.return_value = MockResponse(200, self.read_json('contacts_multiple'))
         self.client.get_contacts(groups=[group1])
 
         self.assert_request(mock_request, 'get', 'contacts', params={'group_uuids': ['xyz']})
 
         # check filtering modified after a date
-        mock_request.return_value = MockResponse(200, read_json('v1/contacts_multiple'))
+        mock_request.return_value = MockResponse(200, self.read_json('contacts_multiple'))
         self.client.get_contacts(after=datetime.datetime(2014, 12, 12, 22, 34, 36, 123000, pytz.utc))
 
         self.assert_request(mock_request, 'get', 'contacts', params={'after': '2014-12-12T22:34:36.123000'})
 
         # check filtering modified before a date
-        mock_request.return_value = MockResponse(200, read_json('v1/contacts_multiple'))
+        mock_request.return_value = MockResponse(200, self.read_json('contacts_multiple'))
         self.client.get_contacts(before=datetime.datetime(2014, 12, 12, 22, 34, 36, 123000, pytz.utc))
 
         self.assert_request(mock_request, 'get', 'contacts', params={'before': '2014-12-12T22:34:36.123000'})
 
         # check filtering modified between dates
-        mock_request.return_value = MockResponse(200, read_json('v1/contacts_multiple'))
+        mock_request.return_value = MockResponse(200, self.read_json('contacts_multiple'))
         self.client.get_contacts(after=datetime.datetime(2014, 12, 12, 22, 34, 36, 123000, pytz.utc),
                                  before=datetime.datetime(2014, 12, 12, 22, 34, 36, 123000, pytz.utc))
 
@@ -339,18 +338,18 @@ class TembaClientTest(unittest.TestCase):
                                                                      'before': '2014-12-12T22:34:36.123000'})
 
         # check multiple pages
-        mock_request.side_effect = (MockResponse(200, read_json('v1/contacts_multipage_1')),
-                                    MockResponse(200, read_json('v1/contacts_multipage_2')),
-                                    MockResponse(200, read_json('v1/contacts_multipage_3')))
+        mock_request.side_effect = (MockResponse(200, self.read_json('contacts_multipage_1')),
+                                    MockResponse(200, self.read_json('contacts_multipage_2')),
+                                    MockResponse(200, self.read_json('contacts_multipage_3')))
         contacts = self.client.get_contacts(after=datetime.datetime(2014, 12, 12, 22, 34, 36, 123000, pytz.utc))
         self.assertEqual(len(contacts), 21)
         self.assert_request_url(mock_request, 'get',
                                 'https://example.com/api/v1/contacts.json?page=3&before=2014-12-12T22:34:36.123')
 
         # test with paging
-        mock_request.side_effect = (MockResponse(200, read_json('v1/contacts_multipage_1')),
-                                    MockResponse(200, read_json('v1/contacts_multipage_2')),
-                                    MockResponse(200, read_json('v1/contacts_multipage_3')))
+        mock_request.side_effect = (MockResponse(200, self.read_json('contacts_multipage_1')),
+                                    MockResponse(200, self.read_json('contacts_multipage_2')),
+                                    MockResponse(200, self.read_json('contacts_multipage_3')))
         pager = self.client.pager()
         contacts = self.client.get_contacts(pager=pager)
         self.assertEqual(len(contacts), 10)
@@ -366,7 +365,7 @@ class TembaClientTest(unittest.TestCase):
         self.assertFalse(pager.has_more())
 
         # test asking for explicit page
-        mock_request.return_value = MockResponse(200, read_json('v1/contacts_multipage_2'))
+        mock_request.return_value = MockResponse(200, self.read_json('contacts_multipage_2'))
         mock_request.side_effect = None
         pager = self.client.pager(start_page=2)
         contacts = self.client.get_contacts(pager=pager)
@@ -380,7 +379,7 @@ class TembaClientTest(unittest.TestCase):
 
     def test_get_event(self, mock_request):
         # check single item response
-        mock_request.return_value = MockResponse(200, read_json('v1/events_single'))
+        mock_request.return_value = MockResponse(200, self.read_json('events_single'))
         event = self.client.get_event('9e6beda-0ce2-46cd-8810-91157f261cbd')
 
         self.assert_request(mock_request, 'get', 'events', params={'uuid': '9e6beda-0ce2-46cd-8810-91157f261cbd'})
@@ -396,16 +395,16 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(event.created_on, datetime.datetime(2015, 6, 8, 12, 18, 7, 671000, pytz.utc))
 
         # check empty response
-        mock_request.return_value = MockResponse(200, read_json('v1/empty'))
+        mock_request.return_value = MockResponse(200, self.read_json('empty'))
         self.assertRaises(TembaNoSuchObjectError, self.client.get_event, 'xyz')
 
         # check multiple item response
-        mock_request.return_value = MockResponse(200, read_json('v1/events_multiple'))
+        mock_request.return_value = MockResponse(200, self.read_json('events_multiple'))
         self.assertRaises(TembaMultipleResultsError, self.client.get_event, '9e6beda-0ce2-46cd-8810-91157f261cbd')
 
     def test_get_events(self, mock_request):
         # check no params
-        mock_request.return_value = MockResponse(200, read_json('v1/events_multiple'))
+        mock_request.return_value = MockResponse(200, self.read_json('events_multiple'))
         events = self.client.get_events()
 
         self.assert_request(mock_request, 'get', 'events')
@@ -415,7 +414,7 @@ class TembaClientTest(unittest.TestCase):
 
     def test_get_field(self, mock_request):
         # check single item response
-        mock_request.return_value = MockResponse(200, read_json('v1/fields_single'))
+        mock_request.return_value = MockResponse(200, self.read_json('fields_single'))
         field = self.client.get_field('chat_name')
 
         self.assert_request(mock_request, 'get', 'fields', params={'key': 'chat_name'})
@@ -424,16 +423,16 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(field.value_type, 'T')
 
         # check empty response
-        mock_request.return_value = MockResponse(200, read_json('v1/empty'))
+        mock_request.return_value = MockResponse(200, self.read_json('empty'))
         self.assertRaises(TembaNoSuchObjectError, self.client.get_field, 'xyz')
 
         # check multiple item response
-        mock_request.return_value = MockResponse(200, read_json('v1/fields_multiple'))
+        mock_request.return_value = MockResponse(200, self.read_json('fields_multiple'))
         self.assertRaises(TembaMultipleResultsError, self.client.get_flow, 'chat_name')
 
     def test_get_fields(self, mock_request):
         # check no params
-        mock_request.return_value = MockResponse(200, read_json('v1/fields_multiple'))
+        mock_request.return_value = MockResponse(200, self.read_json('fields_multiple'))
         fields = self.client.get_fields()
 
         self.assert_request(mock_request, 'get', 'fields')
@@ -443,7 +442,7 @@ class TembaClientTest(unittest.TestCase):
 
     def test_get_flow(self, mock_request):
         # check single item response
-        mock_request.return_value = MockResponse(200, read_json('v1/flows_single'))
+        mock_request.return_value = MockResponse(200, self.read_json('flows_single'))
         flow = self.client.get_flow('a68567fa-ad95-45fc-b5f7-3ce90ebbd46d')
 
         self.assert_request(mock_request, 'get', 'flows', params={'uuid': 'a68567fa-ad95-45fc-b5f7-3ce90ebbd46d'})
@@ -463,16 +462,16 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(flow.created_on, datetime.datetime(2014, 12, 11, 13, 47, 55, 288000, pytz.utc))
 
         # check empty response
-        mock_request.return_value = MockResponse(200, read_json('v1/empty'))
+        mock_request.return_value = MockResponse(200, self.read_json('empty'))
         self.assertRaises(TembaNoSuchObjectError, self.client.get_flow, 'xyz')
 
         # check multiple item response
-        mock_request.return_value = MockResponse(200, read_json('v1/flows_multiple'))
+        mock_request.return_value = MockResponse(200, self.read_json('flows_multiple'))
         self.assertRaises(TembaMultipleResultsError, self.client.get_flow, 'a68567fa-ad95-45fc-b5f7-3ce90ebbd46d')
 
     def test_get_flows(self, mock_request):
         # check no params
-        mock_request.return_value = MockResponse(200, read_json('v1/flows_multiple'))
+        mock_request.return_value = MockResponse(200, self.read_json('flows_multiple'))
         flows = self.client.get_flows()
 
         self.assert_request(mock_request, 'get', 'flows')
@@ -494,7 +493,7 @@ class TembaClientTest(unittest.TestCase):
 
     def test_get_group(self, mock_request):
         # check single item response
-        mock_request.return_value = MockResponse(200, read_json('v1/groups_single'))
+        mock_request.return_value = MockResponse(200, self.read_json('groups_single'))
         group = self.client.get_group('04a4752b-0f49-480e-ae60-3a3f2bea485c')
 
         self.assert_request(mock_request, 'get', 'groups', params={'uuid': '04a4752b-0f49-480e-ae60-3a3f2bea485c'})
@@ -504,16 +503,16 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(group.size, 4)
 
         # check empty response
-        mock_request.return_value = MockResponse(200, read_json('v1/empty'))
+        mock_request.return_value = MockResponse(200, self.read_json('empty'))
         self.assertRaises(TembaNoSuchObjectError, self.client.get_group, 'xyz')
 
         # check multiple item response
-        mock_request.return_value = MockResponse(200, read_json('v1/groups_multiple'))
+        mock_request.return_value = MockResponse(200, self.read_json('groups_multiple'))
         self.assertRaises(TembaMultipleResultsError, self.client.get_group, '04a4752b-0f49-480e-ae60-3a3f2bea485c')
 
     def test_get_groups(self, mock_request):
         # check no params
-        mock_request.return_value = MockResponse(200, read_json('v1/groups_multiple'))
+        mock_request.return_value = MockResponse(200, self.read_json('groups_multiple'))
         groups = self.client.get_groups()
 
         self.assert_request(mock_request, 'get', 'groups')
@@ -527,7 +526,7 @@ class TembaClientTest(unittest.TestCase):
 
     def test_get_label(self, mock_request):
         # check single item response
-        mock_request.return_value = MockResponse(200, read_json('v1/labels_single'))
+        mock_request.return_value = MockResponse(200, self.read_json('labels_single'))
         label = self.client.get_label('946c930d-83b1-4982-a797-9f0c0cc554de')
 
         self.assert_request(mock_request, 'get', 'labels', params={'uuid': '946c930d-83b1-4982-a797-9f0c0cc554de'})
@@ -537,16 +536,16 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(label.count, 4567)
 
         # check empty response
-        mock_request.return_value = MockResponse(200, read_json('v1/empty'))
+        mock_request.return_value = MockResponse(200, self.read_json('empty'))
         self.assertRaises(TembaNoSuchObjectError, self.client.get_label, 'xyz')
 
         # check multiple item response
-        mock_request.return_value = MockResponse(200, read_json('v1/labels_multiple'))
+        mock_request.return_value = MockResponse(200, self.read_json('labels_multiple'))
         self.assertRaises(TembaMultipleResultsError, self.client.get_label, '946c930d-83b1-4982-a797-9f0c0cc554de')
 
     def test_get_labels(self, mock_request):
         # check no params
-        mock_request.return_value = MockResponse(200, read_json('v1/labels_multiple'))
+        mock_request.return_value = MockResponse(200, self.read_json('labels_multiple'))
         labels = self.client.get_labels()
 
         self.assert_request(mock_request, 'get', 'labels')
@@ -560,7 +559,7 @@ class TembaClientTest(unittest.TestCase):
 
     def test_get_message(self, mock_request):
         # check single item response
-        mock_request.return_value = MockResponse(200, read_json('v1/messages_single'))
+        mock_request.return_value = MockResponse(200, self.read_json('messages_single'))
         message = self.client.get_message(13441143)
 
         self.assert_request(mock_request, 'get', 'messages', params={'id': 13441143})
@@ -579,16 +578,16 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(message.delivered_on, datetime.datetime(2014, 12, 12, 13, 35, 12, 861000, pytz.utc))
 
         # check empty response
-        mock_request.return_value = MockResponse(200, read_json('v1/empty'))
+        mock_request.return_value = MockResponse(200, self.read_json('empty'))
         self.assertRaises(TembaNoSuchObjectError, self.client.get_message, 'xyz')
 
         # check multiple item response
-        mock_request.return_value = MockResponse(200, read_json('v1/messages_multiple'))
+        mock_request.return_value = MockResponse(200, self.read_json('messages_multiple'))
         self.assertRaises(TembaMultipleResultsError, self.client.get_message, 13441143)
 
     def test_get_messages(self, mock_request):
         # check no params
-        mock_request.return_value = MockResponse(200, read_json('v1/messages_multiple'))
+        mock_request.return_value = MockResponse(200, self.read_json('messages_multiple'))
         messages = self.client.get_messages()
 
         self.assert_request(mock_request, 'get', 'messages')
@@ -621,7 +620,7 @@ class TembaClientTest(unittest.TestCase):
         self.assert_request(mock_request, 'get', 'messages', params={'broadcast': [123]})
 
     def test_get_org(self, mock_request):
-        mock_request.return_value = MockResponse(200, read_json('v1/org'))
+        mock_request.return_value = MockResponse(200, self.read_json('org'))
         org = self.client.get_org()
 
         self.assert_request(mock_request, 'get', 'org')
@@ -635,7 +634,7 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(org.anon, False)
 
     def test_get_results(self, mock_request):
-        mock_request.return_value = MockResponse(200, read_json('v1/results_missing_optional'))
+        mock_request.return_value = MockResponse(200, self.read_json('results_missing_optional'))
         results = self.client.get_results(ruleset='aabe7d0f-bf27-4e76-a6b3-4d26ec18dd58')
 
         self.assert_request(mock_request, 'get', 'results', params={'ruleset': 'aabe7d0f-bf27-4e76-a6b3-4d26ec18dd58'})
@@ -650,12 +649,12 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(results[0].label, "All")
         self.assertEqual(results[0].open_ended, None)
 
-        mock_request.return_value = MockResponse(200, read_json('v1/results_missing_required'))
+        mock_request.return_value = MockResponse(200, self.read_json('results_missing_required'))
         self.assertRaises(TembaException, self.client.get_results)
 
     def test_get_run(self, mock_request):
         # check single item response
-        mock_request.return_value = MockResponse(200, read_json('v1/runs_single'))
+        mock_request.return_value = MockResponse(200, self.read_json('runs_single'))
         run = self.client.get_run(123)
 
         self.assert_request(mock_request, 'get', 'runs', params={'run': 123})
@@ -685,16 +684,16 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(run.expired_on, None)
 
         # check empty response
-        mock_request.return_value = MockResponse(200, read_json('v1/empty'))
+        mock_request.return_value = MockResponse(200, self.read_json('empty'))
         self.assertRaises(TembaNoSuchObjectError, self.client.get_run, 'xyz')
 
         # check multiple item response
-        mock_request.return_value = MockResponse(200, read_json('v1/groups_multiple'))
+        mock_request.return_value = MockResponse(200, self.read_json('groups_multiple'))
         self.assertRaises(TembaMultipleResultsError, self.client.get_group, '9ec96b73-78c3-4029-ba86-5279c92996fc')
 
     def test_get_runs(self, mock_request):
         # check no params
-        mock_request.return_value = MockResponse(200, read_json('v1/runs_multiple'))
+        mock_request.return_value = MockResponse(200, self.read_json('runs_multiple'))
         runs = self.client.get_runs()
 
         self.assert_request(mock_request, 'get', 'runs')
@@ -729,7 +728,7 @@ class TembaClientTest(unittest.TestCase):
         self.assert_request(mock_request, 'post', 'contact_actions', data=expected_body)
 
     def test_save_flow_definition(self, mock_request):
-        mock_request.return_value = MockResponse(200, read_json('v1/flow_definition_created'))
+        mock_request.return_value = MockResponse(200, self.read_json('flow_definition_created'))
 
         definition = FlowDefinition.create(metadata={'name': "Empty Flow"},
                                            version=7,
@@ -770,7 +769,7 @@ class TembaClientTest(unittest.TestCase):
         self.assert_request(mock_request, 'post', 'message_actions', data=expected_body)
 
     def test_update_contact(self, mock_request):
-        mock_request.return_value = MockResponse(200, read_json('v1/contacts_created'))
+        mock_request.return_value = MockResponse(200, self.read_json('contacts_created'))
         contact = self.client.update_contact('bfff9984-38f4-4e59-998d-3663ec3c650d',
                                              "Amy Amanda Allen",
                                              ['tel:+250700000005'],
@@ -793,7 +792,7 @@ class TembaClientTest(unittest.TestCase):
         self.assertEqual(contact.modified_on, datetime.datetime(2014, 10, 1, 6, 54, 9, 817000, pytz.utc))
 
     def test_update_label(self, mock_request):
-        mock_request.return_value = MockResponse(200, read_json('v1/labels_created'))
+        mock_request.return_value = MockResponse(200, self.read_json('labels_created'))
         label = self.client.update_label('affa6685-0725-49c7-a15a-96f301d996e4', "Really High Priority")
 
         expected_body = {'uuid': 'affa6685-0725-49c7-a15a-96f301d996e4',
@@ -825,23 +824,3 @@ class TembaClientTest(unittest.TestCase):
             self.assertEqual(six.text_type(ex), "API request error. Caused by: xyz")
         else:
             self.fail("Should have thrown exception")
-
-    def assert_request_url(self, mock, method, url, **kwargs):
-        """
-        Asserts that a request was made to the given url with the given parameters
-        """
-        mock.assert_called_with(method, url,
-                                headers={'Content-type': 'application/json',
-                                         'Authorization': 'Token 1234567890',
-                                         'Accept': u'application/json',
-                                         'User-Agent': 'test/0.1 rapidpro-python/%s' % __version__}, **kwargs)
-
-    def assert_request(self, mock, method, endpoint, **kwargs):
-        """
-        Asserts that a request was made to the given endpoint with the given parameters
-        """
-        mock.assert_called_with(method, 'https://example.com/api/v1/%s.json' % endpoint,
-                                headers={'Content-type': 'application/json',
-                                         'Authorization': 'Token 1234567890',
-                                         'Accept': u'application/json',
-                                         'User-Agent': 'test/0.1 rapidpro-python/%s' % __version__}, **kwargs)

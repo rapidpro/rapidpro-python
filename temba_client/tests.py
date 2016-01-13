@@ -15,7 +15,40 @@ from .serialization import TembaObject, SimpleField, BooleanField, IntegerField,
 from .utils import format_iso8601, parse_iso8601
 
 
-class UtilsTest(unittest.TestCase):
+class TembaTest(unittest.TestCase):
+    """
+    Base class for test cases
+    """
+    API_VERSION = None
+
+    def read_json(self, filename):
+        """
+        Loads JSON from the given test file
+        """
+        handle = codecs.open('test_files/v%d/%s.json' % (self.API_VERSION, filename), 'r', 'utf-8')
+        contents = six.text_type(handle.read())
+        handle.close()
+        return contents
+
+    def assert_request_url(self, mock, method, url, **kwargs):
+        """
+        Asserts that a request was made to the given url with the given parameters
+        """
+        mock.assert_called_with(method, url,
+                                headers={'Content-type': 'application/json',
+                                         'Authorization': 'Token 1234567890',
+                                         'Accept': u'application/json',
+                                         'User-Agent': 'test/0.1 rapidpro-python/%s' % __version__}, **kwargs)
+        mock.reset_mock()
+
+    def assert_request(self, mock, method, endpoint, **kwargs):
+        """
+        Asserts that a request was made to the given endpoint with the given parameters
+        """
+        self.assert_request_url(mock, method, 'https://example.com/api/v%d/%s.json' % (self.API_VERSION, endpoint), **kwargs)
+
+
+class UtilsTest(TembaTest):
     class TestTZ(datetime.tzinfo):
         def utcoffset(self, dt):
             return datetime.timedelta(hours=-5)
@@ -34,7 +67,7 @@ class UtilsTest(unittest.TestCase):
         self.assertEqual(parse_iso8601('2014-01-02'), d)
 
 
-class FieldsTest(unittest.TestCase):
+class FieldsTest(TembaTest):
     def test_boolean(self):
         field = BooleanField()
         self.assertEqual(field.serialize(True), True)
@@ -55,7 +88,7 @@ class TestType(TembaObject):
     hum = ObjectListField(item_class=TestSubType)
 
 
-class TembaObjectTest(unittest.TestCase):
+class TembaObjectTest(TembaTest):
     def test_create(self):
         # unspecified fields become None
         obj = TestType.create(foo='a', bar=123)
@@ -91,7 +124,7 @@ class TembaObjectTest(unittest.TestCase):
         self.assertEqual(json_obj, {'foo': 'a', 'bar': 123, 'doh': '2014-01-02T03:04:05.000000', 'hum': [{'zed': 'b'}]})
 
 
-class BaseClientTest(unittest.TestCase):
+class BaseClientTest(TembaTest):
     class Client(BaseClient):
         pass
 
@@ -143,13 +176,3 @@ class MockResponse(object):
 
     def json(self, **kwargs):
         return json.loads(self.content)
-
-
-def read_json(filename):
-    """
-    Test utility method to load JSON from the given test file
-    """
-    handle = codecs.open('test_files/%s.json' % filename, 'r', 'utf-8')
-    contents = six.text_type(handle.read())
-    handle.close()
-    return contents

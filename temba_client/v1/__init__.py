@@ -16,6 +16,15 @@ class TembaClient(BasePagingClient):
     def __init__(self, host, token, user_agent=None):
         super(TembaClient, self).__init__(host, token, user_agent, api_version=1)
 
+    def pager(self, start_page=1):
+        """
+        Returns a new pager
+
+        :param int start_page: the starting page number
+        :return: the pager
+        """
+        return BasePagingClient.Pager(start_page)
+
     # ==================================================================================================================
     # Create object operations
     # ==================================================================================================================

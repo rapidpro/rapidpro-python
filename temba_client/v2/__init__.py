@@ -1,5 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 
+from .types import Run
 from ..clients import BaseCursorClient
 
 
@@ -16,5 +17,15 @@ class TembaClient(BaseCursorClient):
         super(TembaClient, self).__init__(host, token, user_agent, api_version=2)
 
     def get_runs(self, flow=None, contact=None, responded=None, before=None, after=None):
+        """
+        Gets all matching flow runs
+
+        :param flow: flow object or UUID
+        :param contact: contact object or UUID
+        :param responded: whether to limit results to runs with responses
+        :param datetime before: modified before
+        :param datetime after: modified after
+        :return: list of flow runs
+        """
         params = self._build_params(flow=flow, contact=contact, responded=responded, before=before, after=after)
-        return self._get_iterator('runs', params)
+        return self._get_query('runs', params, Run)

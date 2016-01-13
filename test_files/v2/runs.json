@@ -1,0 +1,75 @@
+{
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 4092373,
+            "flow": "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
+            "contact": "d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
+            "responded": true,
+            "steps": [
+                {
+                    "node": "ca6c092a-1615-474e-ab64-4e7ce75a808f",
+                    "category": null,
+                    "left_on": "2015-08-26T10:04:10.006241Z",
+                    "text": "Hi Bobby, is your water filter working? Answer with Yes or No.",
+                    "value": null,
+                    "arrived_on": "2015-08-26T10:04:09.824114Z",
+                    "type": "actionset"
+                },
+                {
+                    "node": "858c1184-4180-47de-bbbd-5f46587d35ce",
+                    "category": "Yes",
+                    "left_on": "2015-08-26T10:05:47.509180Z",
+                    "text": "yes",
+                    "value": "yes",
+                    "arrived_on": "2015-08-26T10:04:10.006241Z",
+                    "type": "ruleset"
+                },
+                {
+                    "node": "ea136a93-d03d-4f2b-b08a-ff43831d0c64",
+                    "category": null,
+                    "left_on": null,
+                    "text": "Great to hear, Thanks for your time!",
+                    "value": null,
+                    "arrived_on": "2015-08-26T10:05:47.512854Z",
+                    "type": "actionset"
+                }
+            ],
+            "created_on": "2015-08-26T10:04:09.737686Z",
+            "modified_on": "2015-08-26T10:05:47.516562Z",
+            "exited_on": "2015-08-26T10:05:47.516562Z",
+            "exit_type": "completed"
+        },
+        {
+            "id": 2504278,
+            "flow": "7b75bcb0-3c86-482f-bdce-06a3d6cd5cf7",
+            "contact": "d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
+            "responded": false,
+            "steps": [
+                {
+                    "node": "f11213ae-f71a-4109-8d97-a4434bfa34b6",
+                    "category": null,
+                    "left_on": "2015-05-22T06:31:52.593473Z",
+                    "text": null,
+                    "value": null,
+                    "arrived_on": "2015-05-22T06:31:52.479766Z",
+                    "type": "actionset"
+                },
+                {
+                    "node": "6af73c98-677b-4703-9b33-24057d8ef1dc",
+                    "category": null,
+                    "left_on": null,
+                    "text": null,
+                    "value": null,
+                    "arrived_on": "2015-05-22T06:31:52.593473Z",
+                    "type": "ruleset"
+                }
+            ],
+            "created_on": "2015-05-22T06:31:52.463317Z",
+            "modified_on": "2015-05-29T06:32:04.061007Z",
+            "exited_on": "2015-05-29T06:32:04.061007Z",
+            "exit_type": "expired"
+        }
+    ]
+}

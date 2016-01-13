@@ -1,17 +1,73 @@
 from __future__ import absolute_import, unicode_literals
 
-import unittest
+import datetime
+import pytz
 
 from mock import patch
 from . import TembaClient
-from ..tests import MockResponse
+from ..exceptions import TembaNoSuchObjectError
+from ..tests import TembaTest, MockResponse
 
 
 @patch('temba_client.clients.request')
-class TembaClientTest(unittest.TestCase):
+class TembaClientTest(TembaTest):
+    API_VERSION = 2
 
     def setUp(self):
         self.client = TembaClient('example.com', '1234567890', user_agent='test/0.1')
 
     def test_get_runs(self, mock_request):
-        pass
+        # check no params
+        mock_request.return_value = MockResponse(200, self.read_json('runs'))
+
+        # check with no params
+        query = self.client.get_runs()
+        runs = query.all()
+
+        self.assert_request(mock_request, 'get', 'runs')
+        self.assertEqual(len(runs), 2)
+
+        self.assertEqual(runs[0].id, 4092373)
+        self.assertEqual(runs[0].flow, "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a")
+        self.assertEqual(runs[0].contact, "d33e9ad5-5c35-414c-abd4-e7451c69ff1d")
+        self.assertEqual(runs[0].responded, True)
+        self.assertEqual(len(runs[0].steps), 3)
+        self.assertEqual(runs[0].steps[0].node, "ca6c092a-1615-474e-ab64-4e7ce75a808f")
+        self.assertEqual(runs[0].steps[0].category, None)
+        self.assertEqual(runs[0].steps[0].left_on, datetime.datetime(2015, 8, 26, 10, 4, 10, 6241, pytz.utc))
+        self.assertEqual(runs[0].steps[0].text, "Hi Bobby, is your water filter working? Answer with Yes or No.")
+        self.assertEqual(runs[0].steps[0].value, None)
+        self.assertEqual(runs[0].steps[0].arrived_on, datetime.datetime(2015, 8, 26, 10, 4, 9, 824114, pytz.utc))
+        self.assertEqual(runs[0].steps[0].type, "actionset")
+        self.assertEqual(runs[0].created_on, datetime.datetime(2015, 8, 26, 10, 4, 9, 737686, pytz.utc))
+        self.assertEqual(runs[0].modified_on, datetime.datetime(2015, 8, 26, 10, 5, 47, 516562, pytz.utc))
+        self.assertEqual(runs[0].exited_on, datetime.datetime(2015, 8, 26, 10, 5, 47, 516562, pytz.utc))
+        self.assertEqual(runs[0].exit_type, "completed")
+
+        self.assertEqual(query.first().id, runs[0].id)
+        self.assert_request(mock_request, 'get', 'runs')
+
+        self.assertEqual(query.get().id, runs[0].id)
+        self.assert_request(mock_request, 'get', 'runs')
+
+        # check with all params
+        query = self.client.get_runs(flow="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
+                                     contact="d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
+                                     responded=True,
+                                     after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
+                                     before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc))
+        query.all()
+
+        self.assert_request(mock_request, 'get', 'runs', params={'flow': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
+                                                                 'contact': "d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
+                                                                 'responded': True,
+                                                                 'after': "2014-12-12T22:34:36.978123",
+                                                                 'before': "2014-12-12T22:56:58.917123"})
+
+        # check when result is empty
+        mock_request.return_value = MockResponse(200, self.read_json('empty'))
+        query = self.client.get_runs()
+
+        self.assertEqual(query.all(), [])
+        self.assertEqual(query.first(), None)
+        self.assertRaises(TembaNoSuchObjectError, query.get)

@@ -15,33 +15,6 @@ from .utils import format_iso8601, request
 logger = logging.getLogger(__name__)
 
 
-# =====================================================================
-# Paging
-# =====================================================================
-
-class TembaPager(object):
-    def __init__(self, start_page):
-        self.start_page = start_page
-        self.count = None
-        self.next_url = None
-
-    def update(self, response):
-        self.count = response['count']
-        self.next_url = response['next']
-
-    @property
-    def total(self):
-        return self.count
-
-    def has_more(self):
-        return bool(self.next_url)
-
-
-# =====================================================================
-# Client base
-# =====================================================================
-
-
 class BaseClient(object):
     """
     Abstract base client
@@ -149,14 +122,25 @@ class BasePagingClient(BaseClient):
     """
     __metaclass__ = ABCMeta
 
-    def pager(self, start_page=1):
+    class Pager(object):
         """
-        Returns a new pager
+        For iterating through page based API responses
+        """
+        def __init__(self, start_page):
+            self.start_page = start_page
+            self.count = None
+            self.next_url = None
 
-        :param int start_page: the starting page number
-        :return: the pager
-        """
-        return TembaPager(start_page)
+        def update(self, response):
+            self.count = response['count']
+            self.next_url = response['next']
+
+        @property
+        def total(self):
+            return self.count
+
+        def has_more(self):
+            return bool(self.next_url)
 
     def _get_single(self, endpoint, params, from_results=True):
         """
@@ -220,33 +204,74 @@ class BasePagingClient(BaseClient):
         return results
 
 
-class Iterator(object):
-    def __init__(self, client, url, params):
-        self.client = client
-        self.url = url
-        self.params = params
-
-    def __iter__(self):
-        return self
-
-    def next(self):
-        if not self.url:
-            raise StopIteration()
-
-        response = self.client._request('get', self.url, params=self.params)
-        self.url = response['next']
-        self.params = {}
-        return response['results']
-
-
 class BaseCursorClient(BaseClient):
     """
     Abstract base client for cursor-based endpoint access
     """
     __metaclass__ = ABCMeta
 
-    def _get_iterator(self, endpoint, params):
+    class Query(object):
         """
-        GETs a result iterator for the given endpoint
+        Result of a GET query which can then be iterated or fetched in its entirety
         """
-        return Iterator(self, '%s/%s.json' % (self.root_url, endpoint), params)
+        def __init__(self, client, url, params, clazz):
+            self.client = client
+            self.url = url
+            self.params = params
+            self.clazz = clazz
+
+        def iterfetches(self):
+            return BaseCursorClient.Iterator(self.client, self.url, self.params, self.clazz)
+
+        def all(self):
+            results = []
+            for fetch in self.iterfetches():
+                results += fetch
+            return results
+
+        def first(self):
+            try:
+                fetch = next(self.iterfetches())
+                return fetch[0]
+            except StopIteration:
+                return None
+
+        def get(self):
+            result = self.first()
+            if result is None:
+                raise TembaNoSuchObjectError()
+            else:
+                return result
+
+    class Iterator(object):
+        """
+        For iterating through cursor based API responses
+        """
+        def __init__(self, client, url, params, clazz):
+            self.client = client
+            self.url = url
+            self.params = params
+            self.clazz = clazz
+
+        def __iter__(self):
+            return self
+
+        def next(self):
+            if not self.url:
+                raise StopIteration()
+
+            response = self.client._request('get', self.url, params=self.params)
+            self.url = response['next']
+            self.params = {}
+            results = response['results']
+
+            if len(results) == 0:
+                raise StopIteration()
+            else:
+                return self.clazz.deserialize_list(results)
+
+    def _get_query(self, endpoint, params, clazz):
+        """
+        GETs a result query for the given endpoint
+        """
+        return BaseCursorClient.Query(self, '%s/%s.json' % (self.root_url, endpoint), params, clazz)
