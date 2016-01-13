@@ -243,7 +243,7 @@ class BaseCursorClient(BaseClient):
             else:
                 return result
 
-    class Iterator(object):
+    class Iterator(six.Iterator):
         """
         For iterating through cursor based API responses
         """
@@ -256,7 +256,7 @@ class BaseCursorClient(BaseClient):
         def __iter__(self):
             return self
 
-        def next(self):
+        def __next__(self):
             if not self.url:
                 raise StopIteration()
 
