@@ -9,8 +9,8 @@ import time
 
 from abc import ABCMeta
 from . import __version__, CLIENT_NAME
-from .exceptions import TembaMultipleResultsError, TembaNoSuchObjectError, TembaAPIError, TembaConnectionError
-from .exceptions import TembaRateExceededError
+from .exceptions import TembaMultipleResultsError, TembaNoSuchObjectError, TembaBadRequestError, TembaConnectionError
+from .exceptions import TembaRateExceededError, TembaHttpError
 from .serialization import TembaObject
 from .utils import format_iso8601, request
 
@@ -79,7 +79,17 @@ class BaseClient(object):
 
             response = request(method, url, **kwargs)
 
-            if response.status_code == 429:  # have we exceeded our allowed rate?
+            if response.status_code == 400:
+                try:
+                    errors = response.json()
+                except ValueError:
+                    errors = {'non_field_errors': [response.content]}
+                raise TembaBadRequestError(errors)
+
+            elif response.status_code == 404:
+                raise TembaNoSuchObjectError()
+
+            elif response.status_code == 429:  # have we exceeded our allowed rate?
                 retry_after = response.headers.get('retry-after')
                 raise TembaRateExceededError(int(retry_after) if retry_after else 0)
 
@@ -87,7 +97,7 @@ class BaseClient(object):
 
             return response.json() if response.content else None
         except requests.HTTPError as ex:
-            raise TembaAPIError(ex)
+            raise TembaHttpError(ex)
         except requests.exceptions.ConnectionError:
             raise TembaConnectionError()
 
@@ -307,4 +317,3 @@ class BaseCursorClient(BaseClient):
                     time.sleep(ex.retry_after)
                 else:
                     raise ex
-

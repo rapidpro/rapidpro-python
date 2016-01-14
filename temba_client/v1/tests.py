@@ -8,7 +8,8 @@ import six
 from mock import patch
 from . import TembaClient
 from .types import Broadcast, Group, FlowDefinition
-from ..exceptions import TembaException, TembaNoSuchObjectError, TembaMultipleResultsError, TembaAPIError, TembaConnectionError
+from ..exceptions import TembaException, TembaNoSuchObjectError, TembaMultipleResultsError, TembaBadRequestError
+from ..exceptions import TembaConnectionError
 from ..tests import TembaTest, MockResponse
 
 
@@ -151,7 +152,7 @@ class TembaClientTest(TembaTest):
 
         # check deleting a non-existent contact
         mock_request.return_value = MockResponse(404, 'NOT FOUND')
-        self.assertRaises(TembaAPIError, self.client.delete_contact, 'bfff9984-38f4-4e59-998d-3663ec3c650d')
+        self.assertRaises(TembaNoSuchObjectError, self.client.delete_contact, 'bfff9984-38f4-4e59-998d-3663ec3c650d')
 
     def test_delete_contacts(self, mock_request):
         mock_request.return_value = MockResponse(204)
@@ -807,10 +808,10 @@ class TembaClientTest(TembaTest):
 
         try:
             self.client.update_label('12345678', "Really High Priority")
-        except TembaAPIError as ex:
+        except TembaBadRequestError as ex:
             self.assertEqual(ex.errors, {'uuid': ["No such message label with UUID: 12345678"]})
-            self.assertEqual(six.text_type(ex), "API request error. Caused by: No such message label with UUID: 12345678")
-            self.assertEqual(str(ex), "API request error. Caused by: No such message label with UUID: 12345678")
+            self.assertEqual(six.text_type(ex), "Bad request: No such message label with UUID: 12345678")
+            self.assertEqual(str(ex), "Bad request: No such message label with UUID: 12345678")
         else:
             self.fail("Should have thrown exception")
 
@@ -819,8 +820,8 @@ class TembaClientTest(TembaTest):
 
         try:
             self.client.update_label('12345678', "Really High Priority")
-        except TembaAPIError as ex:
+        except TembaBadRequestError as ex:
             self.assertEqual(ex.errors, {'non_field_errors': ['xyz']})
-            self.assertEqual(six.text_type(ex), "API request error. Caused by: xyz")
+            self.assertEqual(six.text_type(ex), "Bad request: xyz")
         else:
             self.fail("Should have thrown exception")

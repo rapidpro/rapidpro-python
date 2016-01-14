@@ -13,42 +13,35 @@ class TembaException(Exception):
 
 
 class TembaNoSuchObjectError(TembaException):
-    message = "Request for single object returned no objects"
+    message = "No such object exists"
 
 
 class TembaMultipleResultsError(TembaException):
     message = "Request for single object returned multiple objects"
 
 
-class TembaAPIError(TembaException):
-    """
-    Errors returned by the Temba API
-    """
-    message = "API request error"
+class TembaBadRequestError(TembaException):
+    message = "Bad request: %s"
 
-    def __init__(self, caused_by):
-        self.caused_by = caused_by
-        self.errors = {}
-
-        # if error was caused by a HTTP 400 response, we may have a useful validation error
-        if isinstance(caused_by, requests.HTTPError) and caused_by.response.status_code == 400:
-            try:
-                self.errors = caused_by.response.json()
-            except ValueError:
-                self.errors = {'non_field_errors': [caused_by.response.content]}
-                pass
+    def __init__(self, errors):
+        self.errors = errors
 
     def __unicode__(self):
-        if self.errors:
-            msgs = []
-            for field, field_errors in six.iteritems(self.errors):
-                for error in field_errors:
-                    msgs.append(error)
-            cause = msgs[0] if len(msgs) == 1 else ". ".join(msgs)
+        msgs = []
+        for field, field_errors in six.iteritems(self.errors):
+            for error in field_errors:
+                msgs.append(error)
+        cause = msgs[0] if len(msgs) == 1 else ". ".join(msgs)
 
-            return "%s. Caused by: %s" % (self.message, cause)
-        else:
-            return "%s. Caused by: %s" % (self.message, six.text_type(self.caused_by))
+        return self.message % cause
+
+
+class TembaHttpError(TembaException):
+    def __init__(self, caused_by):
+        self.caused_by = caused_by
+
+    def __unicode__(self):
+        return unicode(self.caused_by)
 
 
 class TembaConnectionError(TembaException):
