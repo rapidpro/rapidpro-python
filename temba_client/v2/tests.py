@@ -30,7 +30,7 @@ class TembaClientTest(TembaTest):
         mock_request.side_effect = fail_then_success
 
         # retries means it will try again after the first 429
-        runs = self.client.get_runs().iterfetches(retry_on_rate_exceed=True).next()
+        runs = self.client.get_runs().iterfetches(retry_on_rate_exceed=True).__next__()
         self.assertEqual(len(runs), 2)
 
         mock_request.side_effect = fail_then_success
