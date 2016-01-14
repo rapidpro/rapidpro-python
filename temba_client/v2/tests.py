@@ -25,7 +25,7 @@ class TembaClientTest(TembaTest):
 
         # no retries means exception right away
         iterator = self.client.get_runs().iterfetches(retry_on_rate_exceed=False)
-        self.assertRaises(TembaRateExceededError, iterator.next)
+        self.assertRaises(TembaRateExceededError, iterator.__next__)
 
         mock_request.side_effect = fail_then_success
 
