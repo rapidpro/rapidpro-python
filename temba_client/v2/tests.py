@@ -5,7 +5,7 @@ import pytz
 
 from mock import patch
 from . import TembaClient
-from ..exceptions import TembaNoSuchObjectError
+from ..exceptions import TembaRateExceededError
 from ..tests import TembaTest, MockResponse
 
 
@@ -15,6 +15,40 @@ class TembaClientTest(TembaTest):
 
     def setUp(self):
         self.client = TembaClient('example.com', '1234567890', user_agent='test/0.1')
+
+    def test_retry_on_rate_exceed(self, mock_request):
+        fail_then_success = [
+            MockResponse(429, '', {'Retry-After': 1}),
+            MockResponse(200, self.read_json('runs'))
+        ]
+        mock_request.side_effect = fail_then_success
+
+        # no retries means exception right away
+        iterator = self.client.get_runs().iterfetches(retry_on_rate_exceed=False)
+        self.assertRaises(TembaRateExceededError, iterator.next)
+
+        mock_request.side_effect = fail_then_success
+
+        # retries means it will try again after the first 429
+        runs = self.client.get_runs().iterfetches(retry_on_rate_exceed=True).next()
+        self.assertEqual(len(runs), 2)
+
+        mock_request.side_effect = fail_then_success
+
+        query = self.client.get_runs()
+        self.assertRaises(TembaRateExceededError, query.all, retry_on_rate_exceed=False)
+
+        mock_request.side_effect = fail_then_success
+
+        runs = self.client.get_runs().all(retry_on_rate_exceed=True)
+        self.assertEqual(len(runs), 2)
+
+        # if requests always return 429, we will hit max retries regardless
+        mock_request.side_effect = None
+        mock_request.return_value = MockResponse(429, '', {'Retry-After': 1})
+
+        self.assertRaises(TembaRateExceededError, self.client.get_runs().all, retry_on_rate_exceed=False)
+        self.assertRaises(TembaRateExceededError, self.client.get_runs().all, retry_on_rate_exceed=True)
 
     def test_get_runs(self, mock_request):
         # check no params
@@ -47,9 +81,6 @@ class TembaClientTest(TembaTest):
         self.assertEqual(query.first().id, runs[0].id)
         self.assert_request(mock_request, 'get', 'runs')
 
-        self.assertEqual(query.get().id, runs[0].id)
-        self.assert_request(mock_request, 'get', 'runs')
-
         # check with all params
         query = self.client.get_runs(flow="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
                                      contact="d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
@@ -70,4 +101,3 @@ class TembaClientTest(TembaTest):
 
         self.assertEqual(query.all(), [])
         self.assertEqual(query.first(), None)
-        self.assertRaises(TembaNoSuchObjectError, query.get)

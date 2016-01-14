@@ -5,14 +5,19 @@ import json
 import logging
 import requests
 import six
+import time
 
 from abc import ABCMeta
 from . import __version__, CLIENT_NAME
-from .exceptions import TembaMultipleResultsError, TembaNoSuchObjectError, TembaAPIError, TembaConnectionError, TembaRateLimitError
+from .exceptions import TembaMultipleResultsError, TembaNoSuchObjectError, TembaAPIError, TembaConnectionError
+from .exceptions import TembaRateExceededError
 from .serialization import TembaObject
 from .utils import format_iso8601, request
 
 logger = logging.getLogger(__name__)
+
+
+MAX_RETRIES = 5
 
 
 class BaseClient(object):
@@ -58,7 +63,7 @@ class BaseClient(object):
         url = '%s/%s.json' % (self.root_url, endpoint)
         self._request('delete', url, params=params)
 
-    def _request(self, method, url, body=None, params=None):
+    def _request(self, method, url, params=None, body=None):
         """
         Makes a GET or POST request to the given URL and returns the parsed JSON
         """
@@ -76,7 +81,7 @@ class BaseClient(object):
 
             if response.status_code == 429:  # have we exceeded our allowed rate?
                 retry_after = response.headers.get('retry-after')
-                raise TembaRateLimitError(int(retry_after) if retry_after else 0)
+                raise TembaRateExceededError(int(retry_after) if retry_after else 0)
 
             response.raise_for_status()
 
@@ -224,38 +229,37 @@ class BaseCursorClient(BaseClient):
             self.params = params
             self.clazz = clazz
 
-        def iterfetches(self):
-            return BaseCursorClient.Iterator(self.client, self.url, self.params, self.clazz)
+        def iterfetches(self, retry_on_rate_exceed=False):
+            """
+            Returns an iterator which makes successive fetch requests for this query
+            :param retry_on_rate_exceed: whether to sleep and retry if request rate limit exceeded
+            :return: the iterator
+            """
+            return BaseCursorClient.Iterator(self.client, self.url, self.params, self.clazz, retry_on_rate_exceed)
 
-        def all(self):
+        def all(self, retry_on_rate_exceed=False):
             results = []
-            for fetch in self.iterfetches():
+            for fetch in self.iterfetches(retry_on_rate_exceed):
                 results += fetch
             return results
 
-        def first(self):
+        def first(self, retry_on_rate_exceed=False):
             try:
-                fetch = next(self.iterfetches())
+                fetch = next(self.iterfetches(retry_on_rate_exceed))
                 return fetch[0]
             except StopIteration:
                 return None
-
-        def get(self):
-            result = self.first()
-            if result is None:
-                raise TembaNoSuchObjectError()
-            else:
-                return result
 
     class Iterator(six.Iterator):
         """
         For iterating through cursor based API responses
         """
-        def __init__(self, client, url, params, clazz):
+        def __init__(self, client, url, params, clazz, retry_on_rate_exceed):
             self.client = client
             self.url = url
             self.params = params
             self.clazz = clazz
+            self.retry_on_rate_exceed = retry_on_rate_exceed
 
         def __iter__(self):
             return self
@@ -264,7 +268,8 @@ class BaseCursorClient(BaseClient):
             if not self.url:
                 raise StopIteration()
 
-            response = self.client._request('get', self.url, params=self.params)
+            response = self.client._request('get', self.url, params=self.params, retry_on_rate_exceed=self.retry_on_rate_exceed)
+
             self.url = response['next']
             self.params = {}
             results = response['results']
@@ -279,3 +284,27 @@ class BaseCursorClient(BaseClient):
         GETs a result query for the given endpoint
         """
         return BaseCursorClient.Query(self, '%s/%s.json' % (self.root_url, endpoint), params, clazz)
+
+    def _request(self, method, url, params=None, body=None, retry_on_rate_exceed=False):
+        if retry_on_rate_exceed:
+            return self._request_wth_rate_limit_retry(method, url, params=params, body=body)
+        else:
+            return super(BaseCursorClient, self)._request(method, url, params=params, body=body)
+
+    def _request_wth_rate_limit_retry(self, method, url, params=None, body=None):
+        """
+        Requests the given endpoint, sleeping and retrying if server responds with a rate limit error
+        """
+        retries = 0
+
+        while True:
+            try:
+                return super(BaseCursorClient, self)._request(method, url, params=params, body=body)
+            except TembaRateExceededError as ex:
+                retries += 1
+
+                if retries < MAX_RETRIES and ex.retry_after:
+                    time.sleep(ex.retry_after)
+                else:
+                    raise ex
+

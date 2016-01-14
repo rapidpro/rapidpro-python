@@ -8,6 +8,7 @@ import requests
 import six
 import unittest
 
+from requests.structures import CaseInsensitiveDict
 from . import __version__
 from .clients import BaseClient
 from .exceptions import TembaSerializationException
@@ -194,9 +195,13 @@ class MockResponse(object):
     """
     Mock response object with a status code and some content
     """
-    def __init__(self, status_code, content=''):
+    def __init__(self, status_code, content=None, headers=None):
         self.status_code = status_code
-        self.content = content
+        self.content = content or ''
+        self.headers = CaseInsensitiveDict()
+
+        if headers:
+            self.headers.update(headers)
 
     def raise_for_status(self):
         http_error_msg = ''

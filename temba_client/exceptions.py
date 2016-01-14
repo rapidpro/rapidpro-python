@@ -55,7 +55,7 @@ class TembaConnectionError(TembaException):
     message = "Unable to connect to host"
 
 
-class TembaRateLimitError(TembaException):
+class TembaRateExceededError(TembaException):
     message = "You have exceeded the number of requests allowed per org in a given time window. Please wait %d seconds before making further requests"
 
     def __init__(self, retry_after):
