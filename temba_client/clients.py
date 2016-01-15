@@ -223,77 +223,79 @@ class BasePagingClient(BaseClient):
         return results
 
 
+class CursorIterator(six.Iterator):
+    """
+    For iterating through cursor based API responses
+    """
+    def __init__(self, client, url, params, clazz, retry_on_rate_exceed):
+        self.client = client
+        self.url = url
+        self.params = params
+        self.clazz = clazz
+        self.retry_on_rate_exceed = retry_on_rate_exceed
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if not self.url:
+            raise StopIteration()
+
+        response = self.client._request('get', self.url, params=self.params, retry_on_rate_exceed=self.retry_on_rate_exceed)
+
+        self.url = response['next']
+        self.params = {}
+        results = response['results']
+
+        if len(results) == 0:
+            raise StopIteration()
+        else:
+            return self.clazz.deserialize_list(results)
+
+
+class CursorQuery(object):
+    """
+    Result of a GET query which can then be iterated or fetched in its entirety
+    """
+    def __init__(self, client, url, params, clazz):
+        self.client = client
+        self.url = url
+        self.params = params
+        self.clazz = clazz
+
+    def iterfetches(self, retry_on_rate_exceed=False):
+        """
+        Returns an iterator which makes successive fetch requests for this query
+        :param retry_on_rate_exceed: whether to sleep and retry if request rate limit exceeded
+        :return: the iterator
+        """
+        return CursorIterator(self.client, self.url, self.params, self.clazz, retry_on_rate_exceed)
+
+    def all(self, retry_on_rate_exceed=False):
+        results = []
+        for fetch in self.iterfetches(retry_on_rate_exceed):
+            results += fetch
+        return results
+
+    def first(self, retry_on_rate_exceed=False):
+        try:
+            fetch = next(self.iterfetches(retry_on_rate_exceed))
+            return fetch[0]
+        except StopIteration:
+            return None
+
+
 class BaseCursorClient(BaseClient):
     """
     Abstract base client for cursor-based endpoint access
     """
     __metaclass__ = ABCMeta
 
-    class Query(object):
-        """
-        Result of a GET query which can then be iterated or fetched in its entirety
-        """
-        def __init__(self, client, url, params, clazz):
-            self.client = client
-            self.url = url
-            self.params = params
-            self.clazz = clazz
-
-        def iterfetches(self, retry_on_rate_exceed=False):
-            """
-            Returns an iterator which makes successive fetch requests for this query
-            :param retry_on_rate_exceed: whether to sleep and retry if request rate limit exceeded
-            :return: the iterator
-            """
-            return BaseCursorClient.Iterator(self.client, self.url, self.params, self.clazz, retry_on_rate_exceed)
-
-        def all(self, retry_on_rate_exceed=False):
-            results = []
-            for fetch in self.iterfetches(retry_on_rate_exceed):
-                results += fetch
-            return results
-
-        def first(self, retry_on_rate_exceed=False):
-            try:
-                fetch = next(self.iterfetches(retry_on_rate_exceed))
-                return fetch[0]
-            except StopIteration:
-                return None
-
-    class Iterator(six.Iterator):
-        """
-        For iterating through cursor based API responses
-        """
-        def __init__(self, client, url, params, clazz, retry_on_rate_exceed):
-            self.client = client
-            self.url = url
-            self.params = params
-            self.clazz = clazz
-            self.retry_on_rate_exceed = retry_on_rate_exceed
-
-        def __iter__(self):
-            return self
-
-        def __next__(self):
-            if not self.url:
-                raise StopIteration()
-
-            response = self.client._request('get', self.url, params=self.params, retry_on_rate_exceed=self.retry_on_rate_exceed)
-
-            self.url = response['next']
-            self.params = {}
-            results = response['results']
-
-            if len(results) == 0:
-                raise StopIteration()
-            else:
-                return self.clazz.deserialize_list(results)
-
     def _get_query(self, endpoint, params, clazz):
         """
         GETs a result query for the given endpoint
         """
-        return BaseCursorClient.Query(self, '%s/%s.json' % (self.root_url, endpoint), params, clazz)
+        return CursorQuery(self, '%s/%s.json' % (self.root_url, endpoint), params, clazz)
 
     def _request(self, method, url, params=None, body=None, retry_on_rate_exceed=False):
         if retry_on_rate_exceed:

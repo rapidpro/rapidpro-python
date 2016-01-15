@@ -1,12 +1,8 @@
-.. temba documentation master file, created by
-   sphinx-quickstart on Wed Jan 28 13:37:50 2015.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Welcome to rapidpro-python's documentation!
 ===========================================
 
-This is the official Python client library for `RapidPro <http://rapidpro.github.io/rapidpro/>`_.
+This is the official Python client library for `RapidPro <http://rapidpro.github.io/rapidpro/>`_. The current stable API
+version is 1 whilst version 2 is still under-development and subject to change without notice.
 
 To create a :class:`temba_client.v1.TembaClient` instance, you need to know the name of the host server, and your API token.
 If you don't know your API token then visit the `API Explorer <http://rapidpro.io/api/v1/explorer>`_. For example:
@@ -87,7 +83,7 @@ The pager also allows you to specify a particular page to start at. For example:
 Error Handling
 --------------
 
-If an API request causes a validation error in RapidPro, the client call will raise a `TembaAPIError` which will contain
+If an API request causes a validation error in RapidPro, the client call will raise a `TembaBadRequestError` which will contain
 the error messages for each field.
 
 .. code-block:: python
@@ -110,7 +106,8 @@ See Also
 .. toctree::
    :maxdepth: 4
 
-   temba
+   client_v1
+   client_v2
 
 * :ref:`genindex`
 * :ref:`search`

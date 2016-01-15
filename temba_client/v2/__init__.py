@@ -1,13 +1,17 @@
 from __future__ import absolute_import, unicode_literals
 
+"""
+This version of the API is still under development and so is subject to change without notice. We strongly recommend
+that users continue using the existing API v1.
+"""
+
 from .types import Run
 from ..clients import BaseCursorClient
 
 
 class TembaClient(BaseCursorClient):
     """
-    Client for the Temba API v2. This version of the API is still under development and so is subject to change without
-    notice. We strongly recommend that users continue using the existing API v1.
+    Client for the Temba API v2
 
     :param str host: server hostname, e.g. 'rapidpro.io'
     :param str token: organization API token
@@ -25,7 +29,7 @@ class TembaClient(BaseCursorClient):
         :param responded: whether to limit results to runs with responses
         :param datetime before: modified before
         :param datetime after: modified after
-        :return: list of flow runs
+        :return: flow run query
         """
         params = self._build_params(flow=flow, contact=contact, responded=responded, before=before, after=after)
         return self._get_query('runs', params, Run)
