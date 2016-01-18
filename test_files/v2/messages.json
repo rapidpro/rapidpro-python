@@ -1,0 +1,43 @@
+{
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 4105423,
+            "broadcast": 2690006,
+            "contact": "d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
+            "urn": "twitter:franky6431",
+            "channel": "9a8b001e-a913-486c-80f4-1356e23f582e",
+            "direction": "out",
+            "type": "inbox",
+            "status": "wired",
+            "archived": false,
+            "text": "How are you?",
+            "labels": [],
+            "created_on": "2016-01-06T15:33:00.813162Z",
+            "sent_on": "2016-01-06T15:35:03.675716Z",
+            "delivered_on": null
+        },
+        {
+            "id": 4088573,
+            "broadcast": null,
+            "contact": "d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
+            "urn": "twitter:franky6431",
+            "channel": "9a8b001e-a913-486c-80f4-1356e23f582e",
+            "direction": "in",
+            "type": "inbox",
+            "status": "handled",
+            "archived": false,
+            "text": "I'm good",
+            "labels": [
+                {
+                    "uuid": "683c00e2-c130-4b40-9be9-e78c3370e583",
+                    "name": "Important"
+                }
+            ],
+            "created_on": "2015-11-10T12:59:10Z",
+            "sent_on": null,
+            "delivered_on": "2015-11-10T12:59:11.101787Z"
+        }
+    ]
+}

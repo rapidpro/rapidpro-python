@@ -50,6 +50,86 @@ class TembaClientTest(TembaTest):
         self.assertRaises(TembaRateExceededError, self.client.get_runs().all, retry_on_rate_exceed=False)
         self.assertRaises(TembaRateExceededError, self.client.get_runs().all, retry_on_rate_exceed=True)
 
+    def test_get_contacts(self, mock_request):
+        # check no params
+        mock_request.return_value = MockResponse(200, self.read_json('contacts'))
+
+        # check with no params
+        query = self.client.get_contacts()
+        contacts = query.all()
+
+        self.assert_request(mock_request, 'get', 'contacts')
+        self.assertEqual(len(contacts), 2)
+
+        self.assertEqual(contacts[0].uuid, "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
+        self.assertEqual(contacts[0].name, "Joe")
+        self.assertEqual(contacts[0].language, "eng")
+        self.assertEqual(contacts[0].urns, ["tel:+250973635665"])
+        self.assertEqual(len(contacts[0].groups), 1)
+        self.assertEqual(contacts[0].groups[0].uuid, "d29eca7c-a475-4d8d-98ca-bff968341356")
+        self.assertEqual(contacts[0].groups[0].name, "Customers")
+        self.assertEqual(contacts[0].fields, {'age': 34, 'nickname': "Jo"})
+        self.assertEqual(contacts[0].blocked, False)
+        self.assertEqual(contacts[0].failed, False)
+        self.assertEqual(contacts[0].created_on, datetime.datetime(2015, 11, 11, 8, 30, 24, 922024, pytz.utc))
+        self.assertEqual(contacts[0].modified_on, datetime.datetime(2015, 11, 11, 8, 30, 25, 525936, pytz.utc))
+
+        # check with all params
+        query = self.client.get_contacts(uuid="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
+                                         urn="tel:+250973635665",
+                                         group="Customers",
+                                         after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
+                                         before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc))
+        query.all()
+
+        self.assert_request(mock_request, 'get', 'contacts', params={'uuid': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
+                                                                     'urn': "tel:+250973635665",
+                                                                     'group': "Customers",
+                                                                     'after': "2014-12-12T22:34:36.978123",
+                                                                     'before': "2014-12-12T22:56:58.917123"})
+
+    def test_get_messages(self, mock_request):
+        # check no params
+        mock_request.return_value = MockResponse(200, self.read_json('messages'))
+
+        # check with no params
+        query = self.client.get_messages()
+        messages = query.all()
+
+        self.assert_request(mock_request, 'get', 'messages')
+        self.assertEqual(len(messages), 2)
+
+        self.assertEqual(messages[0].id, 4105423)
+        self.assertEqual(messages[0].broadcast, 2690006)
+        self.assertEqual(messages[0].contact, "d33e9ad5-5c35-414c-abd4-e7451c69ff1d")
+        self.assertEqual(messages[0].urn, "twitter:franky6431")
+        self.assertEqual(messages[0].channel, "9a8b001e-a913-486c-80f4-1356e23f582e")
+        self.assertEqual(messages[0].direction, "out")
+        self.assertEqual(messages[0].type, "inbox")
+        self.assertEqual(messages[0].status, "wired")
+        self.assertEqual(messages[0].archived, False)
+        self.assertEqual(messages[0].text, "How are you?")
+        self.assertEqual(messages[0].labels, [])
+        self.assertEqual(messages[0].created_on, datetime.datetime(2016, 1, 6, 15, 33, 0, 813162, pytz.utc))
+        self.assertEqual(messages[0].sent_on, datetime.datetime(2016, 1, 6, 15, 35, 3, 675716, pytz.utc))
+        self.assertEqual(messages[0].delivered_on, None)
+
+        # check with all params
+        query = self.client.get_messages(_id=123456,
+                                         broadcast=234567,
+                                         contact="d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
+                                         label="Spam",
+                                         after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
+                                         before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc))
+        query.all()
+
+        self.assert_request(mock_request, 'get', 'messages', params={'id': 123456,
+                                                                     'broadcast': 234567,
+                                                                     'contact': "d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
+                                                                     'label': "Spam",
+                                                                     'after': "2014-12-12T22:34:36.978123",
+                                                                     'before': "2014-12-12T22:56:58.917123"})
+
     def test_get_runs(self, mock_request):
         # check no params
         mock_request.return_value = MockResponse(200, self.read_json('runs'))
@@ -82,14 +162,16 @@ class TembaClientTest(TembaTest):
         self.assert_request(mock_request, 'get', 'runs')
 
         # check with all params
-        query = self.client.get_runs(flow="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
+        query = self.client.get_runs(_id=123456,
+                                     flow="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
                                      contact="d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
                                      responded=True,
                                      after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
                                      before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc))
         query.all()
 
-        self.assert_request(mock_request, 'get', 'runs', params={'flow': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
+        self.assert_request(mock_request, 'get', 'runs', params={'id': 123456,
+                                                                 'flow': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
                                                                  'contact': "d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
                                                                  'responded': True,
                                                                  'after': "2014-12-12T22:34:36.978123",

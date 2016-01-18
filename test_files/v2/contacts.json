@@ -1,0 +1,45 @@
+{
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "uuid": "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9",
+            "name": "Joe",
+            "language": "eng",
+            "urns": [
+                "tel:+250973635665"
+            ],
+            "groups": [
+                {
+                    "uuid": "d29eca7c-a475-4d8d-98ca-bff968341356",
+                    "name": "Customers"
+                }
+            ],
+            "fields": {
+                "nickname": "Jo",
+                "age": 34
+            },
+            "blocked": false,
+            "failed": false,
+            "created_on": "2015-11-11T08:30:24.922024Z",
+            "modified_on": "2015-11-11T08:30:25.525936Z"
+        },
+        {
+            "uuid": "28291a83-157e-45ed-93ef-e0425a065d35",
+            "name": "Frank",
+            "language": null,
+            "urns": [
+                "twitter:franky6342"
+            ],
+            "groups": [],
+            "fields": {
+                "nickname": null,
+                "age": null
+            },
+            "blocked": true,
+            "failed": false,
+            "created_on": "2015-11-10T22:04:39.911870Z",
+            "modified_on": "2015-11-10T22:04:40.052502Z"
+        }
+    ]
+}
