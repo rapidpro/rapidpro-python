@@ -115,9 +115,10 @@ class TembaClientTest(TembaTest):
         self.assertEqual(messages[0].delivered_on, None)
 
         # check with all params
-        query = self.client.get_messages(_id=123456,
+        query = self.client.get_messages(id=123456,
                                          broadcast=234567,
                                          contact="d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
+                                         folder="inbox",
                                          label="Spam",
                                          after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
                                          before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc))
@@ -126,6 +127,7 @@ class TembaClientTest(TembaTest):
         self.assert_request(mock_request, 'get', 'messages', params={'id': 123456,
                                                                      'broadcast': 234567,
                                                                      'contact': "d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
+                                                                     'folder': "inbox",
                                                                      'label': "Spam",
                                                                      'after': "2014-12-12T22:34:36.978123",
                                                                      'before': "2014-12-12T22:56:58.917123"})
@@ -162,7 +164,7 @@ class TembaClientTest(TembaTest):
         self.assert_request(mock_request, 'get', 'runs')
 
         # check with all params
-        query = self.client.get_runs(_id=123456,
+        query = self.client.get_runs(id=123456,
                                      flow="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
                                      contact="d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
                                      responded=True,

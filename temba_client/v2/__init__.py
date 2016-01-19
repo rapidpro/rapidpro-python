@@ -34,26 +34,27 @@ class TembaClient(BaseCursorClient):
         params = self._build_params(uuid=uuid, urn=urn, group=group, before=before, after=after)
         return self._get_query('contacts', params, Contact)
 
-    def get_messages(self, _id=None, broadcast=None, contact=None, label=None, before=None, after=None):
+    def get_messages(self, id=None, broadcast=None, contact=None, folder=None, label=None, before=None, after=None):
         """
         Gets all matching messages
 
-        :param _id: message id
+        :param id: message id
         :param broadcast: broadcast id
         :param contact: contact object or UUID
+        :param folder: folder name
         :param label: message label name or UUID
         :param datetime before: created before
         :param datetime after: created after
         :return: message query
         """
-        params = self._build_params(id=_id, broadcast=broadcast, contact=contact, label=label, before=before, after=after)
+        params = self._build_params(id=id, broadcast=broadcast, contact=contact, folder=folder, label=label, before=before, after=after)
         return self._get_query('messages', params, Message)
 
-    def get_runs(self, _id=None, flow=None, contact=None, responded=None, before=None, after=None):
+    def get_runs(self, id=None, flow=None, contact=None, responded=None, before=None, after=None):
         """
         Gets all matching flow runs
 
-        :param _id: flow run id
+        :param id: flow run id
         :param flow: flow object or UUID
         :param contact: contact object or UUID
         :param responded: whether to limit results to runs with responses
@@ -61,5 +62,5 @@ class TembaClient(BaseCursorClient):
         :param datetime after: modified after
         :return: flow run query
         """
-        params = self._build_params(id=_id, flow=flow, contact=contact, responded=responded, before=before, after=after)
+        params = self._build_params(id=id, flow=flow, contact=contact, responded=responded, before=before, after=after)
         return self._get_query('runs', params, Run)
