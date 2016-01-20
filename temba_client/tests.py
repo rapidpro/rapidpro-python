@@ -175,15 +175,15 @@ class BaseClientTest(TembaTest):
                                           'User-Agent': 'test/0.1 rapidpro-python/%s' % __version__})
 
         # by URL
-        client = BaseClientTest.Client('http://example.com/api/v1', '1234567890')
-        self.assertEqual(client.root_url, 'http://example.com/api/v1')
+        client = BaseClientTest.Client('http://example.com', '1234567890', 2)
+        self.assertEqual(client.root_url, 'http://example.com/api/v2')
         self.assertEqual(client.headers, {'Content-type': 'application/json',
                                           'Accept': 'application/json',
                                           'Authorization': 'Token 1234567890',
                                           'User-Agent': 'rapidpro-python/%s' % __version__})
 
         # by URL with trailing /
-        client = BaseClientTest.Client('http://example.com/api/v1/', '1234567890')
+        client = BaseClientTest.Client('http://example.com/', '1234567890', 1)
         self.assertEqual(client.root_url, 'http://example.com/api/v1')
 
 

@@ -26,14 +26,15 @@ class BaseClient(object):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, host, token, user_agent=None, api_version=None):
+    def __init__(self, host, token, api_version, user_agent=None):
         if host.startswith('http'):
-            if host.endswith('/'):
-                self.root_url = host[:-1]
-            else:
-                self.root_url = host
+            host_url = host
+            if host_url.endswith('/'):  # trim a final slash
+                host_url = host[:-1]
         else:
-            self.root_url = 'https://%s/api/v%d' % (host, api_version)
+            host_url = 'https://%s' % host
+
+        self.root_url = '%s/api/v%d' % (host_url, api_version)
 
         self.headers = self._headers(token, user_agent)
 

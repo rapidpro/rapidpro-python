@@ -14,7 +14,7 @@ class TembaClient(BasePagingClient):
     :param str user_agent: string to be included in the User-Agent header
     """
     def __init__(self, host, token, user_agent=None):
-        super(TembaClient, self).__init__(host, token, user_agent, api_version=1)
+        super(TembaClient, self).__init__(host, token, 1, user_agent)
 
     def pager(self, start_page=1):
         """

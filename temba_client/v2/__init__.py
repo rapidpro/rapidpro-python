@@ -18,7 +18,7 @@ class TembaClient(BaseCursorClient):
     :param str user_agent: string to be included in the User-Agent header
     """
     def __init__(self, host, token, user_agent=None):
-        super(TembaClient, self).__init__(host, token, user_agent, api_version=2)
+        super(TembaClient, self).__init__(host, token, 2, user_agent)
 
     def get_contacts(self, uuid=None, urn=None, group=None, before=None, after=None):
         """
