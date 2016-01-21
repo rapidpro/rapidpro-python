@@ -136,31 +136,32 @@ class BaseClient(object):
             return value
 
 
+class Pager(object):
+    """
+    For iterating through page based API responses
+    """
+    def __init__(self, start_page):
+        self.start_page = start_page
+        self.count = None
+        self.next_url = None
+
+    def update(self, response):
+        self.count = response['count']
+        self.next_url = response['next']
+
+    @property
+    def total(self):
+        return self.count
+
+    def has_more(self):
+        return bool(self.next_url)
+
+
 class BasePagingClient(BaseClient):
     """
     Abstract base client for page-based endpoint access
     """
     __metaclass__ = ABCMeta
-
-    class Pager(object):
-        """
-        For iterating through page based API responses
-        """
-        def __init__(self, start_page):
-            self.start_page = start_page
-            self.count = None
-            self.next_url = None
-
-        def update(self, response):
-            self.count = response['count']
-            self.next_url = response['next']
-
-        @property
-        def total(self):
-            return self.count
-
-        def has_more(self):
-            return bool(self.next_url)
 
     def _get_single(self, endpoint, params, from_results=True):
         """

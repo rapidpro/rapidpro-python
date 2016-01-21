@@ -2,7 +2,7 @@ from __future__ import absolute_import, unicode_literals
 
 from .types import Boundary, Broadcast, Campaign, Contact, Group, Event, Field, Flow, FlowDefinition, Label
 from .types import Message, Org, Result, Run
-from ..clients import BasePagingClient
+from ..clients import BasePagingClient, Pager
 
 
 class TembaClient(BasePagingClient):
@@ -23,7 +23,7 @@ class TembaClient(BasePagingClient):
         :param int start_page: the starting page number
         :return: the pager
         """
-        return BasePagingClient.Pager(start_page)
+        return Pager(start_page)
 
     # ==================================================================================================================
     # Create object operations
