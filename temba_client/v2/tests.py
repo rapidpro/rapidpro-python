@@ -82,11 +82,13 @@ class TembaClientTest(TembaTest):
                                          before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc))
         query.all()
 
-        self.assert_request(mock_request, 'get', 'contacts', params={'uuid': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
-                                                                     'urn': "tel:+250973635665",
-                                                                     'group': "Customers",
-                                                                     'after': "2014-12-12T22:34:36.978123",
-                                                                     'before': "2014-12-12T22:56:58.917123"})
+        self.assert_request(mock_request, 'get', 'contacts', params={
+            'uuid': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
+            'urn': "tel:+250973635665",
+            'group': "Customers",
+            'after': "2014-12-12T22:34:36.978123",
+            'before': "2014-12-12T22:56:58.917123"
+        })
 
     def test_get_messages(self, mock_request):
         # check no params
@@ -101,7 +103,8 @@ class TembaClientTest(TembaTest):
 
         self.assertEqual(messages[0].id, 4105423)
         self.assertEqual(messages[0].broadcast, 2690006)
-        self.assertEqual(messages[0].contact, "d33e9ad5-5c35-414c-abd4-e7451c69ff1d")
+        self.assertEqual(messages[0].contact.uuid, "d33e9ad5-5c35-414c-abd4-e7451c69ff1d")
+        self.assertEqual(messages[0].contact.name, "Frank McFlow")
         self.assertEqual(messages[0].urn, "twitter:franky6431")
         self.assertEqual(messages[0].channel, "9a8b001e-a913-486c-80f4-1356e23f582e")
         self.assertEqual(messages[0].direction, "out")
@@ -124,13 +127,15 @@ class TembaClientTest(TembaTest):
                                          before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc))
         query.all()
 
-        self.assert_request(mock_request, 'get', 'messages', params={'id': 123456,
-                                                                     'broadcast': 234567,
-                                                                     'contact': "d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
-                                                                     'folder': "inbox",
-                                                                     'label': "Spam",
-                                                                     'after': "2014-12-12T22:34:36.978123",
-                                                                     'before': "2014-12-12T22:56:58.917123"})
+        self.assert_request(mock_request, 'get', 'messages', params={
+            'id': 123456,
+            'broadcast': 234567,
+            'contact': "d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
+            'folder': "inbox",
+            'label': "Spam",
+            'after': "2014-12-12T22:34:36.978123",
+            'before': "2014-12-12T22:56:58.917123"
+        })
 
     def test_get_runs(self, mock_request):
         # check no params
@@ -144,8 +149,10 @@ class TembaClientTest(TembaTest):
         self.assertEqual(len(runs), 2)
 
         self.assertEqual(runs[0].id, 4092373)
-        self.assertEqual(runs[0].flow, "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a")
-        self.assertEqual(runs[0].contact, "d33e9ad5-5c35-414c-abd4-e7451c69ff1d")
+        self.assertEqual(runs[0].flow.uuid, "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a")
+        self.assertEqual(runs[0].flow.name, "Water Survey")
+        self.assertEqual(runs[0].contact.uuid, "d33e9ad5-5c35-414c-abd4-e7451c69ff1d")
+        self.assertEqual(runs[0].contact.name, "Frank McFlow")
         self.assertEqual(runs[0].responded, True)
         self.assertEqual(len(runs[0].steps), 3)
         self.assertEqual(runs[0].steps[0].node, "ca6c092a-1615-474e-ab64-4e7ce75a808f")
@@ -172,12 +179,14 @@ class TembaClientTest(TembaTest):
                                      before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc))
         query.all()
 
-        self.assert_request(mock_request, 'get', 'runs', params={'id': 123456,
-                                                                 'flow': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
-                                                                 'contact': "d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
-                                                                 'responded': True,
-                                                                 'after': "2014-12-12T22:34:36.978123",
-                                                                 'before': "2014-12-12T22:56:58.917123"})
+        self.assert_request(mock_request, 'get', 'runs', params={
+            'id': 123456,
+            'flow': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
+            'contact': "d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
+            'responded': True,
+            'after': "2014-12-12T22:34:36.978123",
+            'before': "2014-12-12T22:56:58.917123"
+        })
 
         # check when result is empty
         mock_request.return_value = MockResponse(200, self.read_json('empty'))

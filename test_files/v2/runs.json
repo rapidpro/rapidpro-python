@@ -4,8 +4,8 @@
     "results": [
         {
             "id": 4092373,
-            "flow": "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
-            "contact": "d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
+            "flow": {"uuid": "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a", "name": "Water Survey"},
+            "contact": {"uuid": "d33e9ad5-5c35-414c-abd4-e7451c69ff1d", "name": "Frank McFlow"},
             "responded": true,
             "steps": [
                 {
@@ -43,8 +43,8 @@
         },
         {
             "id": 2504278,
-            "flow": "7b75bcb0-3c86-482f-bdce-06a3d6cd5cf7",
-            "contact": "d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
+            "flow": {"uuid": "7b75bcb0-3c86-482f-bdce-06a3d6cd5cf7", "name": "Test"},
+            "contact": {"uuid": "d33e9ad5-5c35-414c-abd4-e7451c69ff1d", "name": "Frank McFlow"},
             "responded": false,
             "steps": [
                 {

@@ -1,19 +1,12 @@
 from __future__ import absolute_import, unicode_literals
 
-from ..serialization import TembaObject, SimpleField, BooleanField, IntegerField, DatetimeField, ObjectListField
+from ..serialization import TembaObject, SimpleField, BooleanField, IntegerField, DatetimeField, ObjectField
+from ..serialization import ObjectListField
 
 
-class GroupRef(TembaObject):
+class ObjectRef(TembaObject):
     """
-    Used for references to contact groups in other objects
-    """
-    uuid = SimpleField()
-    name = SimpleField()
-
-
-class LabelRef(TembaObject):
-    """
-    Used for references to labels in other objects
+    Used for references to objects in other objects
     """
     uuid = SimpleField()
     name = SimpleField()
@@ -24,7 +17,7 @@ class Contact(TembaObject):
     name = SimpleField()
     language = SimpleField()
     urns = SimpleField()
-    groups = ObjectListField(item_class=GroupRef)
+    groups = ObjectListField(item_class=ObjectRef)
     fields = SimpleField()
     blocked = BooleanField()
     failed = BooleanField()
@@ -35,7 +28,7 @@ class Contact(TembaObject):
 class Message(TembaObject):
     id = IntegerField()
     broadcast = IntegerField(optional=True)
-    contact = SimpleField()
+    contact = ObjectField(item_class=ObjectRef)
     urn = SimpleField()
     channel = SimpleField()
     direction = SimpleField()
@@ -43,7 +36,7 @@ class Message(TembaObject):
     status = SimpleField()
     archived = BooleanField()
     text = SimpleField()
-    labels = ObjectListField(item_class=LabelRef)
+    labels = ObjectListField(item_class=ObjectRef)
     created_on = DatetimeField()
     sent_on = DatetimeField()
     delivered_on = DatetimeField()
@@ -61,8 +54,8 @@ class Step(TembaObject):
 
 class Run(TembaObject):
     id = IntegerField()
-    flow = SimpleField()
-    contact = SimpleField()
+    flow = ObjectField(item_class=ObjectRef)
+    contact = ObjectField(item_class=ObjectRef)
     responded = BooleanField()
     steps = ObjectListField(item_class=Step)
     created_on = DatetimeField()
