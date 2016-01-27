@@ -11,7 +11,7 @@ import unittest
 from requests.structures import CaseInsensitiveDict
 from . import __version__
 from .clients import BaseClient
-from .exceptions import TembaSerializationException
+from .exceptions import TembaException, TembaSerializationException
 from .serialization import TembaObject, SimpleField, BooleanField, IntegerField, DatetimeField, ObjectField
 from .serialization import ObjectListField
 from .utils import format_iso8601, parse_iso8601
@@ -32,7 +32,14 @@ class TembaTest(unittest.TestCase):
         handle.close()
         return contents
 
-    def assert_request_url(self, mock, method, url, **kwargs):
+    def assertRaisesWithMessage(self, exc_class, message, callable_obj, *args, **kwargs):
+        try:
+            callable_obj(*args, **kwargs)
+        except TembaException as exc:
+            self.assertIsInstance(exc, exc_class)
+            self.assertEqual(six.text_type(exc), message)
+
+    def assertRequestURL(self, mock, method, url, **kwargs):
         """
         Asserts that a request was made to the given url with the given parameters
         """
@@ -43,11 +50,11 @@ class TembaTest(unittest.TestCase):
                                          'User-Agent': 'test/0.1 rapidpro-python/%s' % __version__}, **kwargs)
         mock.reset_mock()
 
-    def assert_request(self, mock, method, endpoint, **kwargs):
+    def assertRequest(self, mock, method, endpoint, **kwargs):
         """
         Asserts that a request was made to the given endpoint with the given parameters
         """
-        self.assert_request_url(mock, method, 'https://example.com/api/v%d/%s.json' % (self.API_VERSION, endpoint), **kwargs)
+        self.assertRequestURL(mock, method, 'https://example.com/api/v%d/%s.json' % (self.API_VERSION, endpoint), **kwargs)
 
 
 class UtilsTest(TembaTest):

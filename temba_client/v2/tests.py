@@ -4,8 +4,10 @@ import datetime
 import pytz
 
 from mock import patch
+from requests.exceptions import ConnectionError
 from . import TembaClient
-from ..exceptions import TembaRateExceededError
+from ..exceptions import TembaBadRequestError, TembaTokenError, TembaRateExceededError, TembaHttpError
+from ..exceptions import TembaConnectionError
 from ..tests import TembaTest, MockResponse
 
 
@@ -16,6 +18,37 @@ class TembaClientTest(TembaTest):
     def setUp(self):
         self.client = TembaClient('example.com', '1234567890', user_agent='test/0.1')
 
+    def test_errors(self, mock_request):
+        query = self.client.get_runs()
+
+        # bad request errors (400)
+        mock_request.return_value = MockResponse(400, "XYZ")
+
+        self.assertRaisesWithMessage(TembaBadRequestError, "XYZ", query.all)
+
+        mock_request.return_value = MockResponse(400, '["Msg1", "Msg2"]')
+
+        self.assertRaisesWithMessage(TembaBadRequestError, "Msg1. Msg2", query.all)
+
+        mock_request.return_value = MockResponse(400, '{"field1": ["Msg1", "Msg2"]}')
+
+        self.assertRaisesWithMessage(TembaBadRequestError, "Msg1. Msg2", query.all)
+
+        # forbidden errors (403)
+        mock_request.return_value = MockResponse(403, '{"detail":"Invalid token"}')
+
+        self.assertRaisesWithMessage(TembaTokenError, "Authentication with provided token failed", query.all)
+
+        # other HTTP like 414
+        mock_request.return_value = MockResponse(414, "URI too long")
+
+        self.assertRaisesWithMessage(TembaHttpError, "414 Client Error: ...", query.all)
+
+        # connection failure
+        mock_request.side_effect = ConnectionError()
+
+        self.assertRaisesWithMessage(TembaConnectionError, "Unable to connect to host", query.all)
+
     def test_retry_on_rate_exceed(self, mock_request):
         fail_then_success = [
             MockResponse(429, '', {'Retry-After': 1}),
@@ -25,7 +58,9 @@ class TembaClientTest(TembaTest):
 
         # no retries means exception right away
         iterator = self.client.get_runs().iterfetches(retry_on_rate_exceed=False)
-        self.assertRaises(TembaRateExceededError, iterator.__next__)
+        self.assertRaisesWithMessage(TembaRateExceededError, "You have exceeded the number of requests allowed per org "
+                                                             "in a given time window. Please wait 1 seconds before "
+                                                             "making further requests", iterator.__next__)
 
         mock_request.side_effect = fail_then_success
 
@@ -58,7 +93,7 @@ class TembaClientTest(TembaTest):
         query = self.client.get_contacts()
         contacts = query.all()
 
-        self.assert_request(mock_request, 'get', 'contacts')
+        self.assertRequest(mock_request, 'get', 'contacts')
         self.assertEqual(len(contacts), 2)
 
         self.assertEqual(contacts[0].uuid, "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
@@ -82,7 +117,7 @@ class TembaClientTest(TembaTest):
                                          before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc))
         query.all()
 
-        self.assert_request(mock_request, 'get', 'contacts', params={
+        self.assertRequest(mock_request, 'get', 'contacts', params={
             'uuid': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
             'urn': "tel:+250973635665",
             'group': "Customers",
@@ -98,7 +133,7 @@ class TembaClientTest(TembaTest):
         query = self.client.get_messages()
         messages = query.all()
 
-        self.assert_request(mock_request, 'get', 'messages')
+        self.assertRequest(mock_request, 'get', 'messages')
         self.assertEqual(len(messages), 2)
 
         self.assertEqual(messages[0].id, 4105423)
@@ -128,7 +163,7 @@ class TembaClientTest(TembaTest):
                                          before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc))
         query.all()
 
-        self.assert_request(mock_request, 'get', 'messages', params={
+        self.assertRequest(mock_request, 'get', 'messages', params={
             'id': 123456,
             'broadcast': 234567,
             'contact': "d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
@@ -146,7 +181,7 @@ class TembaClientTest(TembaTest):
         query = self.client.get_runs()
         runs = query.all()
 
-        self.assert_request(mock_request, 'get', 'runs')
+        self.assertRequest(mock_request, 'get', 'runs')
         self.assertEqual(len(runs), 2)
 
         self.assertEqual(runs[0].id, 4092373)
@@ -169,7 +204,7 @@ class TembaClientTest(TembaTest):
         self.assertEqual(runs[0].exit_type, "completed")
 
         self.assertEqual(query.first().id, runs[0].id)
-        self.assert_request(mock_request, 'get', 'runs')
+        self.assertRequest(mock_request, 'get', 'runs')
 
         # check with all params
         query = self.client.get_runs(id=123456,
@@ -180,7 +215,7 @@ class TembaClientTest(TembaTest):
                                      before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc))
         query.all()
 
-        self.assert_request(mock_request, 'get', 'runs', params={
+        self.assertRequest(mock_request, 'get', 'runs', params={
             'id': 123456,
             'flow': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
             'contact': "d33e9ad5-5c35-414c-abd4-e7451c69ff1d",

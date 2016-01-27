@@ -10,7 +10,7 @@ import time
 from abc import ABCMeta
 from . import __version__, CLIENT_NAME
 from .exceptions import TembaMultipleResultsError, TembaNoSuchObjectError, TembaBadRequestError, TembaConnectionError
-from .exceptions import TembaRateExceededError, TembaHttpError
+from .exceptions import TembaRateExceededError, TembaTokenError, TembaHttpError
 from .serialization import TembaObject
 from .utils import format_iso8601, request
 
@@ -84,8 +84,11 @@ class BaseClient(object):
                 try:
                     errors = response.json()
                 except ValueError:
-                    errors = {'non_field_errors': [response.content]}
+                    errors = {'details': [response.content]}
                 raise TembaBadRequestError(errors)
+
+            elif response.status_code == 403:
+                raise TembaTokenError()
 
             elif response.status_code == 404:
                 raise TembaNoSuchObjectError()
