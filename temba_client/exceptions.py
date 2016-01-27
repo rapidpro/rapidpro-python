@@ -8,7 +8,7 @@ class TembaException(Exception):
         return self.message
 
     def __str__(self):
-        return str(self.__unicode__())
+        return six.text_type(self.__unicode__())
 
 
 class TembaConnectionError(TembaException):
@@ -55,7 +55,7 @@ class TembaHttpError(TembaException):
         self.caused_by = caused_by
 
     def __unicode__(self):
-        return unicode(self.caused_by)
+        return six.text_type(self.caused_by)
 
 
 class TembaSerializationException(TembaException):
