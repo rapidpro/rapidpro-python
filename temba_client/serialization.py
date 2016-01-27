@@ -126,15 +126,21 @@ class DatetimeField(TembaField):
 
 
 class ObjectField(TembaField):
-    def __init__(self, item_class, src=None):
-        super(ObjectField, self).__init__(src)
+    def __init__(self, item_class, **kwargs):
+        super(ObjectField, self).__init__(**kwargs)
         self.item_class = item_class
 
     def deserialize(self, value):
-        return self.item_class.deserialize(value)
+        if value is not None:
+            return self.item_class.deserialize(value)
+        else:
+            return None
 
     def serialize(self, value):
-        return self.item_class.serialize(value)
+        if value is not None:
+            return self.item_class.serialize(value)
+        else:
+            return None
 
 
 class ObjectListField(ObjectField):
