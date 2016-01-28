@@ -27,10 +27,10 @@ class Contact(TembaObject):
 
 class Message(TembaObject):
     id = IntegerField()
-    broadcast = IntegerField(optional=True)
+    broadcast = IntegerField()
     contact = ObjectField(item_class=ObjectRef)
     urn = SimpleField()
-    channel = ObjectField(item_class=ObjectRef, optional=True)
+    channel = ObjectField(item_class=ObjectRef)
     direction = SimpleField()
     type = SimpleField()
     status = SimpleField()

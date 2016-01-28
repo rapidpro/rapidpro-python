@@ -98,7 +98,7 @@ class TembaClientTest(TembaTest):
         contacts = query.all()
 
         self.assertRequest(mock_request, 'get', 'contacts')
-        self.assertEqual(len(contacts), 2)
+        self.assertEqual(len(contacts), 3)
 
         self.assertEqual(contacts[0].uuid, "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
         self.assertEqual(contacts[0].name, "Joe")

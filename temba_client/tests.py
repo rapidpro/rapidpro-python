@@ -92,26 +92,26 @@ class FieldsTest(TembaTest):
     def test_boolean(self):
         field = BooleanField()
         self.assertEqual(field.serialize(True), True)
+        self.assertEqual(field.serialize(None), None)
+
         self.assertEqual(field.deserialize(True), True)
         self.assertEqual(field.deserialize(False), False)
-        self.assertRaises(TembaSerializationException, field.deserialize, None)
+        self.assertEqual(field.deserialize(None), None)
+
         self.assertRaises(TembaSerializationException, field.deserialize, "")
         self.assertRaises(TembaSerializationException, field.deserialize, [])
-
-        field = BooleanField(optional=True)
-        self.assertEqual(field.deserialize(None), None)
 
     def test_integer(self):
         field = IntegerField()
         self.assertEqual(field.serialize(1), 1)
+        self.assertEqual(field.serialize(None), None)
+
         self.assertEqual(field.deserialize(2), 2)
-        self.assertRaises(TembaSerializationException, field.deserialize, None)
+        self.assertEqual(field.deserialize(None), None)
+
         self.assertRaises(TembaSerializationException, field.deserialize, 1.5)
         self.assertRaises(TembaSerializationException, field.deserialize, "")
         self.assertRaises(TembaSerializationException, field.deserialize, [])
-
-        field = IntegerField(optional=True)
-        self.assertEqual(field.deserialize(None), None)
 
     def test_object_list(self):
         field = ObjectListField(item_class=TestSubType)

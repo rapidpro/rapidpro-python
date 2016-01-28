@@ -99,20 +99,14 @@ class SimpleField(TembaField):
 
 class BooleanField(SimpleField):
     def deserialize(self, value):
-        if self.optional and value is None:
-            return None
-
-        if not isinstance(value, bool):
+        if value is not None and not isinstance(value, bool):
             raise TembaSerializationException("Value '%s' field is not an boolean" % six.text_type(value))
         return value
 
 
 class IntegerField(SimpleField):
     def deserialize(self, value):
-        if self.optional and value is None:
-            return None
-
-        if type(value) not in six.integer_types:
+        if value is not None and type(value) not in six.integer_types:
             raise TembaSerializationException("Value '%s' field is not an integer" % six.text_type(value))
         return value
 
@@ -131,16 +125,10 @@ class ObjectField(TembaField):
         self.item_class = item_class
 
     def deserialize(self, value):
-        if value is not None:
-            return self.item_class.deserialize(value)
-        else:
-            return None
+        return self.item_class.deserialize(value) if value is not None else None
 
     def serialize(self, value):
-        if value is not None:
-            return self.item_class.serialize(value)
-        else:
-            return None
+        return self.item_class.serialize(value) if value is not None else None
 
 
 class ObjectListField(ObjectField):
