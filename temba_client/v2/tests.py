@@ -117,6 +117,7 @@ class TembaClientTest(TembaTest):
         query = self.client.get_contacts(uuid="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
                                          urn="tel:+250973635665",
                                          group="Customers",
+                                         deleted=False,
                                          after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
                                          before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc))
         query.all()
@@ -125,6 +126,7 @@ class TembaClientTest(TembaTest):
             'uuid': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
             'urn': "tel:+250973635665",
             'group': "Customers",
+            'deleted': False,
             'after': "2014-12-12T22:34:36.978123",
             'before': "2014-12-12T22:56:58.917123"
         })

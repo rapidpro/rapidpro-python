@@ -20,18 +20,19 @@ class TembaClient(BaseCursorClient):
     def __init__(self, host, token, user_agent=None):
         super(TembaClient, self).__init__(host, token, 2, user_agent)
 
-    def get_contacts(self, uuid=None, urn=None, group=None, before=None, after=None):
+    def get_contacts(self, uuid=None, urn=None, group=None, deleted=None, before=None, after=None):
         """
         Gets all matching contacts
 
         :param uuid: contact UUID
         :param urn: contact URN
         :param group: contact group name or UUID
+        :param deleted: return deleted contact only
         :param datetime before: modified before
         :param datetime after: modified after
         :return: contact query
         """
-        params = self._build_params(uuid=uuid, urn=urn, group=group, before=before, after=after)
+        params = self._build_params(uuid=uuid, urn=urn, group=group, deleted=deleted, before=before, after=after)
         return self._get_query('contacts', params, Contact)
 
     def get_messages(self, id=None, broadcast=None, contact=None, folder=None, label=None, before=None, after=None):
