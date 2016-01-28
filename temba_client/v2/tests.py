@@ -30,6 +30,10 @@ class TembaClientTest(TembaTest):
 
         self.assertRaisesWithMessage(TembaBadRequestError, "Msg1. Msg2", query.all)
 
+        mock_request.return_value = MockResponse(400, '{"detail": "Msg"}')
+
+        self.assertRaisesWithMessage(TembaBadRequestError, "Msg", query.all)
+
         mock_request.return_value = MockResponse(400, '{"field1": ["Msg1", "Msg2"]}')
 
         self.assertRaisesWithMessage(TembaBadRequestError, "Msg1. Msg2", query.all)

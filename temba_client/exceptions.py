@@ -23,9 +23,12 @@ class TembaBadRequestError(TembaException):
         msgs = []
         if isinstance(self.errors, dict):
             for field, field_errors in six.iteritems(self.errors):
-                for error in field_errors:
-                    msgs.append(error)
-        elif isinstance(self.errors, (list, tuple)):
+                if isinstance(field_errors, basestring):  # e.g. {"detail": "message..."}
+                    msgs.append(field_errors)
+                else:
+                    for error in field_errors:  # e.g. {"field1": ["msg1...", "msg2..."]}
+                        msgs.append(error)
+        elif isinstance(self.errors, list):
             msgs = self.errors
 
         return msgs[0] if len(msgs) == 1 else ". ".join(msgs)
