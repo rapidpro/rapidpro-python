@@ -134,11 +134,12 @@ class TembaClientTest(TembaTest):
     def test_create_runs(self, mock_request):
         mock_request.return_value = MockResponse(200, self.read_json('runs_created'))
         runs = self.client.create_runs('04a4752b-0f49-480e-ae60-3a3f2bea485c',
-                                       ['bfff9984-38f4-4e59-998d-3663ec3c650d'], True)
+                                       ['bfff9984-38f4-4e59-998d-3663ec3c650d'], True, extra={'variable': 'value'})
 
         expected_body = {"contacts": ['bfff9984-38f4-4e59-998d-3663ec3c650d'],
                          "restart_participants": 1,
-                         "flow_uuid": "04a4752b-0f49-480e-ae60-3a3f2bea485c"}
+                         "flow_uuid": "04a4752b-0f49-480e-ae60-3a3f2bea485c",
+                         "extra": {"variable": "value"}}
         self.assertRequest(mock_request, 'post', 'runs', data=expected_body)
 
         self.assertEqual(len(runs), 2)

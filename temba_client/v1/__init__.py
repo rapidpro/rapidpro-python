@@ -105,7 +105,7 @@ class TembaClient(BasePagingClient):
         params = self._build_params(name=name)
         return Label.deserialize(self._post('labels', params))
 
-    def create_runs(self, flow, contacts, restart_participants):
+    def create_runs(self, flow, contacts, restart_participants, extra=None):
         """
         Creates new flow runs for the given contacts
 
@@ -114,7 +114,8 @@ class TembaClient(BasePagingClient):
         :param bool restart_participants: whether or not to restart participants already in the flow
         :return: list of new runs
         """
-        params = self._build_params(flow_uuid=flow, contacts=contacts, restart_participants=restart_participants)
+        params = self._build_params(flow_uuid=flow, contacts=contacts, restart_participants=restart_participants,
+                                    extra=extra)
         return Run.deserialize_list(self._post('runs', params))
 
     # ==================================================================================================================
