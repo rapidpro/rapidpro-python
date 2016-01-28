@@ -141,6 +141,16 @@ class TembaClientTest(TembaTest):
                          "flow_uuid": "04a4752b-0f49-480e-ae60-3a3f2bea485c"}
         self.assertRequest(mock_request, 'post', 'runs', data=expected_body)
 
+        runs = self.client.create_runs('04a4752b-0f49-480e-ae60-3a3f2bea485c',
+                                       ['bfff9984-38f4-4e59-998d-3663ec3c650d'], True, extra={'variable': 'value'})
+
+        expected_body = {"contacts": ['bfff9984-38f4-4e59-998d-3663ec3c650d'],
+                         "restart_participants": 1,
+                         "flow_uuid": "04a4752b-0f49-480e-ae60-3a3f2bea485c",
+                         "extra": {"variable": "value"}}
+
+        self.assertRequest(mock_request, 'post', 'runs', data=expected_body)
+
         self.assertEqual(len(runs), 2)
 
     def test_delete_contact(self, mock_request):
