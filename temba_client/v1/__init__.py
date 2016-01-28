@@ -112,6 +112,7 @@ class TembaClient(BasePagingClient):
         :param str flow: flow UUID
         :param list contacts: list of contact objects or UUIDs
         :param bool restart_participants: whether or not to restart participants already in the flow
+        :param dict extra: extras variables added to the flow and accessed from @extra
         :return: list of new runs
         """
         params = self._build_params(flow_uuid=flow, contacts=contacts, restart_participants=restart_participants,
