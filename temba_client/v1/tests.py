@@ -462,7 +462,6 @@ class TembaClientTest(TembaTest):
         self.assertEqual(flow.name, "Ping")
         self.assertEqual(flow.archived, False)
         self.assertEqual(flow.labels, ["Registration"])
-        self.assertEqual(flow.participants, 5)
         self.assertEqual(flow.runs, 6)
         self.assertEqual(flow.completed_runs, 4)
         self.assertEqual(flow.expires, 720)

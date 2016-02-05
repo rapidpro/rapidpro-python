@@ -8,7 +8,7 @@
             "archived": false,
             "name": "Ping",
             "labels": ["Registration"],
-            "participants": 5,
+            "participants": null,
             "runs": 6,
             "completed_runs": 4,
             "rulesets": [

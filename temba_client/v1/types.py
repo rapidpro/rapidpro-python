@@ -67,7 +67,6 @@ class Flow(TembaObject):
     name = SimpleField()
     archived = SimpleField()
     labels = SimpleField()
-    participants = IntegerField()
     runs = IntegerField()
     completed_runs = IntegerField()
     expires = IntegerField()
