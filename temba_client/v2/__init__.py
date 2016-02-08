@@ -5,7 +5,7 @@ This version of the API is still under development and so is subject to change w
 that users continue using the existing API v1.
 """
 
-from .types import Contact, Message, Run
+from .types import Contact, Field, Group, Message, Run
 from ..clients import BaseCursorClient
 
 
@@ -34,6 +34,24 @@ class TembaClient(BaseCursorClient):
         """
         params = self._build_params(uuid=uuid, urn=urn, group=group, deleted=deleted, before=before, after=after)
         return self._get_query('contacts', params, Contact)
+
+    def get_fields(self, key=None):
+        """
+        Gets all matching contact fields
+
+        :param key: field key
+        :return: field query
+        """
+        return self._get_query('fields', self._build_params(key=key), Field)
+
+    def get_groups(self, uuid=None):
+        """
+        Gets all matching contact groups
+
+        :param uuid: group UUID
+        :return: group query
+        """
+        return self._get_query('groups', self._build_params(uuid=uuid), Group)
 
     def get_messages(self, id=None, broadcast=None, contact=None, folder=None, label=None, before=None, after=None):
         """

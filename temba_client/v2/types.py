@@ -25,6 +25,18 @@ class Contact(TembaObject):
     modified_on = DatetimeField()
 
 
+class Field(TembaObject):
+    key = SimpleField()
+    label = SimpleField()
+    value_type = SimpleField()
+
+
+class Group(TembaObject):
+    uuid = SimpleField()
+    name = SimpleField()
+    count = IntegerField()
+
+
 class Message(TembaObject):
     id = IntegerField()
     broadcast = IntegerField()

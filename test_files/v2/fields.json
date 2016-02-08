@@ -1,0 +1,16 @@
+{
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "key": "chat_name",
+            "label": "Chat Name",
+            "value_type": "text"
+        },
+        {
+            "key": "registered",
+            "label": "Registered On",
+            "value_type": "datetime"
+        }
+    ]
+}

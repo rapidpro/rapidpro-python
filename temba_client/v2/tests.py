@@ -131,6 +131,48 @@ class TembaClientTest(TembaTest):
             'before': "2014-12-12T22:56:58.917123"
         })
 
+    def test_get_fields(self, mock_request):
+        # check no params
+        mock_request.return_value = MockResponse(200, self.read_json('fields'))
+
+        # check with no params
+        query = self.client.get_fields()
+        fields = query.all()
+
+        self.assertRequest(mock_request, 'get', 'fields')
+        self.assertEqual(len(fields), 2)
+
+        self.assertEqual(fields[0].key, "chat_name")
+        self.assertEqual(fields[0].label, "Chat Name")
+        self.assertEqual(fields[0].value_type, "text")
+
+        # check with all params
+        query = self.client.get_fields(key="chat_name")
+        query.all()
+
+        self.assertRequest(mock_request, 'get', 'fields', params={'key': "chat_name"})
+
+    def test_get_groups(self, mock_request):
+        # check no params
+        mock_request.return_value = MockResponse(200, self.read_json('groups'))
+
+        # check with no params
+        query = self.client.get_groups()
+        groups = query.all()
+
+        self.assertRequest(mock_request, 'get', 'groups')
+        self.assertEqual(len(groups), 2)
+
+        self.assertEqual(groups[0].uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
+        self.assertEqual(groups[0].name, "The A-Team")
+        self.assertEqual(groups[0].count, 4)
+
+        # check with all params
+        query = self.client.get_groups(uuid="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a")
+        query.all()
+
+        self.assertRequest(mock_request, 'get', 'groups', params={'uuid': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a"})
+
     def test_get_messages(self, mock_request):
         # check no params
         mock_request.return_value = MockResponse(200, self.read_json('messages'))
