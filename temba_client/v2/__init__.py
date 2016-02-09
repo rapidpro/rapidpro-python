@@ -5,7 +5,7 @@ This version of the API is still under development and so is subject to change w
 that users continue using the existing API v1.
 """
 
-from .types import Contact, Field, Group, Message, Run
+from .types import Contact, Field, Group, Label, Message, Run
 from ..clients import BaseCursorClient
 
 
@@ -52,6 +52,15 @@ class TembaClient(BaseCursorClient):
         :return: group query
         """
         return self._get_query('groups', self._build_params(uuid=uuid), Group)
+
+    def get_labels(self, uuid=None):
+        """
+        Gets all matching message labels
+
+        :param uuid: label UUID
+        :return: label query
+        """
+        return self._get_query('labels', self._build_params(uuid=uuid), Label)
 
     def get_messages(self, id=None, broadcast=None, contact=None, folder=None, label=None, before=None, after=None):
         """

@@ -37,6 +37,12 @@ class Group(TembaObject):
     count = IntegerField()
 
 
+class Label(TembaObject):
+    uuid = SimpleField()
+    name = SimpleField()
+    count = IntegerField()
+
+
 class Message(TembaObject):
     id = IntegerField()
     broadcast = IntegerField()
