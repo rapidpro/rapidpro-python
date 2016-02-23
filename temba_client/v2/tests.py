@@ -220,7 +220,7 @@ class TembaClientTest(TembaTest):
         self.assertEqual(messages[0].labels, [])
         self.assertEqual(messages[0].created_on, datetime.datetime(2016, 1, 6, 15, 33, 0, 813162, pytz.utc))
         self.assertEqual(messages[0].sent_on, datetime.datetime(2016, 1, 6, 15, 35, 3, 675716, pytz.utc))
-        self.assertEqual(messages[0].delivered_on, None)
+        self.assertEqual(messages[0].modified_on, None)
 
         # check with all params
         query = self.client.get_messages(id=123456,

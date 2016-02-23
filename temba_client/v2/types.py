@@ -57,7 +57,7 @@ class Message(TembaObject):
     labels = ObjectListField(item_class=ObjectRef)
     created_on = DatetimeField()
     sent_on = DatetimeField()
-    delivered_on = DatetimeField()
+    modified_on = DatetimeField(optional=True)
 
 
 class Step(TembaObject):

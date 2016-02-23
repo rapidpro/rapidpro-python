@@ -16,7 +16,7 @@
             "labels": [],
             "created_on": "2016-01-06T15:33:00.813162Z",
             "sent_on": "2016-01-06T15:35:03.675716Z",
-            "delivered_on": null
+            "modified_on": null
         },
         {
             "id": 4088573,
@@ -37,7 +37,7 @@
             ],
             "created_on": "2015-11-10T12:59:10Z",
             "sent_on": null,
-            "delivered_on": "2015-11-10T12:59:11.101787Z"
+            "modified_on": "2015-11-10T12:59:11.101787Z"
         }
     ]
 }
