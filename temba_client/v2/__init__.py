@@ -5,7 +5,7 @@ This version of the API is still under development and so is subject to change w
 that users continue using the existing API v1.
 """
 
-from .types import Contact, Field, Group, Label, Message, Org, Run
+from .types import Broadcast, Contact, Field, Group, Label, Message, Org, Run
 from ..clients import BaseCursorClient
 
 
@@ -19,6 +19,18 @@ class TembaClient(BaseCursorClient):
     """
     def __init__(self, host, token, user_agent=None):
         super(TembaClient, self).__init__(host, token, 2, user_agent)
+
+    def get_broadcasts(self, id=None, before=None, after=None):
+        """
+        Gets all matching broadcasts
+
+        :param id: broadcast id
+        :param datetime before: created before
+        :param datetime after: created after
+        :return: broadcast query
+        """
+        params = self._build_params(id=id, before=before, after=after)
+        return self._get_query('broadcasts', params, Broadcast)
 
     def get_contacts(self, uuid=None, urn=None, group=None, deleted=None, before=None, after=None):
         """

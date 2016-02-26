@@ -89,6 +89,41 @@ class TembaClientTest(TembaTest):
         self.assertRaises(TembaRateExceededError, self.client.get_runs().all, retry_on_rate_exceed=False)
         self.assertRaises(TembaRateExceededError, self.client.get_runs().all, retry_on_rate_exceed=True)
 
+    def test_get_broadcasts(self, mock_request):
+        # check no params
+        mock_request.return_value = MockResponse(200, self.read_json('broadcasts'))
+
+        # check with no params
+        query = self.client.get_broadcasts()
+        broadcasts = query.all()
+
+        self.assertRequest(mock_request, 'get', 'broadcasts')
+        self.assertEqual(len(broadcasts), 2)
+
+        self.assertEqual(broadcasts[0].id, 1234)
+        self.assertEqual(broadcasts[0].urns, ["tel:+250783865665", "twitter:bobby"])
+        self.assertEqual(len(broadcasts[0].contacts), 1)
+        self.assertEqual(broadcasts[0].contacts[0].uuid, "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
+        self.assertEqual(broadcasts[0].contacts[0].name, "Joe")
+        self.assertEqual(len(broadcasts[0].groups), 1)
+        self.assertEqual(broadcasts[0].groups[0].uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
+        self.assertEqual(broadcasts[0].groups[0].name, "The A-Team")
+        self.assertEqual(broadcasts[0].text, "Hello")
+        self.assertEqual(broadcasts[0].created_on, datetime.datetime(2015, 11, 11, 8, 30, 24, 922024, pytz.utc))
+        self.assertEqual(broadcasts[0].status, "queued")
+
+        # check with all params
+        query = self.client.get_broadcasts(id=12345,
+                                           after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
+                                           before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc))
+        query.all()
+
+        self.assertRequest(mock_request, 'get', 'broadcasts', params={
+            'id': 12345,
+            'after': "2014-12-12T22:34:36.978123",
+            'before': "2014-12-12T22:56:58.917123"
+        })
+
     def test_get_contacts(self, mock_request):
         # check no params
         mock_request.return_value = MockResponse(200, self.read_json('contacts'))

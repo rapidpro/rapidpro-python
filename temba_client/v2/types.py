@@ -12,6 +12,16 @@ class ObjectRef(TembaObject):
     name = SimpleField()
 
 
+class Broadcast(TembaObject):
+    id = IntegerField()
+    urns = SimpleField()
+    contacts = ObjectListField(item_class=ObjectRef)
+    groups = ObjectListField(item_class=ObjectRef)
+    text = SimpleField()
+    status = SimpleField()
+    created_on = DatetimeField()
+
+
 class Contact(TembaObject):
     uuid = SimpleField()
     name = SimpleField()
