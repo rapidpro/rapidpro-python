@@ -11,7 +11,7 @@
             "direction": "out",
             "type": "inbox",
             "status": "wired",
-            "archived": false,
+            "visibility": "visible",
             "text": "How are you?",
             "labels": [],
             "created_on": "2016-01-06T15:33:00.813162Z",
@@ -27,7 +27,7 @@
             "direction": "in",
             "type": "inbox",
             "status": "handled",
-            "archived": false,
+            "visibility": "archived",
             "text": "I'm good",
             "labels": [
                 {

@@ -215,7 +215,7 @@ class TembaClientTest(TembaTest):
         self.assertEqual(messages[0].direction, "out")
         self.assertEqual(messages[0].type, "inbox")
         self.assertEqual(messages[0].status, "wired")
-        self.assertEqual(messages[0].archived, False)
+        self.assertEqual(messages[0].visibility, "visible")
         self.assertEqual(messages[0].text, "How are you?")
         self.assertEqual(messages[0].labels, [])
         self.assertEqual(messages[0].created_on, datetime.datetime(2016, 1, 6, 15, 33, 0, 813162, pytz.utc))
