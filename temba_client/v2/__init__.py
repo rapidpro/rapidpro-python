@@ -5,7 +5,7 @@ This version of the API is still under development and so is subject to change w
 that users continue using the existing API v1.
 """
 
-from .types import Contact, Field, Group, Label, Message, Run
+from .types import Contact, Field, Group, Label, Message, Org, Run
 from ..clients import BaseCursorClient
 
 
@@ -77,6 +77,15 @@ class TembaClient(BaseCursorClient):
         """
         params = self._build_params(id=id, broadcast=broadcast, contact=contact, folder=folder, label=label, before=before, after=after)
         return self._get_query('messages', params, Message)
+
+    def get_org(self, retry_on_rate_exceed=False):
+        """
+        Gets the current organization
+
+        :param retry_on_rate_exceed: whether to sleep and retry if request rate limit exceeded
+        :return: the org
+        """
+        return Org.deserialize(self._get_raw('org', {}, retry_on_rate_exceed))
 
     def get_runs(self, id=None, flow=None, contact=None, responded=None, before=None, after=None):
         """

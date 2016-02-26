@@ -60,6 +60,16 @@ class Message(TembaObject):
     modified_on = DatetimeField(optional=True)
 
 
+class Org(TembaObject):
+    name = SimpleField()
+    country = SimpleField()
+    languages = SimpleField()
+    primary_language = SimpleField()
+    timezone = SimpleField()
+    date_style = SimpleField()
+    anon = SimpleField()
+
+
 class Step(TembaObject):
     node = SimpleField()
     text = SimpleField()

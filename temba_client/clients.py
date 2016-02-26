@@ -302,6 +302,12 @@ class BaseCursorClient(BaseClient):
         """
         return CursorQuery(self, '%s/%s.json' % (self.root_url, endpoint), params, clazz)
 
+    def _get_raw(self, endpoint, params, retry_on_rate_exceed=False):
+        """
+        GETs the raw response from the given endpoint
+        """
+        return self._request('get', '%s/%s.json' % (self.root_url, endpoint), params, retry_on_rate_exceed=retry_on_rate_exceed)
+
     def _request(self, method, url, params=None, body=None, retry_on_rate_exceed=False):
         if retry_on_rate_exceed:
             return self._request_wth_rate_limit_retry(method, url, params=params, body=body)

@@ -242,6 +242,20 @@ class TembaClientTest(TembaTest):
             'before': "2014-12-12T22:56:58.917123"
         })
 
+    def test_get_org(self, mock_request):
+        mock_request.return_value = MockResponse(200, self.read_json('org'))
+        org = self.client.get_org()
+
+        self.assertRequest(mock_request, 'get', 'org')
+
+        self.assertEqual(org.name, "Nyaruka")
+        self.assertEqual(org.country, "RW")
+        self.assertEqual(org.languages, ["eng", "fre"])
+        self.assertEqual(org.primary_language, "eng")
+        self.assertEqual(org.timezone, "Africa/Kigali")
+        self.assertEqual(org.date_style, "day_first")
+        self.assertEqual(org.anon, False)
+
     def test_get_runs(self, mock_request):
         # check no params
         mock_request.return_value = MockResponse(200, self.read_json('runs'))
