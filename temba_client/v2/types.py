@@ -62,7 +62,7 @@ class Message(TembaObject):
     direction = SimpleField()
     type = SimpleField()
     status = SimpleField()
-    archived = BooleanField()
+    visibility = SimpleField(optional=True)
     text = SimpleField()
     labels = ObjectListField(item_class=ObjectRef)
     created_on = DatetimeField()
