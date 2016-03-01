@@ -499,6 +499,14 @@ class TembaClient(BasePagingClient):
         """
         self._post('contact_actions', self._build_params(contacts=contacts, action='unblock'))
 
+    def archive_contacts(self, contacts):
+        """
+        Archives all of the given contacts' messages.
+
+        :param list[str] contacts: the contact UUIDs
+        """
+        self._post('contact_actions', self._build_params(contacts=contacts, action='archive'))
+
     def expire_contacts(self, contacts):
         """
         Forces expiration of the given contacts' active flow runs.

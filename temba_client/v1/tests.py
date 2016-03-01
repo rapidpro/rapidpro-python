@@ -29,6 +29,15 @@ class TembaClientTest(TembaTest):
                          'action': 'add', 'group': 'Testers'}
         self.assertRequest(mock_request, 'post', 'contact_actions', data=expected_body)
 
+    def test_archive_contacts(self, mock_request):
+        mock_request.return_value = MockResponse(204)
+        self.client.archive_contacts(contacts=['bfff9984-38f4-4e59-998d-3663ec3c650d',
+                                               '7a165fe9-575b-4d15-b2ac-58fec913d603'])
+
+        expected_body = {'contacts': ['bfff9984-38f4-4e59-998d-3663ec3c650d', '7a165fe9-575b-4d15-b2ac-58fec913d603'],
+                         'action': 'archive'}
+        self.assertRequest(mock_request, 'post', 'contact_actions', data=expected_body)
+
     def test_archive_messages(self, mock_request):
         mock_request.return_value = MockResponse(204)
         self.client.archive_messages(messages=[123, 234, 345])
