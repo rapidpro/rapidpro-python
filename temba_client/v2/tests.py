@@ -124,6 +124,74 @@ class TembaClientTest(TembaTest):
             'before': "2014-12-12T22:56:58.917123"
         })
 
+    def test_get_calls(self, mock_request):
+        # check no params
+        mock_request.return_value = MockResponse(200, self.read_json('calls'))
+
+        # check with no params
+        query = self.client.get_calls()
+        calls = query.all()
+
+        self.assertRequest(mock_request, 'get', 'calls')
+        self.assertEqual(len(calls), 2)
+
+        self.assertEqual(calls[0].id, 12345)
+        self.assertEqual(calls[0].type, "in")
+        self.assertEqual(calls[0].contact.uuid, "d33e9ad5-5c35-414c-abd4-e7451c69ff1d")
+        self.assertEqual(calls[0].contact.name, "Frank McFlow")
+        self.assertEqual(calls[0].channel.uuid, "9a8b001e-a913-486c-80f4-1356e23f582e")
+        self.assertEqual(calls[0].channel.name, "Nexmo")
+        self.assertEqual(calls[0].time, datetime.datetime(2016, 1, 6, 15, 35, 3, 675716, pytz.utc))
+        self.assertEqual(calls[0].duration, 123)
+        self.assertEqual(calls[0].created_on, datetime.datetime(2016, 1, 6, 15, 33, 0, 813162, pytz.utc))
+
+        # check with all params
+        query = self.client.get_calls(id=12345,
+                                      contact="5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9",
+                                      after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
+                                      before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc))
+        query.all()
+
+        self.assertRequest(mock_request, 'get', 'calls', params={
+            'id': 12345,
+            'contact': "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9",
+            'after': "2014-12-12T22:34:36.978123",
+            'before': "2014-12-12T22:56:58.917123"
+        })
+
+    def test_get_channels(self, mock_request):
+        # check no params
+        mock_request.return_value = MockResponse(200, self.read_json('channels'))
+
+        # check with no params
+        query = self.client.get_channels()
+        channels = query.all()
+
+        self.assertRequest(mock_request, 'get', 'channels')
+        self.assertEqual(len(channels), 2)
+
+        self.assertEqual(channels[0].uuid, "09d23a05-47fe-11e4-bfe9-b8f6b119e9ab")
+        self.assertEqual(channels[0].name, "Android Phone")
+        self.assertEqual(channels[0].address, "+250788123123")
+        self.assertEqual(channels[0].country, "RW")
+        self.assertEqual(channels[0].device.name, "Nexus 5X")
+        self.assertEqual(channels[0].device.power_level, 99)
+        self.assertEqual(channels[0].device.power_status, "STATUS_DISCHARGING")
+        self.assertEqual(channels[0].device.power_source, "BATTERY")
+        self.assertEqual(channels[0].device.network_type, "WIFI")
+        self.assertEqual(channels[0].last_seen, datetime.datetime(2016, 3, 1, 5, 31, 27, 456000, pytz.utc))
+        self.assertEqual(channels[0].created_on, datetime.datetime(2014, 6, 23, 9, 34, 12, 866000, pytz.utc))
+
+        # check with all params
+        query = self.client.get_channels(uuid="09d23a05-47fe-11e4-bfe9-b8f6b119e9ab",
+                                         address="+250788123123")
+        query.all()
+
+        self.assertRequest(mock_request, 'get', 'channels', params={
+            'uuid': "09d23a05-47fe-11e4-bfe9-b8f6b119e9ab",
+            'address': "+250788123123"
+        })
+
     def test_get_contacts(self, mock_request):
         # check no params
         mock_request.return_value = MockResponse(200, self.read_json('contacts'))
