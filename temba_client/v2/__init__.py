@@ -5,7 +5,7 @@ This version of the API is still under development and so is subject to change w
 that users continue using the existing API v1.
 """
 
-from .types import Broadcast, Call, Channel, Contact, Field, Group, Label, Message, Org, Run
+from .types import Broadcast, Channel, ChannelEvent, Contact, Field, Group, Label, Message, Org, Run
 from ..clients import BaseCursorClient
 
 
@@ -32,19 +32,6 @@ class TembaClient(BaseCursorClient):
         params = self._build_params(id=id, before=before, after=after)
         return self._get_query('broadcasts', params, Broadcast)
 
-    def get_calls(self, id=None, contact=None, before=None, after=None):
-        """
-        Gets all matching calls
-
-        :param id: call id
-        :param contact: contact object or UUID
-        :param datetime before: created before
-        :param datetime after: created after
-        :return: call query
-        """
-        params = self._build_params(id=id, contact=contact, before=before, after=after)
-        return self._get_query('calls', params, Call)
-
     def get_channels(self, uuid=None, address=None):
         """
         Gets all matching channels
@@ -55,6 +42,19 @@ class TembaClient(BaseCursorClient):
         """
         params = self._build_params(uuid=uuid, address=address)
         return self._get_query('channels', params, Channel)
+
+    def get_channel_events(self, id=None, contact=None, before=None, after=None):
+        """
+        Gets all matching channel events
+
+        :param id: event id
+        :param contact: contact object or UUID
+        :param datetime before: created before
+        :param datetime after: created after
+        :return: channel event query
+        """
+        params = self._build_params(id=id, contact=contact, before=before, after=after)
+        return self._get_query('channel_events', params, ChannelEvent)
 
     def get_contacts(self, uuid=None, urn=None, group=None, deleted=None, before=None, after=None):
         """

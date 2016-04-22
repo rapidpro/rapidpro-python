@@ -22,16 +22,6 @@ class Broadcast(TembaObject):
     created_on = DatetimeField()
 
 
-class Call(TembaObject):
-    id = IntegerField()
-    type = SimpleField()
-    contact = ObjectField(item_class=ObjectRef)
-    channel = ObjectField(item_class=ObjectRef)
-    time = DatetimeField()
-    duration = IntegerField()
-    created_on = DatetimeField()
-
-
 class Channel(TembaObject):
     class Device(TembaObject):
         name = SimpleField()
@@ -46,6 +36,16 @@ class Channel(TembaObject):
     country = SimpleField()
     device = ObjectField(item_class=Device)
     last_seen = DatetimeField()
+    created_on = DatetimeField()
+
+
+class ChannelEvent(TembaObject):
+    id = IntegerField()
+    type = SimpleField()
+    contact = ObjectField(item_class=ObjectRef)
+    channel = ObjectField(item_class=ObjectRef)
+    time = DatetimeField()
+    duration = IntegerField()
     created_on = DatetimeField()
 
 

@@ -94,67 +94,32 @@ class TembaClientTest(TembaTest):
         mock_request.return_value = MockResponse(200, self.read_json('broadcasts'))
 
         # check with no params
-        query = self.client.get_broadcasts()
-        broadcasts = query.all()
+        results = self.client.get_broadcasts().all()
 
         self.assertRequest(mock_request, 'get', 'broadcasts')
-        self.assertEqual(len(broadcasts), 2)
+        self.assertEqual(len(results), 2)
 
-        self.assertEqual(broadcasts[0].id, 1234)
-        self.assertEqual(broadcasts[0].urns, ["tel:+250783865665", "twitter:bobby"])
-        self.assertEqual(len(broadcasts[0].contacts), 1)
-        self.assertEqual(broadcasts[0].contacts[0].uuid, "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
-        self.assertEqual(broadcasts[0].contacts[0].name, "Joe")
-        self.assertEqual(len(broadcasts[0].groups), 1)
-        self.assertEqual(broadcasts[0].groups[0].uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
-        self.assertEqual(broadcasts[0].groups[0].name, "The A-Team")
-        self.assertEqual(broadcasts[0].text, "Hello")
-        self.assertEqual(broadcasts[0].created_on, datetime.datetime(2015, 11, 11, 8, 30, 24, 922024, pytz.utc))
-        self.assertEqual(broadcasts[0].status, "queued")
+        self.assertEqual(results[0].id, 1234)
+        self.assertEqual(results[0].urns, ["tel:+250783865665", "twitter:bobby"])
+        self.assertEqual(len(results[0].contacts), 1)
+        self.assertEqual(results[0].contacts[0].uuid, "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
+        self.assertEqual(results[0].contacts[0].name, "Joe")
+        self.assertEqual(len(results[0].groups), 1)
+        self.assertEqual(results[0].groups[0].uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
+        self.assertEqual(results[0].groups[0].name, "The A-Team")
+        self.assertEqual(results[0].text, "Hello")
+        self.assertEqual(results[0].created_on, datetime.datetime(2015, 11, 11, 8, 30, 24, 922024, pytz.utc))
+        self.assertEqual(results[0].status, "queued")
 
         # check with all params
-        query = self.client.get_broadcasts(id=12345,
-                                           after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
-                                           before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc))
-        query.all()
+        self.client.get_broadcasts(
+            id=12345,
+            after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
+            before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc)
+        ).all()
 
         self.assertRequest(mock_request, 'get', 'broadcasts', params={
             'id': 12345,
-            'after': "2014-12-12T22:34:36.978123",
-            'before': "2014-12-12T22:56:58.917123"
-        })
-
-    def test_get_calls(self, mock_request):
-        # check no params
-        mock_request.return_value = MockResponse(200, self.read_json('calls'))
-
-        # check with no params
-        query = self.client.get_calls()
-        calls = query.all()
-
-        self.assertRequest(mock_request, 'get', 'calls')
-        self.assertEqual(len(calls), 2)
-
-        self.assertEqual(calls[0].id, 12345)
-        self.assertEqual(calls[0].type, "in")
-        self.assertEqual(calls[0].contact.uuid, "d33e9ad5-5c35-414c-abd4-e7451c69ff1d")
-        self.assertEqual(calls[0].contact.name, "Frank McFlow")
-        self.assertEqual(calls[0].channel.uuid, "9a8b001e-a913-486c-80f4-1356e23f582e")
-        self.assertEqual(calls[0].channel.name, "Nexmo")
-        self.assertEqual(calls[0].time, datetime.datetime(2016, 1, 6, 15, 35, 3, 675716, pytz.utc))
-        self.assertEqual(calls[0].duration, 123)
-        self.assertEqual(calls[0].created_on, datetime.datetime(2016, 1, 6, 15, 33, 0, 813162, pytz.utc))
-
-        # check with all params
-        query = self.client.get_calls(id=12345,
-                                      contact="5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9",
-                                      after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
-                                      before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc))
-        query.all()
-
-        self.assertRequest(mock_request, 'get', 'calls', params={
-            'id': 12345,
-            'contact': "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9",
             'after': "2014-12-12T22:34:36.978123",
             'before': "2014-12-12T22:56:58.917123"
         })
@@ -164,32 +129,67 @@ class TembaClientTest(TembaTest):
         mock_request.return_value = MockResponse(200, self.read_json('channels'))
 
         # check with no params
-        query = self.client.get_channels()
-        channels = query.all()
+        results = self.client.get_channels().all()
 
         self.assertRequest(mock_request, 'get', 'channels')
-        self.assertEqual(len(channels), 2)
+        self.assertEqual(len(results), 2)
 
-        self.assertEqual(channels[0].uuid, "09d23a05-47fe-11e4-bfe9-b8f6b119e9ab")
-        self.assertEqual(channels[0].name, "Android Phone")
-        self.assertEqual(channels[0].address, "+250788123123")
-        self.assertEqual(channels[0].country, "RW")
-        self.assertEqual(channels[0].device.name, "Nexus 5X")
-        self.assertEqual(channels[0].device.power_level, 99)
-        self.assertEqual(channels[0].device.power_status, "STATUS_DISCHARGING")
-        self.assertEqual(channels[0].device.power_source, "BATTERY")
-        self.assertEqual(channels[0].device.network_type, "WIFI")
-        self.assertEqual(channels[0].last_seen, datetime.datetime(2016, 3, 1, 5, 31, 27, 456000, pytz.utc))
-        self.assertEqual(channels[0].created_on, datetime.datetime(2014, 6, 23, 9, 34, 12, 866000, pytz.utc))
+        self.assertEqual(results[0].uuid, "09d23a05-47fe-11e4-bfe9-b8f6b119e9ab")
+        self.assertEqual(results[0].name, "Android Phone")
+        self.assertEqual(results[0].address, "+250788123123")
+        self.assertEqual(results[0].country, "RW")
+        self.assertEqual(results[0].device.name, "Nexus 5X")
+        self.assertEqual(results[0].device.power_level, 99)
+        self.assertEqual(results[0].device.power_status, "STATUS_DISCHARGING")
+        self.assertEqual(results[0].device.power_source, "BATTERY")
+        self.assertEqual(results[0].device.network_type, "WIFI")
+        self.assertEqual(results[0].last_seen, datetime.datetime(2016, 3, 1, 5, 31, 27, 456000, pytz.utc))
+        self.assertEqual(results[0].created_on, datetime.datetime(2014, 6, 23, 9, 34, 12, 866000, pytz.utc))
 
         # check with all params
-        query = self.client.get_channels(uuid="09d23a05-47fe-11e4-bfe9-b8f6b119e9ab",
-                                         address="+250788123123")
-        query.all()
+        self.client.get_channels(
+            uuid="09d23a05-47fe-11e4-bfe9-b8f6b119e9ab",
+            address="+250788123123"
+        ).all()
 
         self.assertRequest(mock_request, 'get', 'channels', params={
             'uuid': "09d23a05-47fe-11e4-bfe9-b8f6b119e9ab",
             'address': "+250788123123"
+        })
+
+    def test_get_channel_events(self, mock_request):
+        # check no params
+        mock_request.return_value = MockResponse(200, self.read_json('channel_events'))
+
+        # check with no params
+        results = self.client.get_channel_events().all()
+
+        self.assertRequest(mock_request, 'get', 'channel_events')
+        self.assertEqual(len(results), 2)
+
+        self.assertEqual(results[0].id, 12345)
+        self.assertEqual(results[0].type, "in")
+        self.assertEqual(results[0].contact.uuid, "d33e9ad5-5c35-414c-abd4-e7451c69ff1d")
+        self.assertEqual(results[0].contact.name, "Frank McFlow")
+        self.assertEqual(results[0].channel.uuid, "9a8b001e-a913-486c-80f4-1356e23f582e")
+        self.assertEqual(results[0].channel.name, "Nexmo")
+        self.assertEqual(results[0].time, datetime.datetime(2016, 1, 6, 15, 35, 3, 675716, pytz.utc))
+        self.assertEqual(results[0].duration, 123)
+        self.assertEqual(results[0].created_on, datetime.datetime(2016, 1, 6, 15, 33, 0, 813162, pytz.utc))
+
+        # check with all params
+        self.client.get_channel_events(
+            id=12345,
+            contact="5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9",
+            after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
+            before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc)
+        ).all()
+
+        self.assertRequest(mock_request, 'get', 'channel_events', params={
+            'id': 12345,
+            'contact': "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9",
+            'after': "2014-12-12T22:34:36.978123",
+            'before': "2014-12-12T22:56:58.917123"
         })
 
     def test_get_contacts(self, mock_request):
@@ -197,33 +197,33 @@ class TembaClientTest(TembaTest):
         mock_request.return_value = MockResponse(200, self.read_json('contacts'))
 
         # check with no params
-        query = self.client.get_contacts()
-        contacts = query.all()
+        results = self.client.get_contacts().all()
 
         self.assertRequest(mock_request, 'get', 'contacts')
-        self.assertEqual(len(contacts), 3)
+        self.assertEqual(len(results), 3)
 
-        self.assertEqual(contacts[0].uuid, "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
-        self.assertEqual(contacts[0].name, "Joe")
-        self.assertEqual(contacts[0].language, "eng")
-        self.assertEqual(contacts[0].urns, ["tel:+250973635665"])
-        self.assertEqual(len(contacts[0].groups), 1)
-        self.assertEqual(contacts[0].groups[0].uuid, "d29eca7c-a475-4d8d-98ca-bff968341356")
-        self.assertEqual(contacts[0].groups[0].name, "Customers")
-        self.assertEqual(contacts[0].fields, {'age': 34, 'nickname': "Jo"})
-        self.assertEqual(contacts[0].blocked, False)
-        self.assertEqual(contacts[0].failed, False)
-        self.assertEqual(contacts[0].created_on, datetime.datetime(2015, 11, 11, 8, 30, 24, 922024, pytz.utc))
-        self.assertEqual(contacts[0].modified_on, datetime.datetime(2015, 11, 11, 8, 30, 25, 525936, pytz.utc))
+        self.assertEqual(results[0].uuid, "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
+        self.assertEqual(results[0].name, "Joe")
+        self.assertEqual(results[0].language, "eng")
+        self.assertEqual(results[0].urns, ["tel:+250973635665"])
+        self.assertEqual(len(results[0].groups), 1)
+        self.assertEqual(results[0].groups[0].uuid, "d29eca7c-a475-4d8d-98ca-bff968341356")
+        self.assertEqual(results[0].groups[0].name, "Customers")
+        self.assertEqual(results[0].fields, {'age': 34, 'nickname': "Jo"})
+        self.assertEqual(results[0].blocked, False)
+        self.assertEqual(results[0].failed, False)
+        self.assertEqual(results[0].created_on, datetime.datetime(2015, 11, 11, 8, 30, 24, 922024, pytz.utc))
+        self.assertEqual(results[0].modified_on, datetime.datetime(2015, 11, 11, 8, 30, 25, 525936, pytz.utc))
 
         # check with all params
-        query = self.client.get_contacts(uuid="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
-                                         urn="tel:+250973635665",
-                                         group="Customers",
-                                         deleted=False,
-                                         after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
-                                         before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc))
-        query.all()
+        self.client.get_contacts(
+            uuid="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
+            urn="tel:+250973635665",
+            group="Customers",
+            deleted=False,
+            after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
+            before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc)
+        ).all()
 
         self.assertRequest(mock_request, 'get', 'contacts', params={
             'uuid': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
@@ -239,19 +239,17 @@ class TembaClientTest(TembaTest):
         mock_request.return_value = MockResponse(200, self.read_json('fields'))
 
         # check with no params
-        query = self.client.get_fields()
-        fields = query.all()
+        results = self.client.get_fields().all()
 
         self.assertRequest(mock_request, 'get', 'fields')
-        self.assertEqual(len(fields), 2)
+        self.assertEqual(len(results), 2)
 
-        self.assertEqual(fields[0].key, "chat_name")
-        self.assertEqual(fields[0].label, "Chat Name")
-        self.assertEqual(fields[0].value_type, "text")
+        self.assertEqual(results[0].key, "chat_name")
+        self.assertEqual(results[0].label, "Chat Name")
+        self.assertEqual(results[0].value_type, "text")
 
         # check with all params
-        query = self.client.get_fields(key="chat_name")
-        query.all()
+        self.client.get_fields(key="chat_name").all()
 
         self.assertRequest(mock_request, 'get', 'fields', params={'key': "chat_name"})
 
@@ -260,19 +258,17 @@ class TembaClientTest(TembaTest):
         mock_request.return_value = MockResponse(200, self.read_json('groups'))
 
         # check with no params
-        query = self.client.get_groups()
-        groups = query.all()
+        results = self.client.get_groups().all()
 
         self.assertRequest(mock_request, 'get', 'groups')
-        self.assertEqual(len(groups), 2)
+        self.assertEqual(len(results), 2)
 
-        self.assertEqual(groups[0].uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
-        self.assertEqual(groups[0].name, "The A-Team")
-        self.assertEqual(groups[0].count, 4)
+        self.assertEqual(results[0].uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
+        self.assertEqual(results[0].name, "The A-Team")
+        self.assertEqual(results[0].count, 4)
 
         # check with all params
-        query = self.client.get_groups(uuid="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a")
-        query.all()
+        self.client.get_groups(uuid="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a").all()
 
         self.assertRequest(mock_request, 'get', 'groups', params={'uuid': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a"})
 
@@ -281,19 +277,17 @@ class TembaClientTest(TembaTest):
         mock_request.return_value = MockResponse(200, self.read_json('labels'))
 
         # check with no params
-        query = self.client.get_labels()
-        labels = query.all()
+        results = self.client.get_labels().all()
 
         self.assertRequest(mock_request, 'get', 'labels')
-        self.assertEqual(len(labels), 2)
+        self.assertEqual(len(results), 2)
 
-        self.assertEqual(labels[0].uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
-        self.assertEqual(labels[0].name, "Important")
-        self.assertEqual(labels[0].count, 4)
+        self.assertEqual(results[0].uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
+        self.assertEqual(results[0].name, "Important")
+        self.assertEqual(results[0].count, 4)
 
         # check with all params
-        query = self.client.get_labels(uuid="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a")
-        query.all()
+        self.client.get_labels(uuid="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a").all()
 
         self.assertRequest(mock_request, 'get', 'labels', params={'uuid': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a"})
 
@@ -302,38 +296,38 @@ class TembaClientTest(TembaTest):
         mock_request.return_value = MockResponse(200, self.read_json('messages'))
 
         # check with no params
-        query = self.client.get_messages()
-        messages = query.all()
+        results = self.client.get_messages().all()
 
         self.assertRequest(mock_request, 'get', 'messages')
-        self.assertEqual(len(messages), 2)
+        self.assertEqual(len(results), 2)
 
-        self.assertEqual(messages[0].id, 4105423)
-        self.assertEqual(messages[0].broadcast, 2690006)
-        self.assertEqual(messages[0].contact.uuid, "d33e9ad5-5c35-414c-abd4-e7451c69ff1d")
-        self.assertEqual(messages[0].contact.name, "Frank McFlow")
-        self.assertEqual(messages[0].urn, "twitter:franky6431")
-        self.assertEqual(messages[0].channel.uuid, "9a8b001e-a913-486c-80f4-1356e23f582e")
-        self.assertEqual(messages[0].channel.name, "Nexmo")
-        self.assertEqual(messages[0].direction, "out")
-        self.assertEqual(messages[0].type, "inbox")
-        self.assertEqual(messages[0].status, "wired")
-        self.assertEqual(messages[0].visibility, "visible")
-        self.assertEqual(messages[0].text, "How are you?")
-        self.assertEqual(messages[0].labels, [])
-        self.assertEqual(messages[0].created_on, datetime.datetime(2016, 1, 6, 15, 33, 0, 813162, pytz.utc))
-        self.assertEqual(messages[0].sent_on, datetime.datetime(2016, 1, 6, 15, 35, 3, 675716, pytz.utc))
-        self.assertEqual(messages[0].modified_on, None)
+        self.assertEqual(results[0].id, 4105423)
+        self.assertEqual(results[0].broadcast, 2690006)
+        self.assertEqual(results[0].contact.uuid, "d33e9ad5-5c35-414c-abd4-e7451c69ff1d")
+        self.assertEqual(results[0].contact.name, "Frank McFlow")
+        self.assertEqual(results[0].urn, "twitter:franky6431")
+        self.assertEqual(results[0].channel.uuid, "9a8b001e-a913-486c-80f4-1356e23f582e")
+        self.assertEqual(results[0].channel.name, "Nexmo")
+        self.assertEqual(results[0].direction, "out")
+        self.assertEqual(results[0].type, "inbox")
+        self.assertEqual(results[0].status, "wired")
+        self.assertEqual(results[0].visibility, "visible")
+        self.assertEqual(results[0].text, "How are you?")
+        self.assertEqual(results[0].labels, [])
+        self.assertEqual(results[0].created_on, datetime.datetime(2016, 1, 6, 15, 33, 0, 813162, pytz.utc))
+        self.assertEqual(results[0].sent_on, datetime.datetime(2016, 1, 6, 15, 35, 3, 675716, pytz.utc))
+        self.assertEqual(results[0].modified_on, None)
 
         # check with all params
-        query = self.client.get_messages(id=123456,
-                                         broadcast=234567,
-                                         contact="d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
-                                         folder="inbox",
-                                         label="Spam",
-                                         after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
-                                         before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc))
-        query.all()
+        self.client.get_messages(
+            id=123456,
+            broadcast=234567,
+            contact="d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
+            folder="inbox",
+            label="Spam",
+            after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
+            before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc)
+        ).all()
 
         self.assertRequest(mock_request, 'get', 'messages', params={
             'id': 123456,
@@ -365,41 +359,42 @@ class TembaClientTest(TembaTest):
 
         # check with no params
         query = self.client.get_runs()
-        runs = query.all()
+        results = query.all()
 
         self.assertRequest(mock_request, 'get', 'runs')
-        self.assertEqual(len(runs), 2)
+        self.assertEqual(len(results), 2)
 
-        self.assertEqual(runs[0].id, 4092373)
-        self.assertEqual(runs[0].flow.uuid, "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a")
-        self.assertEqual(runs[0].flow.name, "Water Survey")
-        self.assertEqual(runs[0].contact.uuid, "d33e9ad5-5c35-414c-abd4-e7451c69ff1d")
-        self.assertEqual(runs[0].contact.name, "Frank McFlow")
-        self.assertEqual(runs[0].responded, True)
-        self.assertEqual(len(runs[0].steps), 3)
-        self.assertEqual(runs[0].steps[0].node, "ca6c092a-1615-474e-ab64-4e7ce75a808f")
-        self.assertEqual(runs[0].steps[0].category, None)
-        self.assertEqual(runs[0].steps[0].left_on, datetime.datetime(2015, 8, 26, 10, 4, 10, 6241, pytz.utc))
-        self.assertEqual(runs[0].steps[0].text, "Hi Bobby, is your water filter working? Answer with Yes or No.")
-        self.assertEqual(runs[0].steps[0].value, None)
-        self.assertEqual(runs[0].steps[0].arrived_on, datetime.datetime(2015, 8, 26, 10, 4, 9, 824114, pytz.utc))
-        self.assertEqual(runs[0].steps[0].type, "actionset")
-        self.assertEqual(runs[0].created_on, datetime.datetime(2015, 8, 26, 10, 4, 9, 737686, pytz.utc))
-        self.assertEqual(runs[0].modified_on, datetime.datetime(2015, 8, 26, 10, 5, 47, 516562, pytz.utc))
-        self.assertEqual(runs[0].exited_on, datetime.datetime(2015, 8, 26, 10, 5, 47, 516562, pytz.utc))
-        self.assertEqual(runs[0].exit_type, "completed")
+        self.assertEqual(results[0].id, 4092373)
+        self.assertEqual(results[0].flow.uuid, "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a")
+        self.assertEqual(results[0].flow.name, "Water Survey")
+        self.assertEqual(results[0].contact.uuid, "d33e9ad5-5c35-414c-abd4-e7451c69ff1d")
+        self.assertEqual(results[0].contact.name, "Frank McFlow")
+        self.assertEqual(results[0].responded, True)
+        self.assertEqual(len(results[0].steps), 3)
+        self.assertEqual(results[0].steps[0].node, "ca6c092a-1615-474e-ab64-4e7ce75a808f")
+        self.assertEqual(results[0].steps[0].category, None)
+        self.assertEqual(results[0].steps[0].left_on, datetime.datetime(2015, 8, 26, 10, 4, 10, 6241, pytz.utc))
+        self.assertEqual(results[0].steps[0].text, "Hi Bobby, is your water filter working? Answer with Yes or No.")
+        self.assertEqual(results[0].steps[0].value, None)
+        self.assertEqual(results[0].steps[0].arrived_on, datetime.datetime(2015, 8, 26, 10, 4, 9, 824114, pytz.utc))
+        self.assertEqual(results[0].steps[0].type, "actionset")
+        self.assertEqual(results[0].created_on, datetime.datetime(2015, 8, 26, 10, 4, 9, 737686, pytz.utc))
+        self.assertEqual(results[0].modified_on, datetime.datetime(2015, 8, 26, 10, 5, 47, 516562, pytz.utc))
+        self.assertEqual(results[0].exited_on, datetime.datetime(2015, 8, 26, 10, 5, 47, 516562, pytz.utc))
+        self.assertEqual(results[0].exit_type, "completed")
 
-        self.assertEqual(query.first().id, runs[0].id)
+        self.assertEqual(query.first().id, results[0].id)
         self.assertRequest(mock_request, 'get', 'runs')
 
         # check with all params
-        query = self.client.get_runs(id=123456,
-                                     flow="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
-                                     contact="d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
-                                     responded=True,
-                                     after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
-                                     before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc))
-        query.all()
+        self.client.get_runs(
+            id=123456,
+            flow="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
+            contact="d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
+            responded=True,
+            after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
+            before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc)
+        ).all()
 
         self.assertRequest(mock_request, 'get', 'runs', params={
             'id': 123456,
