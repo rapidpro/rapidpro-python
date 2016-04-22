@@ -1,6 +1,8 @@
 from __future__ import absolute_import, unicode_literals
 
-from ..serialization import TembaObject, SimpleField, BooleanField, IntegerField, DatetimeField, ObjectListField, ObjectField
+from ..serialization import (
+    TembaObject, SimpleField, BooleanField, IntegerField, DatetimeField, ObjectListField, ObjectField
+)
 
 
 class Broadcast(TembaObject):

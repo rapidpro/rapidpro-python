@@ -355,7 +355,7 @@ class TembaClient(BasePagingClient):
         :param list[str] statuses: list of message statuses
         :param str direction: message direction (I or O)
         :param list[str] _types: list of message types
-        :param list[str] labels: list of message labels. Prefix the label name with + to require it and with - to exclude it.
+        :param list[str] labels: list of message labels
         :param datetime before: created before
         :param datetime after: created after
         :param str text: containing text

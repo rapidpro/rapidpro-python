@@ -54,7 +54,9 @@ class TembaTest(unittest.TestCase):
         """
         Asserts that a request was made to the given endpoint with the given parameters
         """
-        self.assertRequestURL(mock, method, 'https://example.com/api/v%d/%s.json' % (self.API_VERSION, endpoint), **kwargs)
+        url = 'https://example.com/api/v%d/%s.json' % (self.API_VERSION, endpoint)
+
+        self.assertRequestURL(mock, method, url, **kwargs)
 
 
 class UtilsTest(TembaTest):
@@ -115,7 +117,10 @@ class FieldsTest(TembaTest):
 
     def test_object_list(self):
         field = ObjectListField(item_class=TestSubType)
-        self.assertEqual(field.serialize([TestSubType.create(zed='a'), TestSubType.create(zed=2)]), [{'zed': 'a'}, {'zed': 2}])
+        self.assertEqual(field.serialize([TestSubType.create(zed='a'), TestSubType.create(zed=2)]),
+                         [{'zed': 'a'}, {'zed': 2}])
+
+        self.assertRaises(TembaSerializationException, field.serialize, "Not a list")
 
         obj_list = field.deserialize([{'zed': 'a'}, {'zed': 2}])
         self.assertEqual(len(obj_list), 2)

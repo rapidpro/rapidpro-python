@@ -134,7 +134,8 @@ class TembaClient(BaseCursorClient):
         :param datetime after: created after
         :return: message query
         """
-        params = self._build_params(id=id, broadcast=broadcast, contact=contact, folder=folder, label=label, before=before, after=after)
+        params = self._build_params(id=id, broadcast=broadcast, contact=contact, folder=folder, label=label,
+                                    before=before, after=after)
         return self._get_query('messages', params, Message)
 
     def get_org(self, retry_on_rate_exceed=False):
