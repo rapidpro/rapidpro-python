@@ -5,9 +5,8 @@ This version of the API is still under development and so is subject to change w
 that users continue using the existing API v1.
 """
 
-from .types import (
-    Broadcast, Campaign, CampaignEvent, Channel, ChannelEvent, Contact, Field, Group, Label, Message, Org, Run
-)
+from .types import Broadcast, Campaign, CampaignEvent, Channel, ChannelEvent, Contact, Field, Group, Label, Message
+from .types import Org, Run
 from ..clients import BaseCursorClient
 
 
