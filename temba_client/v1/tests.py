@@ -505,10 +505,10 @@ class TembaClientTest(TembaTest):
                               before=datetime.datetime(2014, 12, 12, 22, 34, 36, 123000, pytz.utc),
                               after=datetime.datetime(2014, 12, 12, 22, 34, 36, 234000, pytz.utc))
         self.assertRequest(mock_request, 'get', 'flows', params={'uuid': ['abc', 'xyz'],
-                                                                  'archived': 0,
-                                                                  'label': ['polls', 'events'],
-                                                                  'before': '2014-12-12T22:34:36.123000',
-                                                                  'after': '2014-12-12T22:34:36.234000'})
+                                                                 'archived': 0,
+                                                                 'label': ['polls', 'events'],
+                                                                 'before': '2014-12-12T22:34:36.123000',
+                                                                 'after': '2014-12-12T22:34:36.234000'})
 
     def test_get_group(self, mock_request):
         # check single item response
@@ -624,13 +624,13 @@ class TembaClientTest(TembaTest):
                                  archived=False)
 
         self.assertRequest(mock_request, 'get', 'messages', params={'id': [123, 234],
-                                                                     'broadcast': [345, 456],
-                                                                     'contact': ['abc'],
-                                                                     'label': ['polls', '+events', '-flagged'],
-                                                                     'before': '2014-12-12T22:34:36.123000',
-                                                                     'after': '2014-12-12T22:34:36.234000',
-                                                                     'text': 'heists',
-                                                                     'archived': 0})
+                                                                    'broadcast': [345, 456],
+                                                                    'contact': ['abc'],
+                                                                    'label': ['polls', '+events', '-flagged'],
+                                                                    'before': '2014-12-12T22:34:36.123000',
+                                                                    'after': '2014-12-12T22:34:36.234000',
+                                                                    'text': 'heists',
+                                                                    'archived': 0})
 
         # test getting by broadcast object (should extract id)
         broadcast = Broadcast.create(id=123)
@@ -726,9 +726,9 @@ class TembaClientTest(TembaTest):
                              before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917000, pytz.utc))
 
         self.assertRequest(mock_request, 'get', 'runs', params={'run': [123, 234],
-                                                                 'flow_uuid': ['a68567fa-ad95-45fc-b5f7-3ce90ebbd46d'],
-                                                                 'after': '2014-12-12T22:34:36.978000',
-                                                                 'before': '2014-12-12T22:56:58.917000'})
+                                                                'flow_uuid': ['a68567fa-ad95-45fc-b5f7-3ce90ebbd46d'],
+                                                                'after': '2014-12-12T22:34:36.978000',
+                                                                'before': '2014-12-12T22:56:58.917000'})
 
     def test_label_messages(self, mock_request):
         mock_request.return_value = MockResponse(204)

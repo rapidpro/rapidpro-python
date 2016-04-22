@@ -246,7 +246,8 @@ class CursorIterator(six.Iterator):
         if not self.url:
             raise StopIteration()
 
-        response = self.client._request('get', self.url, params=self.params, retry_on_rate_exceed=self.retry_on_rate_exceed)
+        response = self.client._request('get', self.url, params=self.params,
+                                        retry_on_rate_exceed=self.retry_on_rate_exceed)
 
         self.url = response['next']
         self.params = {}
@@ -306,7 +307,8 @@ class BaseCursorClient(BaseClient):
         """
         GETs the raw response from the given endpoint
         """
-        return self._request('get', '%s/%s.json' % (self.root_url, endpoint), params, retry_on_rate_exceed=retry_on_rate_exceed)
+        url = '%s/%s.json' % (self.root_url, endpoint)
+        return self._request('get', url, params, retry_on_rate_exceed=retry_on_rate_exceed)
 
     def _request(self, method, url, params=None, body=None, retry_on_rate_exceed=False):
         if retry_on_rate_exceed:

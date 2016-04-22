@@ -11,8 +11,10 @@ env:
 install:
 - pip install -q --use-mirrors tox
 - pip install coveralls
+- pip install flake8
 script:
 - tox
+- flake8
 after_success:
 - coveralls
 notifications:

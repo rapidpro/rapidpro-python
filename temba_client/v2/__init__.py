@@ -5,7 +5,9 @@ This version of the API is still under development and so is subject to change w
 that users continue using the existing API v1.
 """
 
-from .types import Broadcast, Contact, Field, Group, Label, Message, Org, Run
+from .types import (
+    Broadcast, Campaign, CampaignEvent, Channel, ChannelEvent, Contact, Field, Group, Label, Message, Org, Run
+)
 from ..clients import BaseCursorClient
 
 
@@ -31,6 +33,51 @@ class TembaClient(BaseCursorClient):
         """
         params = self._build_params(id=id, before=before, after=after)
         return self._get_query('broadcasts', params, Broadcast)
+
+    def get_campaigns(self, uuid=None):
+        """
+        Gets all matching campaigns
+
+        :param uuid: campaigns UUID
+        :return: campaign query
+        """
+        params = self._build_params(uuid=uuid)
+        return self._get_query('campaigns', params, Campaign)
+
+    def get_campaign_events(self, uuid=None, campaign=None):
+        """
+        Gets all matching campaign events
+
+        :param uuid: event UUID
+        :param campaign: campaign object or UUID
+        :return: campaign event query
+        """
+        params = self._build_params(uuid=uuid, campaign=campaign)
+        return self._get_query('campaign_events', params, CampaignEvent)
+
+    def get_channels(self, uuid=None, address=None):
+        """
+        Gets all matching channels
+
+        :param uuid: channel UUID
+        :param urn: channel address
+        :return: channel query
+        """
+        params = self._build_params(uuid=uuid, address=address)
+        return self._get_query('channels', params, Channel)
+
+    def get_channel_events(self, id=None, contact=None, before=None, after=None):
+        """
+        Gets all matching channel events
+
+        :param id: event id
+        :param contact: contact object or UUID
+        :param datetime before: created before
+        :param datetime after: created after
+        :return: channel event query
+        """
+        params = self._build_params(id=id, contact=contact, before=before, after=after)
+        return self._get_query('channel_events', params, ChannelEvent)
 
     def get_contacts(self, uuid=None, urn=None, group=None, deleted=None, before=None, after=None):
         """
@@ -87,7 +134,8 @@ class TembaClient(BaseCursorClient):
         :param datetime after: created after
         :return: message query
         """
-        params = self._build_params(id=id, broadcast=broadcast, contact=contact, folder=folder, label=label, before=before, after=after)
+        params = self._build_params(id=id, broadcast=broadcast, contact=contact, folder=folder, label=label,
+                                    before=before, after=after)
         return self._get_query('messages', params, Message)
 
     def get_org(self, retry_on_rate_exceed=False):

@@ -12,6 +12,14 @@ class ObjectRef(TembaObject):
     name = SimpleField()
 
 
+class FieldRef(TembaObject):
+    """
+    Used for references to fields in other objects
+    """
+    key = SimpleField()
+    label = SimpleField()
+
+
 class Broadcast(TembaObject):
     id = IntegerField()
     urns = SimpleField()
@@ -19,6 +27,52 @@ class Broadcast(TembaObject):
     groups = ObjectListField(item_class=ObjectRef)
     text = SimpleField()
     status = SimpleField()
+    created_on = DatetimeField()
+
+
+class Campaign(TembaObject):
+    uuid = SimpleField()
+    name = SimpleField()
+    group = ObjectField(item_class=ObjectRef)
+    created_on = DatetimeField()
+
+
+class CampaignEvent(TembaObject):
+    uuid = SimpleField()
+    campaign = ObjectField(item_class=ObjectRef)
+    relative_to = ObjectField(item_class=FieldRef)
+    offset = IntegerField()
+    unit = SimpleField()
+    delivery_hour = IntegerField()
+    flow = ObjectField(item_class=ObjectRef)
+    message = SimpleField()
+    created_on = DatetimeField()
+
+
+class Channel(TembaObject):
+    class Device(TembaObject):
+        name = SimpleField()
+        power_level = IntegerField()
+        power_status = SimpleField()
+        power_source = SimpleField()
+        network_type = SimpleField()
+
+    uuid = SimpleField()
+    name = SimpleField()
+    address = SimpleField()
+    country = SimpleField()
+    device = ObjectField(item_class=Device)
+    last_seen = DatetimeField()
+    created_on = DatetimeField()
+
+
+class ChannelEvent(TembaObject):
+    id = IntegerField()
+    type = SimpleField()
+    contact = ObjectField(item_class=ObjectRef)
+    channel = ObjectField(item_class=ObjectRef)
+    time = DatetimeField()
+    duration = IntegerField()
     created_on = DatetimeField()
 
 
@@ -80,17 +134,16 @@ class Org(TembaObject):
     anon = SimpleField()
 
 
-class Step(TembaObject):
-    node = SimpleField()
-    text = SimpleField()
-    value = SimpleField()
-    category = SimpleField()
-    type = SimpleField()
-    arrived_on = DatetimeField()
-    left_on = DatetimeField()
-
-
 class Run(TembaObject):
+    class Step(TembaObject):
+        node = SimpleField()
+        text = SimpleField()
+        value = SimpleField()
+        category = SimpleField()
+        type = SimpleField()
+        arrived_on = DatetimeField()
+        left_on = DatetimeField()
+
     id = IntegerField()
     flow = ObjectField(item_class=ObjectRef)
     contact = ObjectField(item_class=ObjectRef)
