@@ -5,7 +5,9 @@ This version of the API is still under development and so is subject to change w
 that users continue using the existing API v1.
 """
 
-from .types import Broadcast, Channel, ChannelEvent, Contact, Field, Group, Label, Message, Org, Run
+from .types import (
+    Broadcast, Campaign, CampaignEvent, Channel, ChannelEvent, Contact, Field, Group, Label, Message, Org, Run
+)
 from ..clients import BaseCursorClient
 
 
@@ -31,6 +33,27 @@ class TembaClient(BaseCursorClient):
         """
         params = self._build_params(id=id, before=before, after=after)
         return self._get_query('broadcasts', params, Broadcast)
+
+    def get_campaigns(self, uuid=None):
+        """
+        Gets all matching campaigns
+
+        :param uuid: campaigns UUID
+        :return: campaign query
+        """
+        params = self._build_params(uuid=uuid)
+        return self._get_query('campaigns', params, Campaign)
+
+    def get_campaign_events(self, uuid=None, campaign=None):
+        """
+        Gets all matching campaign events
+
+        :param uuid: event UUID
+        :param campaign: campaign object or UUID
+        :return: campaign event query
+        """
+        params = self._build_params(uuid=uuid, campaign=campaign)
+        return self._get_query('campaign_events', params, CampaignEvent)
 
     def get_channels(self, uuid=None, address=None):
         """

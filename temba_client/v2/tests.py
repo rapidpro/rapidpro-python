@@ -124,6 +124,63 @@ class TembaClientTest(TembaTest):
             'before': "2014-12-12T22:56:58.917123"
         })
 
+    def test_get_campaigns(self, mock_request):
+        # check no params
+        mock_request.return_value = MockResponse(200, self.read_json('campaigns'))
+
+        # check with no params
+        results = self.client.get_campaigns().all()
+
+        self.assertRequest(mock_request, 'get', 'campaigns')
+        self.assertEqual(len(results), 2)
+
+        self.assertEqual(results[0].uuid, "09d23a05-47fe-11e4-bfe9-b8f6b119e9ab")
+        self.assertEqual(results[0].name, "Reminders")
+        self.assertEqual(results[0].group.uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
+        self.assertEqual(results[0].group.name, "The A-Team")
+        self.assertEqual(results[0].created_on, datetime.datetime(2014, 6, 23, 9, 34, 12, 866000, pytz.utc))
+
+        # check with all params
+        self.client.get_campaigns(
+            uuid="09d23a05-47fe-11e4-bfe9-b8f6b119e9ab"
+        ).all()
+
+        self.assertRequest(mock_request, 'get', 'campaigns', params={
+            'uuid': "09d23a05-47fe-11e4-bfe9-b8f6b119e9ab",
+        })
+
+    def test_get_campaign_events(self, mock_request):
+        # check no params
+        mock_request.return_value = MockResponse(200, self.read_json('campaign_events'))
+
+        # check with no params
+        results = self.client.get_campaign_events().all()
+
+        self.assertRequest(mock_request, 'get', 'campaign_events')
+        self.assertEqual(len(results), 2)
+
+        self.assertEqual(results[0].uuid, "9e6beda-0ce2-46cd-8810-91157f261cbd")
+        self.assertEqual(results[0].campaign.uuid, "9ccae91f-b3f8-4c18-ad92-e795a2332c11")
+        self.assertEqual(results[0].campaign.name, "Reminders")
+        self.assertEqual(results[0].relative_to.key, "edd")
+        self.assertEqual(results[0].relative_to.label, "EDD")
+        self.assertEqual(results[0].offset, 14)
+        self.assertEqual(results[0].unit, "days")
+        self.assertEqual(results[0].delivery_hour, -1)
+        self.assertEqual(results[0].message, None)
+        self.assertEqual(results[0].flow.uuid, "70c38f94-ab42-4666-86fd-3c76139110d3")
+        self.assertEqual(results[0].flow.name, "Survey Flow")
+        self.assertEqual(results[0].created_on, datetime.datetime(2015, 6, 8, 12, 18, 7, 671000, pytz.utc))
+
+        # check with all params
+        self.client.get_campaign_events(
+            uuid="09d23a05-47fe-11e4-bfe9-b8f6b119e9ab"
+        ).all()
+
+        self.assertRequest(mock_request, 'get', 'campaign_events', params={
+            'uuid': "09d23a05-47fe-11e4-bfe9-b8f6b119e9ab",
+        })
+
     def test_get_channels(self, mock_request):
         # check no params
         mock_request.return_value = MockResponse(200, self.read_json('channels'))

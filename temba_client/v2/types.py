@@ -12,6 +12,14 @@ class ObjectRef(TembaObject):
     name = SimpleField()
 
 
+class FieldRef(TembaObject):
+    """
+    Used for references to fields in other objects
+    """
+    key = SimpleField()
+    label = SimpleField()
+
+
 class Broadcast(TembaObject):
     id = IntegerField()
     urns = SimpleField()
@@ -19,6 +27,25 @@ class Broadcast(TembaObject):
     groups = ObjectListField(item_class=ObjectRef)
     text = SimpleField()
     status = SimpleField()
+    created_on = DatetimeField()
+
+
+class Campaign(TembaObject):
+    uuid = SimpleField()
+    name = SimpleField()
+    group = ObjectField(item_class=ObjectRef)
+    created_on = DatetimeField()
+
+
+class CampaignEvent(TembaObject):
+    uuid = SimpleField()
+    campaign = ObjectField(item_class=ObjectRef)
+    relative_to = ObjectField(item_class=FieldRef)
+    offset = IntegerField()
+    unit = SimpleField()
+    delivery_hour = IntegerField()
+    flow = ObjectField(item_class=ObjectRef)
+    message = SimpleField()
     created_on = DatetimeField()
 
 
