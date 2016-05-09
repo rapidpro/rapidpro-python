@@ -322,6 +322,7 @@ class TembaClientTest(TembaTest):
 
         self.assertEqual(results[0].uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
         self.assertEqual(results[0].name, "The A-Team")
+        self.assertEqual(results[0].query, None)
         self.assertEqual(results[0].count, 4)
 
         # check with all params
