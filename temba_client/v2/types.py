@@ -98,6 +98,7 @@ class Field(TembaObject):
 class Group(TembaObject):
     uuid = SimpleField()
     name = SimpleField()
+    query = SimpleField()
     count = IntegerField()
 
 
