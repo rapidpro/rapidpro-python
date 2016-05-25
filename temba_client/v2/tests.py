@@ -109,7 +109,6 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].groups[0].name, "The A-Team")
         self.assertEqual(results[0].text, "Hello")
         self.assertEqual(results[0].created_on, datetime.datetime(2015, 11, 11, 8, 30, 24, 922024, pytz.utc))
-        self.assertEqual(results[0].status, "queued")
 
         # check with all params
         self.client.get_broadcasts(
