@@ -26,7 +26,6 @@ class Broadcast(TembaObject):
     contacts = ObjectListField(item_class=ObjectRef)
     groups = ObjectListField(item_class=ObjectRef)
     text = SimpleField()
-    status = SimpleField()
     created_on = DatetimeField()
 
 
