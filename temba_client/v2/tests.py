@@ -267,7 +267,7 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].groups[0].name, "Customers")
         self.assertEqual(results[0].fields, {'age': 34, 'nickname': "Jo"})
         self.assertEqual(results[0].blocked, False)
-        self.assertEqual(results[0].failed, False)
+        self.assertEqual(results[0].stopped, False)
         self.assertEqual(results[0].created_on, datetime.datetime(2015, 11, 11, 8, 30, 24, 922024, pytz.utc))
         self.assertEqual(results[0].modified_on, datetime.datetime(2015, 11, 11, 8, 30, 25, 525936, pytz.utc))
 

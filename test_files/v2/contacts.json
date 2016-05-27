@@ -20,7 +20,7 @@
                 "age": 34
             },
             "blocked": false,
-            "failed": false,
+            "stopped": false,
             "created_on": "2015-11-11T08:30:24.922024Z",
             "modified_on": "2015-11-11T08:30:25.525936Z"
         },
@@ -37,7 +37,7 @@
                 "age": null
             },
             "blocked": true,
-            "failed": false,
+            "stopped": false,
             "created_on": "2015-11-10T22:04:39.911870Z",
             "modified_on": "2015-11-10T22:04:40.052502Z"
         },
@@ -49,7 +49,7 @@
             "groups": [],
             "fields": {},
             "blocked": null,
-            "failed": null,
+            "stopped": null,
             "created_on": "2014-11-04T22:00:19.554852Z",
             "modified_on": "2014-12-11T19:30:45.482638Z"
         }

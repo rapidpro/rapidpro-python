@@ -83,7 +83,7 @@ class Contact(TembaObject):
     groups = ObjectListField(item_class=ObjectRef)
     fields = SimpleField()
     blocked = BooleanField()
-    failed = BooleanField()
+    stopped = BooleanField()
     created_on = DatetimeField()
     modified_on = DatetimeField()
 
