@@ -5,8 +5,8 @@ This version of the API is still under development and so is subject to change w
 that users continue using the existing API v1.
 """
 
-from .types import Broadcast, Campaign, CampaignEvent, Channel, ChannelEvent, Contact, Field, Group, Label, Message
-from .types import Org, Run
+from .types import Broadcast, Campaign, CampaignEvent, Channel, ChannelEvent, Contact, Field, Flow
+from .types import Group, Label, Message, Org, Run
 from ..clients import BaseCursorClient
 
 
@@ -101,6 +101,15 @@ class TembaClient(BaseCursorClient):
         :return: field query
         """
         return self._get_query('fields', self._build_params(key=key), Field)
+
+    def get_flows(self, uuid=None):
+        """
+        Gets all matching flows
+
+        :param uuid: flow UUID
+        :return: flow query
+        """
+        return self._get_query('flows', self._build_params(uuid=uuid), Flow)
 
     def get_groups(self, uuid=None):
         """

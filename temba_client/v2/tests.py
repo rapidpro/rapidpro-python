@@ -309,6 +309,32 @@ class TembaClientTest(TembaTest):
 
         self.assertRequest(mock_request, 'get', 'fields', params={'key': "chat_name"})
 
+    def test_get_flows(self, mock_request):
+        # check no params
+        mock_request.return_value = MockResponse(200, self.read_json('flows'))
+
+        # check with no params
+        results = self.client.get_flows().all()
+
+        self.assertRequest(mock_request, 'get', 'flows')
+        self.assertEqual(len(results), 2)
+
+        self.assertEqual(results[0].uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
+        self.assertEqual(results[0].name, "Registration")
+        self.assertEqual(results[0].archived, False)
+        self.assertEqual(len(results[0].labels), 1)
+        self.assertEqual(results[0].labels[0].uuid, "5a4eb79e-1b1f-4ae3-8700-09384cca385f")
+        self.assertEqual(results[0].labels[0].name, "Important")
+        self.assertEqual(results[0].expires, 600)
+        self.assertEqual(results[0].created_on, datetime.datetime(2014, 6, 23, 9, 34, 12, 866000, pytz.utc))
+        self.assertEqual(results[0].runs.completed, 123)
+        self.assertEqual(results[0].runs.expired, 34)
+
+        # check with all params
+        self.client.get_flows(uuid="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a").all()
+
+        self.assertRequest(mock_request, 'get', 'flows', params={'uuid': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a"})
+
     def test_get_groups(self, mock_request):
         # check no params
         mock_request.return_value = MockResponse(200, self.read_json('groups'))
