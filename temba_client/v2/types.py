@@ -97,6 +97,7 @@ class Field(TembaObject):
 class Flow(TembaObject):
     class Runs(TembaObject):
         completed = IntegerField()
+        interrupted = IntegerField()
         expired = IntegerField()
 
     uuid = SimpleField()
