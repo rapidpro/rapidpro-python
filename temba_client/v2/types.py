@@ -94,6 +94,21 @@ class Field(TembaObject):
     value_type = SimpleField()
 
 
+class Flow(TembaObject):
+    class Runs(TembaObject):
+        completed = IntegerField()
+        interrupted = IntegerField()
+        expired = IntegerField()
+
+    uuid = SimpleField()
+    name = SimpleField()
+    archived = BooleanField()
+    labels = ObjectListField(item_class=ObjectRef)
+    expires = IntegerField()
+    created_on = DatetimeField()
+    runs = ObjectField(item_class=Runs)
+
+
 class Group(TembaObject):
     uuid = SimpleField()
     name = SimpleField()
