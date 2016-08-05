@@ -20,6 +20,23 @@ class FieldRef(TembaObject):
     label = SimpleField()
 
 
+class Boundary(TembaObject):
+    class BoundaryRef(TembaObject):
+        id = SimpleField()
+        name = SimpleField()
+
+    class Geometry(TembaObject):
+        type = SimpleField()
+        coordinates = SimpleField()
+
+    id = SimpleField()
+    name = SimpleField()
+    level = IntegerField()
+    parent = ObjectField(item_class=BoundaryRef)
+    aliases = SimpleField()
+    geometry = ObjectField(item_class=Geometry)
+
+
 class Broadcast(TembaObject):
     id = IntegerField()
     urns = SimpleField()

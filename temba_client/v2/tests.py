@@ -89,6 +89,27 @@ class TembaClientTest(TembaTest):
         self.assertRaises(TembaRateExceededError, self.client.get_runs().all, retry_on_rate_exceed=False)
         self.assertRaises(TembaRateExceededError, self.client.get_runs().all, retry_on_rate_exceed=True)
 
+    def test_get_boundaries(self, mock_request):
+        # check no params
+        mock_request.return_value = MockResponse(200, self.read_json('boundaries'))
+
+        # check with no params
+        results = self.client.get_boundaries().all()
+
+        self.assertRequest(mock_request, 'get', 'boundaries')
+        self.assertEqual(len(results), 2)
+
+        self.assertEqual(results[1].id, "R195270")
+        self.assertEqual(results[1].name, "Bujumbura")
+        self.assertEqual(results[1].level, 1)
+        self.assertEqual(results[1].parent.id, "R195269")
+        self.assertEqual(results[1].parent.name, "Burundi")
+        self.assertEqual(results[1].aliases, ["Buja"])
+        self.assertEqual(results[1].geometry.type, "MultiPolygon")
+        self.assertEqual(results[1].geometry.coordinates, [
+            [[[29.5025959, -3.2634468], [29.4886074, -3.2496493], [29.4170303, -3.2721906]]]
+        ])
+
     def test_get_broadcasts(self, mock_request):
         # check no params
         mock_request.return_value = MockResponse(200, self.read_json('broadcasts'))

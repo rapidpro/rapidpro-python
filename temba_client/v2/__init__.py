@@ -5,7 +5,7 @@ This version of the API is still under development and so is subject to change w
 that users continue using the existing API v1.
 """
 
-from .types import Broadcast, Campaign, CampaignEvent, Channel, ChannelEvent, Contact, Field, Flow
+from .types import Boundary, Broadcast, Campaign, CampaignEvent, Channel, ChannelEvent, Contact, Field, Flow
 from .types import Group, Label, Message, Org, Run
 from ..clients import BaseCursorClient
 
@@ -20,6 +20,14 @@ class TembaClient(BaseCursorClient):
     """
     def __init__(self, host, token, user_agent=None):
         super(TembaClient, self).__init__(host, token, 2, user_agent)
+
+    def get_boundaries(self):
+        """
+        Gets all administrative boundaries
+
+        :return: boundary query
+        """
+        return self._get_query('boundaries', {}, Boundary)
 
     def get_broadcasts(self, id=None, before=None, after=None):
         """
