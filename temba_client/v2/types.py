@@ -151,8 +151,13 @@ class Org(TembaObject):
 
 class Run(TembaObject):
     class Step(TembaObject):
+        class MessageRef(TembaObject):
+            id = IntegerField()
+            broadcast = IntegerField()
+            text = SimpleField()
+
         node = SimpleField()
-        text = SimpleField()
+        messages = ObjectListField(item_class=MessageRef)
         value = SimpleField()
         category = SimpleField()
         type = SimpleField()
