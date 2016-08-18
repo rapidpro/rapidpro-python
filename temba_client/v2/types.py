@@ -22,14 +22,14 @@ class FieldRef(TembaObject):
 
 class Boundary(TembaObject):
     class BoundaryRef(TembaObject):
-        id = SimpleField()
+        osm_id = SimpleField()
         name = SimpleField()
 
     class Geometry(TembaObject):
         type = SimpleField()
         coordinates = SimpleField()
 
-    id = SimpleField()
+    osm_id = SimpleField()
     name = SimpleField()
     level = IntegerField()
     parent = ObjectField(item_class=BoundaryRef)

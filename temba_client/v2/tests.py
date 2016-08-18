@@ -99,10 +99,10 @@ class TembaClientTest(TembaTest):
         self.assertRequest(mock_request, 'get', 'boundaries')
         self.assertEqual(len(results), 2)
 
-        self.assertEqual(results[1].id, "R195270")
+        self.assertEqual(results[1].osm_id, "R195270")
         self.assertEqual(results[1].name, "Bujumbura")
         self.assertEqual(results[1].level, 1)
-        self.assertEqual(results[1].parent.id, "R195269")
+        self.assertEqual(results[1].parent.osm_id, "R195269")
         self.assertEqual(results[1].parent.name, "Burundi")
         self.assertEqual(results[1].aliases, ["Buja"])
         self.assertEqual(results[1].geometry.type, "MultiPolygon")
