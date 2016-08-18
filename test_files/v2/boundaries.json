@@ -1,0 +1,44 @@
+{
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "osm_id": "R195269",
+            "name": "Burundi",
+            "level": 0,
+            "parent": null,
+            "aliases": [],
+            "geometry": {
+                "type": "MultiPolygon",
+                "coordinates": [
+                    [
+                        [
+                            [30.2140541, -3.990247],
+                            [30.2291985, -4.0145059],
+                            [30.1913548, -4.0508509]
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "osm_id": "R195270",
+            "name": "Bujumbura",
+            "level": 1,
+            "parent": {"osm_id": "R195269", "name": "Burundi"},
+            "aliases": ["Buja"],
+            "geometry": {
+                "type": "MultiPolygon",
+                "coordinates": [
+                    [
+                        [
+                            [29.5025959, -3.2634468],
+                            [29.4886074, -3.2496493],
+                            [29.4170303, -3.2721906]
+                        ]
+                    ]
+                ]
+            }
+        }
+    ]
+}
