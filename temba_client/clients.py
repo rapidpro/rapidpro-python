@@ -289,6 +289,7 @@ class CursorQuery(object):
         """
         Returns an iterator which makes successive fetch requests for this query
         :param retry_on_rate_exceed: whether to sleep and retry if request rate limit exceeded
+        :param resume_cursor: a cursor string to use to resume a previous iteration
         :return: the iterator
         """
         return CursorIterator(self.client, self.url, self.params, self.clazz, retry_on_rate_exceed, resume_cursor)
