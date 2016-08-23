@@ -235,12 +235,13 @@ class CursorIterator(six.Iterator):
     """
     For iterating through cursor based API responses
     """
-    def __init__(self, client, url, params, clazz, retry_on_rate_exceed):
+    def __init__(self, client, url, params, clazz, retry_on_rate_exceed, resume_cursor):
         self.client = client
         self.url = url
         self.params = params
         self.clazz = clazz
         self.retry_on_rate_exceed = retry_on_rate_exceed
+        self.resume_cursor = resume_cursor
 
     def __iter__(self):
         return self
@@ -249,10 +250,14 @@ class CursorIterator(six.Iterator):
         if not self.url:
             raise StopIteration()
 
+        if self.resume_cursor:
+            self.params['cursor'] = self.resume_cursor
+
         response = self.client._request('get', self.url, params=self.params,
                                         retry_on_rate_exceed=self.retry_on_rate_exceed)
 
         self.url = response['next']
+        self.resume_cursor = None
         self.params = {}
         results = response['results']
 
@@ -280,13 +285,13 @@ class CursorQuery(object):
         self.params = params
         self.clazz = clazz
 
-    def iterfetches(self, retry_on_rate_exceed=False):
+    def iterfetches(self, retry_on_rate_exceed=False, resume_cursor=None):
         """
         Returns an iterator which makes successive fetch requests for this query
         :param retry_on_rate_exceed: whether to sleep and retry if request rate limit exceeded
         :return: the iterator
         """
-        return CursorIterator(self.client, self.url, self.params, self.clazz, retry_on_rate_exceed)
+        return CursorIterator(self.client, self.url, self.params, self.clazz, retry_on_rate_exceed, resume_cursor)
 
     def all(self, retry_on_rate_exceed=False):
         results = []

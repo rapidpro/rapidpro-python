@@ -62,6 +62,22 @@ class TembaClientTest(TembaTest):
         iterator.__next__()
         self.assertEqual(iterator.get_cursor(), 'qwerty=')
 
+    def test_resume_cursor(self, mock_request):
+        mock_request.return_value = MockResponse(200, self.read_json('runs_with_next'))
+
+        iterator = self.client.get_runs().iterfetches(retry_on_rate_exceed=True, resume_cursor='qwERty=')
+
+        # we have resume cursor attribute set
+        self.assertTrue(iterator.resume_cursor)
+
+        iterator.__next__()
+
+        # resume cursor attribute should be cleared
+        self.assertFalse(iterator.resume_cursor)
+        self.assertEqual(iterator.url, "https://app.rapidpro.io/api/v2/runs.json?cursor=qwerty%3D&flow=flow_uuid")
+
+        self.assertRequest(mock_request, 'get', 'runs', params={'cursor': "qwERty="})
+
     def test_retry_on_rate_exceed(self, mock_request):
         fail_then_success = [
             MockResponse(429, '', {'Retry-After': 1}),
