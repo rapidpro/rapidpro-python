@@ -53,6 +53,16 @@ class TembaClientTest(TembaTest):
 
         self.assertRaisesWithMessage(TembaConnectionError, "Unable to connect to host", query.all)
 
+    def test_get_cursor(self, mock_request):
+        mock_request.return_value = MockResponse(200, self.read_json('runs_with_next'))
+
+        iterator = self.client.get_runs().iterfetches(retry_on_rate_exceed=True)
+        self.assertEqual(iterator.get_cursor(), None)
+
+        iterator.__next__()
+        self.assertEqual(iterator.get_cursor(), 'qwerty=')
+
+
     def test_retry_on_rate_exceed(self, mock_request):
         fail_then_success = [
             MockResponse(429, '', {'Retry-After': 1}),

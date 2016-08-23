@@ -3,6 +3,14 @@ from __future__ import absolute_import, unicode_literals
 import datetime
 import json
 import logging
+
+try:
+    # Python 3
+    from urllib.parse import urlparse, parse_qs
+except ImportError:
+    # Python 2
+    from urlparse import urlparse, parse_qs
+
 import requests
 import six
 import time
@@ -257,6 +265,14 @@ class CursorIterator(six.Iterator):
             raise StopIteration()
         else:
             return self.clazz.deserialize_list(results)
+
+    def get_cursor(self):
+        if not self.url:
+            return None
+
+        query_dict = parse_qs(urlparse(self.url).query)
+        cursors = query_dict.get('cursor', None)
+        return cursors[0] if cursors else None
 
 
 class CursorQuery(object):
