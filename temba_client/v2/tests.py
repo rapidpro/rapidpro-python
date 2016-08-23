@@ -145,13 +145,15 @@ class TembaClientTest(TembaTest):
         self.client.get_broadcasts(
             id=12345,
             after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
-            before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc)
+            before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc),
+            cursor="QWERTY="
         ).all()
 
         self.assertRequest(mock_request, 'get', 'broadcasts', params={
             'id': 12345,
             'after': "2014-12-12T22:34:36.978123",
-            'before': "2014-12-12T22:56:58.917123"
+            'before': "2014-12-12T22:56:58.917123",
+            'cursor': "QWERTY="
         })
 
     def test_get_campaigns(self, mock_request):
@@ -172,11 +174,13 @@ class TembaClientTest(TembaTest):
 
         # check with all params
         self.client.get_campaigns(
-            uuid="09d23a05-47fe-11e4-bfe9-b8f6b119e9ab"
+            uuid="09d23a05-47fe-11e4-bfe9-b8f6b119e9ab",
+            cursor="QWERTY="
         ).all()
 
         self.assertRequest(mock_request, 'get', 'campaigns', params={
             'uuid': "09d23a05-47fe-11e4-bfe9-b8f6b119e9ab",
+            'cursor': "QWERTY="
         })
 
     def test_get_campaign_events(self, mock_request):
@@ -204,11 +208,13 @@ class TembaClientTest(TembaTest):
 
         # check with all params
         self.client.get_campaign_events(
-            uuid="09d23a05-47fe-11e4-bfe9-b8f6b119e9ab"
+            uuid="09d23a05-47fe-11e4-bfe9-b8f6b119e9ab",
+            cursor="QWERTY="
         ).all()
 
         self.assertRequest(mock_request, 'get', 'campaign_events', params={
             'uuid': "09d23a05-47fe-11e4-bfe9-b8f6b119e9ab",
+            'cursor': "QWERTY="
         })
 
     def test_get_channels(self, mock_request):
@@ -236,12 +242,14 @@ class TembaClientTest(TembaTest):
         # check with all params
         self.client.get_channels(
             uuid="09d23a05-47fe-11e4-bfe9-b8f6b119e9ab",
-            address="+250788123123"
+            address="+250788123123",
+            cursor="QWERTY="
         ).all()
 
         self.assertRequest(mock_request, 'get', 'channels', params={
             'uuid': "09d23a05-47fe-11e4-bfe9-b8f6b119e9ab",
-            'address': "+250788123123"
+            'address': "+250788123123",
+            'cursor': "QWERTY="
         })
 
     def test_get_channel_events(self, mock_request):
@@ -269,14 +277,16 @@ class TembaClientTest(TembaTest):
             id=12345,
             contact="5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9",
             after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
-            before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc)
+            before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc),
+            cursor="QWERTY="
         ).all()
 
         self.assertRequest(mock_request, 'get', 'channel_events', params={
             'id': 12345,
             'contact': "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9",
             'after': "2014-12-12T22:34:36.978123",
-            'before': "2014-12-12T22:56:58.917123"
+            'before': "2014-12-12T22:56:58.917123",
+            'cursor': "QWERTY="
         })
 
     def test_get_contacts(self, mock_request):
@@ -309,7 +319,8 @@ class TembaClientTest(TembaTest):
             group="Customers",
             deleted=False,
             after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
-            before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc)
+            before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc),
+            cursor="QWERTY="
         ).all()
 
         self.assertRequest(mock_request, 'get', 'contacts', params={
@@ -318,7 +329,8 @@ class TembaClientTest(TembaTest):
             'group': "Customers",
             'deleted': False,
             'after': "2014-12-12T22:34:36.978123",
-            'before': "2014-12-12T22:56:58.917123"
+            'before': "2014-12-12T22:56:58.917123",
+            'cursor': "QWERTY="
         })
 
     def test_get_fields(self, mock_request):
@@ -336,9 +348,9 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].value_type, "text")
 
         # check with all params
-        self.client.get_fields(key="chat_name").all()
+        self.client.get_fields(key="chat_name", cursor="QWERTY=").all()
 
-        self.assertRequest(mock_request, 'get', 'fields', params={'key': "chat_name"})
+        self.assertRequest(mock_request, 'get', 'fields', params={'key': "chat_name", 'cursor': "QWERTY="})
 
     def test_get_flows(self, mock_request):
         # check no params
@@ -363,9 +375,10 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].runs.expired, 34)
 
         # check with all params
-        self.client.get_flows(uuid="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a").all()
+        self.client.get_flows(uuid="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a", cursor="QWERTY=").all()
 
-        self.assertRequest(mock_request, 'get', 'flows', params={'uuid': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a"})
+        self.assertRequest(mock_request, 'get', 'flows', params={'uuid': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
+                                                                 'cursor': "QWERTY="})
 
     def test_get_groups(self, mock_request):
         # check no params
@@ -383,9 +396,10 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].count, 4)
 
         # check with all params
-        self.client.get_groups(uuid="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a").all()
+        self.client.get_groups(uuid="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a", cursor="QWERTY=").all()
 
-        self.assertRequest(mock_request, 'get', 'groups', params={'uuid': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a"})
+        self.assertRequest(mock_request, 'get', 'groups', params={'uuid': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
+                                                                  'cursor': "QWERTY="})
 
     def test_get_labels(self, mock_request):
         # check no params
@@ -402,9 +416,10 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].count, 4)
 
         # check with all params
-        self.client.get_labels(uuid="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a").all()
+        self.client.get_labels(uuid="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a", cursor="QWERTY=").all()
 
-        self.assertRequest(mock_request, 'get', 'labels', params={'uuid': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a"})
+        self.assertRequest(mock_request, 'get', 'labels', params={'uuid': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
+                                                                  'cursor': "QWERTY="})
 
     def test_get_messages(self, mock_request):
         # check no params
@@ -441,7 +456,8 @@ class TembaClientTest(TembaTest):
             folder="inbox",
             label="Spam",
             after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
-            before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc)
+            before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc),
+            cursor="QWERTY="
         ).all()
 
         self.assertRequest(mock_request, 'get', 'messages', params={
@@ -451,7 +467,8 @@ class TembaClientTest(TembaTest):
             'folder': "inbox",
             'label': "Spam",
             'after': "2014-12-12T22:34:36.978123",
-            'before': "2014-12-12T22:56:58.917123"
+            'before': "2014-12-12T22:56:58.917123",
+            'cursor': "QWERTY="
         })
 
     def test_get_org(self, mock_request):
@@ -512,7 +529,8 @@ class TembaClientTest(TembaTest):
             contact="d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
             responded=True,
             after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
-            before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc)
+            before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc),
+            cursor="QWERTY="
         ).all()
 
         self.assertRequest(mock_request, 'get', 'runs', params={
@@ -521,7 +539,8 @@ class TembaClientTest(TembaTest):
             'contact': "d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
             'responded': True,
             'after': "2014-12-12T22:34:36.978123",
-            'before': "2014-12-12T22:56:58.917123"
+            'before': "2014-12-12T22:56:58.917123",
+            'cursor': "QWERTY="
         })
 
         # check when result is empty

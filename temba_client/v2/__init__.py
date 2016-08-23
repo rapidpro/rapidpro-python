@@ -29,7 +29,7 @@ class TembaClient(BaseCursorClient):
         """
         return self._get_query('boundaries', {}, Boundary)
 
-    def get_broadcasts(self, id=None, before=None, after=None):
+    def get_broadcasts(self, id=None, before=None, after=None, cursor=None):
         """
         Gets all matching broadcasts
 
@@ -38,20 +38,20 @@ class TembaClient(BaseCursorClient):
         :param datetime after: created after
         :return: broadcast query
         """
-        params = self._build_params(id=id, before=before, after=after)
+        params = self._build_params(id=id, before=before, after=after, cursor=cursor)
         return self._get_query('broadcasts', params, Broadcast)
 
-    def get_campaigns(self, uuid=None):
+    def get_campaigns(self, uuid=None, cursor=None):
         """
         Gets all matching campaigns
 
         :param uuid: campaigns UUID
         :return: campaign query
         """
-        params = self._build_params(uuid=uuid)
+        params = self._build_params(uuid=uuid, cursor=cursor)
         return self._get_query('campaigns', params, Campaign)
 
-    def get_campaign_events(self, uuid=None, campaign=None):
+    def get_campaign_events(self, uuid=None, campaign=None, cursor=None):
         """
         Gets all matching campaign events
 
@@ -59,10 +59,10 @@ class TembaClient(BaseCursorClient):
         :param campaign: campaign object or UUID
         :return: campaign event query
         """
-        params = self._build_params(uuid=uuid, campaign=campaign)
+        params = self._build_params(uuid=uuid, campaign=campaign, cursor=cursor)
         return self._get_query('campaign_events', params, CampaignEvent)
 
-    def get_channels(self, uuid=None, address=None):
+    def get_channels(self, uuid=None, address=None, cursor=None):
         """
         Gets all matching channels
 
@@ -70,10 +70,10 @@ class TembaClient(BaseCursorClient):
         :param urn: channel address
         :return: channel query
         """
-        params = self._build_params(uuid=uuid, address=address)
+        params = self._build_params(uuid=uuid, address=address, cursor=cursor)
         return self._get_query('channels', params, Channel)
 
-    def get_channel_events(self, id=None, contact=None, before=None, after=None):
+    def get_channel_events(self, id=None, contact=None, before=None, after=None, cursor=None):
         """
         Gets all matching channel events
 
@@ -83,10 +83,10 @@ class TembaClient(BaseCursorClient):
         :param datetime after: created after
         :return: channel event query
         """
-        params = self._build_params(id=id, contact=contact, before=before, after=after)
+        params = self._build_params(id=id, contact=contact, before=before, after=after, cursor=cursor)
         return self._get_query('channel_events', params, ChannelEvent)
 
-    def get_contacts(self, uuid=None, urn=None, group=None, deleted=None, before=None, after=None):
+    def get_contacts(self, uuid=None, urn=None, group=None, deleted=None, before=None, after=None, cursor=None):
         """
         Gets all matching contacts
 
@@ -98,46 +98,48 @@ class TembaClient(BaseCursorClient):
         :param datetime after: modified after
         :return: contact query
         """
-        params = self._build_params(uuid=uuid, urn=urn, group=group, deleted=deleted, before=before, after=after)
+        params = self._build_params(uuid=uuid, urn=urn, group=group, deleted=deleted, before=before, after=after,
+                                    cursor=cursor)
         return self._get_query('contacts', params, Contact)
 
-    def get_fields(self, key=None):
+    def get_fields(self, key=None, cursor=None):
         """
         Gets all matching contact fields
 
         :param key: field key
         :return: field query
         """
-        return self._get_query('fields', self._build_params(key=key), Field)
+        return self._get_query('fields', self._build_params(key=key, cursor=cursor), Field)
 
-    def get_flows(self, uuid=None):
+    def get_flows(self, uuid=None, cursor=None):
         """
         Gets all matching flows
 
         :param uuid: flow UUID
         :return: flow query
         """
-        return self._get_query('flows', self._build_params(uuid=uuid), Flow)
+        return self._get_query('flows', self._build_params(uuid=uuid, cursor=cursor), Flow)
 
-    def get_groups(self, uuid=None):
+    def get_groups(self, uuid=None, cursor=None):
         """
         Gets all matching contact groups
 
         :param uuid: group UUID
         :return: group query
         """
-        return self._get_query('groups', self._build_params(uuid=uuid), Group)
+        return self._get_query('groups', self._build_params(uuid=uuid, cursor=cursor), Group)
 
-    def get_labels(self, uuid=None):
+    def get_labels(self, uuid=None, cursor=None):
         """
         Gets all matching message labels
 
         :param uuid: label UUID
         :return: label query
         """
-        return self._get_query('labels', self._build_params(uuid=uuid), Label)
+        return self._get_query('labels', self._build_params(uuid=uuid, cursor=cursor), Label)
 
-    def get_messages(self, id=None, broadcast=None, contact=None, folder=None, label=None, before=None, after=None):
+    def get_messages(self, id=None, broadcast=None, contact=None, folder=None, label=None, before=None, after=None,
+                     cursor=None):
         """
         Gets all matching messages
 
@@ -151,7 +153,7 @@ class TembaClient(BaseCursorClient):
         :return: message query
         """
         params = self._build_params(id=id, broadcast=broadcast, contact=contact, folder=folder, label=label,
-                                    before=before, after=after)
+                                    before=before, after=after, cursor=cursor)
         return self._get_query('messages', params, Message)
 
     def get_org(self, retry_on_rate_exceed=False):
@@ -163,7 +165,7 @@ class TembaClient(BaseCursorClient):
         """
         return Org.deserialize(self._get_raw('org', {}, retry_on_rate_exceed))
 
-    def get_runs(self, id=None, flow=None, contact=None, responded=None, before=None, after=None):
+    def get_runs(self, id=None, flow=None, contact=None, responded=None, before=None, after=None, cursor=None):
         """
         Gets all matching flow runs
 
@@ -175,5 +177,6 @@ class TembaClient(BaseCursorClient):
         :param datetime after: modified after
         :return: flow run query
         """
-        params = self._build_params(id=id, flow=flow, contact=contact, responded=responded, before=before, after=after)
+        params = self._build_params(id=id, flow=flow, contact=contact, responded=responded, before=before, after=after,
+                                    cursor=cursor)
         return self._get_query('runs', params, Run)
