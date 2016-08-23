@@ -62,7 +62,6 @@ class TembaClientTest(TembaTest):
         iterator.__next__()
         self.assertEqual(iterator.get_cursor(), 'qwerty=')
 
-
     def test_retry_on_rate_exceed(self, mock_request):
         fail_then_success = [
             MockResponse(429, '', {'Retry-After': 1}),
