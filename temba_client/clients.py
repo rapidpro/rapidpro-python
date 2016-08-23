@@ -4,16 +4,11 @@ import datetime
 import json
 import logging
 
-try:
-    # Python 3
-    from urllib.parse import urlparse, parse_qs
-except ImportError:
-    # Python 2
-    from urlparse import urlparse, parse_qs
-
 import requests
 import six
 import time
+
+from six.moves.urllib.parse import parse_qs, urlparse
 
 from abc import ABCMeta
 from . import __version__, CLIENT_NAME
