@@ -62,6 +62,9 @@ class TembaClientTest(TembaTest):
         iterator.__next__()
         self.assertEqual(iterator.get_cursor(), 'qwerty=')
 
+        iterator.url = None
+        self.assertEqual(iterator.get_cursor(), None)
+
     def test_resume_cursor(self, mock_request):
         mock_request.return_value = MockResponse(200, self.read_json('runs_with_next'))
 
