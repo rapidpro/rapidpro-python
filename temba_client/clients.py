@@ -3,9 +3,12 @@ from __future__ import absolute_import, unicode_literals
 import datetime
 import json
 import logging
+
 import requests
 import six
 import time
+
+from six.moves.urllib.parse import parse_qs, urlparse
 
 from abc import ABCMeta
 from . import __version__, CLIENT_NAME
@@ -232,12 +235,13 @@ class CursorIterator(six.Iterator):
     """
     For iterating through cursor based API responses
     """
-    def __init__(self, client, url, params, clazz, retry_on_rate_exceed):
+    def __init__(self, client, url, params, clazz, retry_on_rate_exceed, resume_cursor):
         self.client = client
         self.url = url
         self.params = params
         self.clazz = clazz
         self.retry_on_rate_exceed = retry_on_rate_exceed
+        self.resume_cursor = resume_cursor
 
     def __iter__(self):
         return self
@@ -246,10 +250,14 @@ class CursorIterator(six.Iterator):
         if not self.url:
             raise StopIteration()
 
+        if self.resume_cursor:
+            self.params['cursor'] = self.resume_cursor
+
         response = self.client._request('get', self.url, params=self.params,
                                         retry_on_rate_exceed=self.retry_on_rate_exceed)
 
         self.url = response['next']
+        self.resume_cursor = None
         self.params = {}
         results = response['results']
 
@@ -257,6 +265,14 @@ class CursorIterator(six.Iterator):
             raise StopIteration()
         else:
             return self.clazz.deserialize_list(results)
+
+    def get_cursor(self):
+        if not self.url:
+            return None
+
+        query_dict = parse_qs(urlparse(self.url).query)
+        cursors = query_dict.get('cursor', None)
+        return cursors[0] if cursors else None
 
 
 class CursorQuery(object):
@@ -269,13 +285,14 @@ class CursorQuery(object):
         self.params = params
         self.clazz = clazz
 
-    def iterfetches(self, retry_on_rate_exceed=False):
+    def iterfetches(self, retry_on_rate_exceed=False, resume_cursor=None):
         """
         Returns an iterator which makes successive fetch requests for this query
         :param retry_on_rate_exceed: whether to sleep and retry if request rate limit exceeded
+        :param resume_cursor: a cursor string to use to resume a previous iteration
         :return: the iterator
         """
-        return CursorIterator(self.client, self.url, self.params, self.clazz, retry_on_rate_exceed)
+        return CursorIterator(self.client, self.url, self.params, self.clazz, retry_on_rate_exceed, resume_cursor)
 
     def all(self, retry_on_rate_exceed=False):
         results = []
