@@ -225,6 +225,15 @@ class TembaClient(BaseCursorClient):
         params = self._build_params(name=name, language=language, urns=urns, fields=fields, groups=groups)
         return Contact.deserialize(self._post('contacts', params))
 
+    def create_group(self, name):
+        """
+        Creates a new contact group
+
+        :param str name: group name
+        :return: the new group
+        """
+        return Group.deserialize(self._post('groups', self._build_params(name=name)))
+
     def create_label(self, name):
         """
         Creates a new message label
@@ -254,6 +263,16 @@ class TembaClient(BaseCursorClient):
         params['urn' if ':' in uuid_or_urn else 'uuid'] = uuid_or_urn
         return Contact.deserialize(self._post('contacts', self._build_params(**params)))
 
+    def update_group(self, uuid, name):
+        """
+        Updates an existing contact group
+
+        :param str uuid: group UUID
+        :param str name: group name
+        :return: the updated group
+        """
+        return Group.deserialize(self._post('groups', self._build_params(uuid=uuid, name=name)))
+
     def update_label(self, uuid, name):
         """
         Updates an existing message label
@@ -276,6 +295,14 @@ class TembaClient(BaseCursorClient):
         """
         params = {'urn' if ':' in uuid_or_urn else 'uuid': uuid_or_urn}
         self._delete('contacts', self._build_params(**params))
+
+    def delete_group(self, uuid):
+        """
+        Deletes an existing contact group
+
+        :param str uuid: group UUID
+        """
+        self._delete('groups', self._build_params(uuid=uuid))
 
     def delete_label(self, uuid):
         """

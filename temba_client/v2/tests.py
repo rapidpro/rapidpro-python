@@ -602,6 +602,13 @@ class TembaClientTest(TembaTest):
         })
         self.assertEqual(contact.uuid, "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
 
+    def test_create_group(self, mock_request):
+        mock_request.return_value = MockResponse(201, self.read_json('group_created'))
+        group = self.client.create_group(name="Reporters")
+
+        self.assertRequest(mock_request, 'post', 'groups', data={'name': "Reporters"})
+        self.assertEqual(group.uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
+
     def test_create_label(self, mock_request):
         mock_request.return_value = MockResponse(201, self.read_json('label_created'))
         label = self.client.create_label(name="Important")
@@ -637,6 +644,16 @@ class TembaClientTest(TembaTest):
 
         self.assertRequest(mock_request, 'post', 'contacts', data={'urn': "tel:+250973635665", 'language': "fre"})
 
+    def test_update_group(self, mock_request):
+        mock_request.return_value = MockResponse(201, self.read_json('group_created'))
+        group = self.client.update_group(uuid="04a4752b-0f49-480e-ae60-3a3f2bea485c", name="Reporters")
+
+        self.assertRequest(mock_request, 'post', 'groups', data={
+            'uuid': "04a4752b-0f49-480e-ae60-3a3f2bea485c",
+            'name': "Reporters"
+        })
+        self.assertEqual(group.uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
+
     def test_update_label(self, mock_request):
         mock_request.return_value = MockResponse(201, self.read_json('label_created'))
         label = self.client.update_label(uuid="04a4752b-0f49-480e-ae60-3a3f2bea485c", name="Important")
@@ -659,6 +676,13 @@ class TembaClientTest(TembaTest):
         self.client.delete_contact(uuid_or_urn="tel:+250973635665")
 
         self.assertRequest(mock_request, 'delete', 'contacts', params={'urn': "tel:+250973635665"})
+
+    def test_delete_group(self, mock_request):
+        mock_request.return_value = MockResponse(204, "")
+
+        self.client.delete_group(uuid="04a4752b-0f49-480e-ae60-3a3f2bea485c")
+
+        self.assertRequest(mock_request, 'delete', 'groups', params={'uuid': "04a4752b-0f49-480e-ae60-3a3f2bea485c"})
 
     def test_delete_label(self, mock_request):
         mock_request.return_value = MockResponse(204, "")
