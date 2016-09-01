@@ -5,8 +5,8 @@ This version of the API is still under development and so is subject to change w
 that users continue using the existing API v1.
 """
 
-from .types import Boundary, Broadcast, Campaign, CampaignEvent, Channel, ChannelEvent, Contact, Field, Flow
-from .types import Group, Label, Message, Org, Run
+from .types import Boundary, Broadcast, Campaign, CampaignEvent, Channel, ChannelEvent, Contact, Export
+from .types import Field, Flow, Group, Label, Message, Org, Run
 from ..clients import BaseCursorClient
 
 
@@ -20,6 +20,10 @@ class TembaClient(BaseCursorClient):
     """
     def __init__(self, host, token, user_agent=None):
         super(TembaClient, self).__init__(host, token, 2, user_agent)
+
+    # ==================================================================================================================
+    # Fetch object operations
+    # ==================================================================================================================
 
     def get_boundaries(self):
         """
@@ -101,6 +105,18 @@ class TembaClient(BaseCursorClient):
         params = self._build_params(uuid=uuid, urn=urn, group=group, deleted=deleted, before=before, after=after)
         return self._get_query('contacts', params, Contact)
 
+    def get_definitions(self, flows=(), campaigns=(), dependencies=None):
+        """
+        Gets an export of specified definitions
+
+        :param flows: flow objects or UUIDs to include
+        :param campaigns: campaign objects or UUIDs to include
+        :param dependencies: whether to include dependencies
+        :return: definitions export
+        """
+        params = self._build_params(flow=flows, campaign=campaigns, dependencies=dependencies)
+        return Export.deserialize(self._get_raw('definitions', params))
+
     def get_fields(self, key=None):
         """
         Gets all matching contact fields
@@ -177,3 +193,67 @@ class TembaClient(BaseCursorClient):
         """
         params = self._build_params(id=id, flow=flow, contact=contact, responded=responded, before=before, after=after)
         return self._get_query('runs', params, Run)
+
+    # ==================================================================================================================
+    # Create object operations
+    # ==================================================================================================================
+
+    def create_broadcast(self, text, urns=None, contacts=None, groups=None):
+        """
+        Creates and sends a broadcast to the given URNs, contacts or contact groups
+
+        :param str text: message text
+        :param list[str] urns: list of URN strings
+        :param list contacts: list of contact objects or UUIDs
+        :param list groups: list of group objects or UUIDs
+        :return: the new broadcast
+        """
+        params = self._build_params(text=text, urns=urns, contacts=contacts, groups=groups)
+        return Broadcast.deserialize(self._post('broadcasts', params))
+
+    def create_contact(self, name=None, language=None, urns=None, fields=None, groups=None):
+        """
+        Creates a new contact
+
+        :param str name: full name
+        :param str language: the language code, e.g. "eng"
+        :param list[str] urns: list of URN strings
+        :param dict[str,str] fields: dictionary of contact field values
+        :param list groups: list of group objects or UUIDs
+        :return: the new contact
+        """
+        params = self._build_params(name=name, language=language, urns=urns, fields=fields, groups=groups)
+        return Contact.deserialize(self._post('contacts', params))
+
+    # ==================================================================================================================
+    # Update object operations
+    # ==================================================================================================================
+
+    def update_contact(self, uuid_or_urn, name=None, language=None, urns=None, fields=None, groups=None):
+        """
+        Updates an existing contact
+
+        :param str uuid_or_urn: contact UUID or URN
+        :param str name: full name
+        :param str language: the language code, e.g. "eng"
+        :param list[str] urns: list of URN strings
+        :param dict[str,str] fields: dictionary of contact field values
+        :param list groups: list of group objects or UUIDs
+        :return: the updated contact
+        """
+        params = dict(name=name, language=language, urns=urns, fields=fields, groups=groups)
+        params['urn' if ':' in uuid_or_urn else 'uuid'] = uuid_or_urn
+        return Contact.deserialize(self._post('contacts', self._build_params(**params)))
+
+    # ==================================================================================================================
+    # Delete object operations
+    # ==================================================================================================================
+
+    def delete_contact(self, uuid_or_urn):
+        """
+        Deletes an existing contact
+
+        :param str uuid_or_urn: contact UUID or URN
+        """
+        params = {'urn' if ':' in uuid_or_urn else 'uuid': uuid_or_urn}
+        self._delete('contacts', self._build_params(**params))
