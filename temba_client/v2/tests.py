@@ -575,13 +575,12 @@ class TembaClientTest(TembaTest):
             groups=["04a4752b-0f49-480e-ae60-3a3f2bea485c"]
         )
 
-        expected_body = {
+        self.assertRequest(mock_request, 'post', 'broadcasts', data={
             'text': "Hello",
             'urns': ["tel:+250783865665", "twitter:bobby"],
             'contacts': ["5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9"],
             'groups': ['04a4752b-0f49-480e-ae60-3a3f2bea485c']
-        }
-        self.assertRequest(mock_request, 'post', 'broadcasts', data=expected_body)
+        })
         self.assertEqual(broadcast.id, 1234)
 
     def test_create_contact(self, mock_request):
@@ -594,15 +593,21 @@ class TembaClientTest(TembaTest):
             groups=["d29eca7c-a475-4d8d-98ca-bff968341356"]
         )
 
-        expected_body = {
+        self.assertRequest(mock_request, 'post', 'contacts', data={
             'name': "Joe",
             'language': "eng",
             'urns': ["tel:+250973635665"],
             'fields': {"nickname": "Jo", "age": 34},
             'groups': ["d29eca7c-a475-4d8d-98ca-bff968341356"]
-        }
-        self.assertRequest(mock_request, 'post', 'contacts', data=expected_body)
+        })
         self.assertEqual(contact.uuid, "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
+
+    def test_create_label(self, mock_request):
+        mock_request.return_value = MockResponse(201, self.read_json('label_created'))
+        label = self.client.create_label(name="Important")
+
+        self.assertRequest(mock_request, 'post', 'labels', data={'name': "Important"})
+        self.assertEqual(label.uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
 
     def test_update_contact(self, mock_request):
         mock_request.return_value = MockResponse(201, self.read_json('contact_created'))
@@ -617,21 +622,30 @@ class TembaClientTest(TembaTest):
             groups=["d29eca7c-a475-4d8d-98ca-bff968341356"]
         )
 
-        expected_body = {
+        self.assertRequest(mock_request, 'post', 'contacts', data={
             'uuid': "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9",
             'name': "Joe",
             'language': "eng",
             'urns': ["tel:+250973635665"],
             'fields': {"nickname": "Jo", "age": 34},
             'groups': ["d29eca7c-a475-4d8d-98ca-bff968341356"]
-        }
-        self.assertRequest(mock_request, 'post', 'contacts', data=expected_body)
+        })
         self.assertEqual(contact.uuid, "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
 
         # check partial update by URN
         self.client.update_contact(uuid_or_urn="tel:+250973635665", language="fre")
 
         self.assertRequest(mock_request, 'post', 'contacts', data={'urn': "tel:+250973635665", 'language': "fre"})
+
+    def test_update_label(self, mock_request):
+        mock_request.return_value = MockResponse(201, self.read_json('label_created'))
+        label = self.client.update_label(uuid="04a4752b-0f49-480e-ae60-3a3f2bea485c", name="Important")
+
+        self.assertRequest(mock_request, 'post', 'labels', data={
+            'uuid': "04a4752b-0f49-480e-ae60-3a3f2bea485c",
+            'name': "Important"
+        })
+        self.assertEqual(label.uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
 
     def test_delete_contact(self, mock_request):
         mock_request.return_value = MockResponse(204, "")
@@ -646,3 +660,9 @@ class TembaClientTest(TembaTest):
 
         self.assertRequest(mock_request, 'delete', 'contacts', params={'urn': "tel:+250973635665"})
 
+    def test_delete_label(self, mock_request):
+        mock_request.return_value = MockResponse(204, "")
+
+        self.client.delete_label(uuid="5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
+
+        self.assertRequest(mock_request, 'delete', 'labels', params={'uuid': "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9"})

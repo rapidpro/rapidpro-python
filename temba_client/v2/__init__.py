@@ -225,6 +225,15 @@ class TembaClient(BaseCursorClient):
         params = self._build_params(name=name, language=language, urns=urns, fields=fields, groups=groups)
         return Contact.deserialize(self._post('contacts', params))
 
+    def create_label(self, name):
+        """
+        Creates a new message label
+
+        :param str name: label name
+        :return: the new label
+        """
+        return Label.deserialize(self._post('labels', self._build_params(name=name)))
+
     # ==================================================================================================================
     # Update object operations
     # ==================================================================================================================
@@ -245,6 +254,16 @@ class TembaClient(BaseCursorClient):
         params['urn' if ':' in uuid_or_urn else 'uuid'] = uuid_or_urn
         return Contact.deserialize(self._post('contacts', self._build_params(**params)))
 
+    def update_label(self, uuid, name):
+        """
+        Updates an existing message label
+
+        :param str uuid: label UUID
+        :param str name: label name
+        :return: the updated label
+        """
+        return Label.deserialize(self._post('labels', self._build_params(uuid=uuid, name=name)))
+
     # ==================================================================================================================
     # Delete object operations
     # ==================================================================================================================
@@ -257,3 +276,11 @@ class TembaClient(BaseCursorClient):
         """
         params = {'urn' if ':' in uuid_or_urn else 'uuid': uuid_or_urn}
         self._delete('contacts', self._build_params(**params))
+
+    def delete_label(self, uuid):
+        """
+        Deletes an existing message label
+
+        :param str uuid: label UUID
+        """
+        self._delete('labels', self._build_params(uuid=uuid))
