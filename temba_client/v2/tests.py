@@ -339,6 +339,23 @@ class TembaClientTest(TembaTest):
             'before': "2014-12-12T22:56:58.917123"
         })
 
+    def test_get_definitions(self, mock_request):
+        mock_request.return_value = MockResponse(200, self.read_json('definitions'))
+
+        # check with all params
+        definitions = self.client.get_definitions(
+            flows=["04a4752b-0f49-480e-ae60-3a3f2bea485c", "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a"],
+            campaigns=[], dependencies=False
+        )
+
+        self.assertRequest(mock_request, 'get', 'definitions', params={
+            'flow': ["04a4752b-0f49-480e-ae60-3a3f2bea485c", "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a"],
+            'campaign': [],
+            'dependencies': 0
+        })
+
+        self.assertEqual(definitions.version, 8)
+
     def test_get_fields(self, mock_request):
         # check no params
         mock_request.return_value = MockResponse(200, self.read_json('fields'))
@@ -548,3 +565,128 @@ class TembaClientTest(TembaTest):
 
         self.assertEqual(query.all(), [])
         self.assertEqual(query.first(), None)
+
+    def test_create_broadcast(self, mock_request):
+        mock_request.return_value = MockResponse(200, self.read_json('broadcast_created'))
+        broadcast = self.client.create_broadcast(
+            text="Hello",
+            urns=["tel:+250783865665", "twitter:bobby"],
+            contacts=["5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9"],
+            groups=["04a4752b-0f49-480e-ae60-3a3f2bea485c"]
+        )
+
+        self.assertRequest(mock_request, 'post', 'broadcasts', data={
+            'text': "Hello",
+            'urns': ["tel:+250783865665", "twitter:bobby"],
+            'contacts': ["5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9"],
+            'groups': ['04a4752b-0f49-480e-ae60-3a3f2bea485c']
+        })
+        self.assertEqual(broadcast.id, 1234)
+
+    def test_create_contact(self, mock_request):
+        mock_request.return_value = MockResponse(201, self.read_json('contact_created'))
+        contact = self.client.create_contact(
+            name="Joe",
+            language="eng",
+            urns=["tel:+250973635665"],
+            fields={"nickname": "Jo", "age": 34},
+            groups=["d29eca7c-a475-4d8d-98ca-bff968341356"]
+        )
+
+        self.assertRequest(mock_request, 'post', 'contacts', data={
+            'name': "Joe",
+            'language': "eng",
+            'urns': ["tel:+250973635665"],
+            'fields': {"nickname": "Jo", "age": 34},
+            'groups': ["d29eca7c-a475-4d8d-98ca-bff968341356"]
+        })
+        self.assertEqual(contact.uuid, "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
+
+    def test_create_group(self, mock_request):
+        mock_request.return_value = MockResponse(201, self.read_json('group_created'))
+        group = self.client.create_group(name="Reporters")
+
+        self.assertRequest(mock_request, 'post', 'groups', data={'name': "Reporters"})
+        self.assertEqual(group.uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
+
+    def test_create_label(self, mock_request):
+        mock_request.return_value = MockResponse(201, self.read_json('label_created'))
+        label = self.client.create_label(name="Important")
+
+        self.assertRequest(mock_request, 'post', 'labels', data={'name': "Important"})
+        self.assertEqual(label.uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
+
+    def test_update_contact(self, mock_request):
+        mock_request.return_value = MockResponse(201, self.read_json('contact_created'))
+
+        # check update by UUID
+        contact = self.client.update_contact(
+            uuid_or_urn="5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9",
+            name="Joe",
+            language="eng",
+            urns=["tel:+250973635665"],
+            fields={"nickname": "Jo", "age": 34},
+            groups=["d29eca7c-a475-4d8d-98ca-bff968341356"]
+        )
+
+        self.assertRequest(mock_request, 'post', 'contacts', data={
+            'uuid': "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9",
+            'name': "Joe",
+            'language': "eng",
+            'urns': ["tel:+250973635665"],
+            'fields': {"nickname": "Jo", "age": 34},
+            'groups': ["d29eca7c-a475-4d8d-98ca-bff968341356"]
+        })
+        self.assertEqual(contact.uuid, "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
+
+        # check partial update by URN
+        self.client.update_contact(uuid_or_urn="tel:+250973635665", language="fre")
+
+        self.assertRequest(mock_request, 'post', 'contacts', data={'urn': "tel:+250973635665", 'language': "fre"})
+
+    def test_update_group(self, mock_request):
+        mock_request.return_value = MockResponse(201, self.read_json('group_created'))
+        group = self.client.update_group(uuid="04a4752b-0f49-480e-ae60-3a3f2bea485c", name="Reporters")
+
+        self.assertRequest(mock_request, 'post', 'groups', data={
+            'uuid': "04a4752b-0f49-480e-ae60-3a3f2bea485c",
+            'name': "Reporters"
+        })
+        self.assertEqual(group.uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
+
+    def test_update_label(self, mock_request):
+        mock_request.return_value = MockResponse(201, self.read_json('label_created'))
+        label = self.client.update_label(uuid="04a4752b-0f49-480e-ae60-3a3f2bea485c", name="Important")
+
+        self.assertRequest(mock_request, 'post', 'labels', data={
+            'uuid': "04a4752b-0f49-480e-ae60-3a3f2bea485c",
+            'name': "Important"
+        })
+        self.assertEqual(label.uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
+
+    def test_delete_contact(self, mock_request):
+        mock_request.return_value = MockResponse(204, "")
+
+        # check delete by UUID
+        self.client.delete_contact(uuid_or_urn="5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
+
+        self.assertRequest(mock_request, 'delete', 'contacts', params={'uuid': "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9"})
+
+        # check delete by URN
+        self.client.delete_contact(uuid_or_urn="tel:+250973635665")
+
+        self.assertRequest(mock_request, 'delete', 'contacts', params={'urn': "tel:+250973635665"})
+
+    def test_delete_group(self, mock_request):
+        mock_request.return_value = MockResponse(204, "")
+
+        self.client.delete_group(uuid="04a4752b-0f49-480e-ae60-3a3f2bea485c")
+
+        self.assertRequest(mock_request, 'delete', 'groups', params={'uuid': "04a4752b-0f49-480e-ae60-3a3f2bea485c"})
+
+    def test_delete_label(self, mock_request):
+        mock_request.return_value = MockResponse(204, "")
+
+        self.client.delete_label(uuid="5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
+
+        self.assertRequest(mock_request, 'delete', 'labels', params={'uuid': "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9"})

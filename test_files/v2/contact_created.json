@@ -1,0 +1,22 @@
+{
+    "uuid": "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9",
+    "name": "Joe",
+    "language": "eng",
+    "urns": [
+        "tel:+250973635665"
+    ],
+    "groups": [
+        {
+            "uuid": "d29eca7c-a475-4d8d-98ca-bff968341356",
+            "name": "Customers"
+        }
+    ],
+    "fields": {
+        "nickname": "Jo",
+        "age": 34
+    },
+    "blocked": false,
+    "stopped": false,
+    "created_on": "2015-11-11T08:30:24.922024Z",
+    "modified_on": "2015-11-11T08:30:25.525936Z"
+}

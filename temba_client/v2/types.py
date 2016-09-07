@@ -105,6 +105,13 @@ class Contact(TembaObject):
     modified_on = DatetimeField()
 
 
+class Export(TembaObject):
+    version = IntegerField()
+    flows = SimpleField()
+    campaigns = SimpleField()
+    triggers = SimpleField()
+
+
 class Field(TembaObject):
     key = SimpleField()
     label = SimpleField()
