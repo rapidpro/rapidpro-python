@@ -517,7 +517,26 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].created_on, datetime.datetime(2015, 8, 26, 10, 4, 9, 737686, pytz.utc))
         self.assertEqual(results[0].modified_on, datetime.datetime(2015, 9, 26, 10, 4, 9, 737686, pytz.utc))
 
-    def test_get_resthook_subcribers(self, mock_request):
+    def test_get_resthook_events(self, mock_request):
+        # check no params
+        mock_request.return_value = MockResponse(200, self.read_json('resthook_events'))
+
+        # check with no params
+        results = self.client.get_resthook_events().all()
+
+        self.assertRequest(mock_request, 'get', 'resthook_events')
+        self.assertEqual(len(results), 2)
+
+        self.assertEqual(results[0].resthook, "new-mother")
+        self.assertEqual(results[0].data, {"foo": "bar"})
+        self.assertEqual(results[0].created_on, datetime.datetime(2015, 8, 26, 10, 4, 9, 737686, pytz.utc))
+
+        # check with all params
+        self.client.get_resthook_events(resthook='new-mother').all()
+
+        self.assertRequest(mock_request, 'get', 'resthook_events', params={'resthook': 'new-mother'})
+
+    def test_get_resthook_subscribers(self, mock_request):
         # check no params
         mock_request.return_value = MockResponse(200, self.read_json('resthook_subscribers'))
 
