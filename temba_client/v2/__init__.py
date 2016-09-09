@@ -6,7 +6,7 @@ that users continue using the existing API v1.
 """
 
 from .types import Boundary, Broadcast, Campaign, CampaignEvent, Channel, ChannelEvent, Contact, Export
-from .types import Field, Flow, Group, Label, Message, Org, Run
+from .types import Field, Flow, Group, Label, Message, Org, Resthook, ResthookSubscriber, ResthookEvent, Run
 from ..clients import BaseCursorClient
 
 
@@ -179,6 +179,35 @@ class TembaClient(BaseCursorClient):
         """
         return Org.deserialize(self._get_raw('org', {}, retry_on_rate_exceed))
 
+    def get_resthooks(self):
+        """
+        Gets all resthooks
+
+        :return: resthook query
+        """
+        return self._get_query('resthooks', {}, Resthook)
+
+    def get_resthook_events(self, resthook=None):
+        """
+        Gets all resthook events
+
+        :param resthook: the resthook slug
+        :return: resthook event query
+        """
+        params = self._build_params(resthook=resthook)
+        return self._get_query('resthook_events', params, ResthookEvent)
+
+    def get_resthook_subscribers(self, id=None, resthook=None):
+        """
+        Gets all resthook subscribers
+
+        :param id: subscriber id
+        :param resthook: the resthook slug
+        :return: resthook subscriber query
+        """
+        params = self._build_params(id=id, resthook=resthook)
+        return self._get_query('resthook_subscribers', params, ResthookSubscriber)
+
     def get_runs(self, id=None, flow=None, contact=None, responded=None, before=None, after=None):
         """
         Gets all matching flow runs
@@ -242,6 +271,17 @@ class TembaClient(BaseCursorClient):
         :return: the new label
         """
         return Label.deserialize(self._post('labels', self._build_params(name=name)))
+
+    def create_resthook_subscriber(self, resthook, target_url):
+        """
+        Creates a new resthook subscriber
+
+        :param resthook: the resthook slug
+        :param target_url: the target URL
+        :return: the new subscriber
+        """
+        params = self._build_params(resthook=resthook, target_url=target_url)
+        return ResthookSubscriber.deserialize(self._post('resthook_subscribers', params))
 
     # ==================================================================================================================
     # Update object operations
@@ -311,3 +351,11 @@ class TembaClient(BaseCursorClient):
         :param str uuid: label UUID
         """
         self._delete('labels', self._build_params(uuid=uuid))
+
+    def delete_resthook_subscriber(self, id):
+        """
+        Deletes an existing resthook subscriber
+
+        :param id: the resthook subscriber id
+        """
+        self._delete('resthook_subscribers', self._build_params(id=id))

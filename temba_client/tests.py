@@ -23,13 +23,17 @@ class TembaTest(unittest.TestCase):
     """
     API_VERSION = None
 
-    def read_json(self, filename):
+    def read_json(self, filename, extract_result=None):
         """
         Loads JSON from the given test file
         """
         handle = codecs.open('test_files/v%d/%s.json' % (self.API_VERSION, filename), 'r', 'utf-8')
         contents = six.text_type(handle.read())
         handle.close()
+
+        if extract_result is not None:
+            contents = json.dumps(json.loads(contents)['results'][0])
+
         return contents
 
     def assertRaisesWithMessage(self, exc_class, message, callable_obj, *args, **kwargs):
