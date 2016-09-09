@@ -601,7 +601,7 @@ class TembaClientTest(TembaTest):
         self.assertEqual(query.first(), None)
 
     def test_create_broadcast(self, mock_request):
-        mock_request.return_value = MockResponse(200, self.read_json('broadcast_created'))
+        mock_request.return_value = MockResponse(200, self.read_json('broadcasts', extract_result=0))
         broadcast = self.client.create_broadcast(
             text="Hello",
             urns=["tel:+250783865665", "twitter:bobby"],
@@ -618,7 +618,7 @@ class TembaClientTest(TembaTest):
         self.assertEqual(broadcast.id, 1234)
 
     def test_create_contact(self, mock_request):
-        mock_request.return_value = MockResponse(201, self.read_json('contact_created'))
+        mock_request.return_value = MockResponse(201, self.read_json('contacts', extract_result=0))
         contact = self.client.create_contact(
             name="Joe",
             language="eng",
@@ -637,14 +637,14 @@ class TembaClientTest(TembaTest):
         self.assertEqual(contact.uuid, "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
 
     def test_create_group(self, mock_request):
-        mock_request.return_value = MockResponse(201, self.read_json('group_created'))
+        mock_request.return_value = MockResponse(201, self.read_json('groups', extract_result=0))
         group = self.client.create_group(name="Reporters")
 
         self.assertRequest(mock_request, 'post', 'groups', data={'name': "Reporters"})
         self.assertEqual(group.uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
 
     def test_create_label(self, mock_request):
-        mock_request.return_value = MockResponse(201, self.read_json('label_created'))
+        mock_request.return_value = MockResponse(201, self.read_json('labels', extract_result=0))
         label = self.client.create_label(name="Important")
 
         self.assertRequest(mock_request, 'post', 'labels', data={'name': "Important"})
@@ -663,7 +663,7 @@ class TembaClientTest(TembaTest):
         self.assertEqual(subscriber.id, 1001)
 
     def test_update_contact(self, mock_request):
-        mock_request.return_value = MockResponse(201, self.read_json('contact_created'))
+        mock_request.return_value = MockResponse(201, self.read_json('contacts', extract_result=0))
 
         # check update by UUID
         contact = self.client.update_contact(
@@ -691,7 +691,7 @@ class TembaClientTest(TembaTest):
         self.assertRequest(mock_request, 'post', 'contacts', data={'urn': "tel:+250973635665", 'language': "fre"})
 
     def test_update_group(self, mock_request):
-        mock_request.return_value = MockResponse(201, self.read_json('group_created'))
+        mock_request.return_value = MockResponse(201, self.read_json('groups', extract_result=0))
         group = self.client.update_group(uuid="04a4752b-0f49-480e-ae60-3a3f2bea485c", name="Reporters")
 
         self.assertRequest(mock_request, 'post', 'groups', data={
@@ -701,7 +701,7 @@ class TembaClientTest(TembaTest):
         self.assertEqual(group.uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
 
     def test_update_label(self, mock_request):
-        mock_request.return_value = MockResponse(201, self.read_json('label_created'))
+        mock_request.return_value = MockResponse(201, self.read_json('labels', extract_result=0))
         label = self.client.update_label(uuid="04a4752b-0f49-480e-ae60-3a3f2bea485c", name="Important")
 
         self.assertRequest(mock_request, 'post', 'labels', data={
