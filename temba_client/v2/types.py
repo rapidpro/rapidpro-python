@@ -133,6 +133,18 @@ class Flow(TembaObject):
     runs = ObjectField(item_class=Runs)
 
 
+class FlowStart(TembaObject):
+    id = IntegerField()
+    flow = ObjectField(item_class=ObjectRef)
+    groups = ObjectListField(item_class=ObjectRef)
+    contacts = ObjectListField(item_class=ObjectRef)
+    status = SimpleField()
+    restart_participants = BooleanField()
+    extra = SimpleField()
+    created_on = DatetimeField()
+    modified_on = DatetimeField()
+
+
 class Group(TembaObject):
     uuid = SimpleField()
     name = SimpleField()

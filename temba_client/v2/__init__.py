@@ -5,8 +5,8 @@ This version of the API is still under development and so is subject to change w
 that users continue using the existing API v1.
 """
 
-from .types import Boundary, Broadcast, Campaign, CampaignEvent, Channel, ChannelEvent, Contact, Export
-from .types import Field, Flow, Group, Label, Message, Org, Resthook, ResthookSubscriber, ResthookEvent, Run
+from .types import Boundary, Broadcast, Campaign, CampaignEvent, Channel, ChannelEvent, Contact, Export, Field
+from .types import FlowStart, Flow, Group, Label, Message, Org, Resthook, ResthookSubscriber, ResthookEvent, Run
 from ..clients import BaseCursorClient
 
 
@@ -134,6 +134,15 @@ class TembaClient(BaseCursorClient):
         :return: flow query
         """
         return self._get_query('flows', self._build_params(uuid=uuid), Flow)
+
+    def get_flow_starts(self, id=None):
+        """
+        Gets all matching flows starts
+
+        :param id: flow start id
+        :return: flow start query
+        """
+        return self._get_query('flow_starts', self._build_params(id=id), FlowStart)
 
     def get_groups(self, uuid=None):
         """
