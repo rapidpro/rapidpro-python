@@ -173,6 +173,25 @@ class Org(TembaObject):
     anon = SimpleField()
 
 
+class Resthook(TembaObject):
+    resthook = SimpleField()
+    created_on = DatetimeField()
+    modified_on = DatetimeField()
+
+
+class ResthookEvent(TembaObject):
+    resthook = SimpleField()
+    data = SimpleField()
+    created_on = DatetimeField()
+
+
+class ResthookSubscriber(TembaObject):
+    id = IntegerField()
+    resthook = SimpleField()
+    target_url = SimpleField()
+    created_on = DatetimeField()
+
+
 class Run(TembaObject):
     class Step(TembaObject):
         class MessageRef(TembaObject):

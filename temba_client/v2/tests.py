@@ -503,6 +503,59 @@ class TembaClientTest(TembaTest):
         self.assertEqual(org.date_style, "day_first")
         self.assertEqual(org.anon, False)
 
+    def test_get_resthooks(self, mock_request):
+        # check no params
+        mock_request.return_value = MockResponse(200, self.read_json('resthooks'))
+
+        # check with no params
+        results = self.client.get_resthooks().all()
+
+        self.assertRequest(mock_request, 'get', 'resthooks')
+        self.assertEqual(len(results), 2)
+
+        self.assertEqual(results[0].resthook, "new-mother")
+        self.assertEqual(results[0].created_on, datetime.datetime(2015, 8, 26, 10, 4, 9, 737686, pytz.utc))
+        self.assertEqual(results[0].modified_on, datetime.datetime(2015, 9, 26, 10, 4, 9, 737686, pytz.utc))
+
+    def test_get_resthook_events(self, mock_request):
+        # check no params
+        mock_request.return_value = MockResponse(200, self.read_json('resthook_events'))
+
+        # check with no params
+        results = self.client.get_resthook_events().all()
+
+        self.assertRequest(mock_request, 'get', 'resthook_events')
+        self.assertEqual(len(results), 2)
+
+        self.assertEqual(results[0].resthook, "new-mother")
+        self.assertEqual(results[0].data, {"foo": "bar"})
+        self.assertEqual(results[0].created_on, datetime.datetime(2015, 8, 26, 10, 4, 9, 737686, pytz.utc))
+
+        # check with all params
+        self.client.get_resthook_events(resthook='new-mother').all()
+
+        self.assertRequest(mock_request, 'get', 'resthook_events', params={'resthook': 'new-mother'})
+
+    def test_get_resthook_subscribers(self, mock_request):
+        # check no params
+        mock_request.return_value = MockResponse(200, self.read_json('resthook_subscribers'))
+
+        # check with no params
+        results = self.client.get_resthook_subscribers().all()
+
+        self.assertRequest(mock_request, 'get', 'resthook_subscribers')
+        self.assertEqual(len(results), 2)
+
+        self.assertEqual(results[0].id, 1001)
+        self.assertEqual(results[0].resthook, "new-mother")
+        self.assertEqual(results[0].target_url, "http://foo.bar/mothers")
+        self.assertEqual(results[0].created_on, datetime.datetime(2015, 8, 26, 10, 4, 9, 737686, pytz.utc))
+
+        # check with all params
+        self.client.get_resthook_subscribers(id=1001, resthook='new-mother').all()
+
+        self.assertRequest(mock_request, 'get', 'resthook_subscribers', params={'id': 1001, 'resthook': 'new-mother'})
+
     def test_get_runs(self, mock_request):
         # check no params
         mock_request.return_value = MockResponse(200, self.read_json('runs'))
@@ -567,7 +620,7 @@ class TembaClientTest(TembaTest):
         self.assertEqual(query.first(), None)
 
     def test_create_broadcast(self, mock_request):
-        mock_request.return_value = MockResponse(200, self.read_json('broadcast_created'))
+        mock_request.return_value = MockResponse(200, self.read_json('broadcasts', extract_result=0))
         broadcast = self.client.create_broadcast(
             text="Hello",
             urns=["tel:+250783865665", "twitter:bobby"],
@@ -584,7 +637,7 @@ class TembaClientTest(TembaTest):
         self.assertEqual(broadcast.id, 1234)
 
     def test_create_contact(self, mock_request):
-        mock_request.return_value = MockResponse(201, self.read_json('contact_created'))
+        mock_request.return_value = MockResponse(201, self.read_json('contacts', extract_result=0))
         contact = self.client.create_contact(
             name="Joe",
             language="eng",
@@ -603,21 +656,33 @@ class TembaClientTest(TembaTest):
         self.assertEqual(contact.uuid, "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
 
     def test_create_group(self, mock_request):
-        mock_request.return_value = MockResponse(201, self.read_json('group_created'))
+        mock_request.return_value = MockResponse(201, self.read_json('groups', extract_result=0))
         group = self.client.create_group(name="Reporters")
 
         self.assertRequest(mock_request, 'post', 'groups', data={'name': "Reporters"})
         self.assertEqual(group.uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
 
     def test_create_label(self, mock_request):
-        mock_request.return_value = MockResponse(201, self.read_json('label_created'))
+        mock_request.return_value = MockResponse(201, self.read_json('labels', extract_result=0))
         label = self.client.create_label(name="Important")
 
         self.assertRequest(mock_request, 'post', 'labels', data={'name': "Important"})
         self.assertEqual(label.uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
 
+    def test_create_resthook_subscriber(self, mock_request):
+        subscriber_json = self.read_json('resthook_subscribers', extract_result=0)
+
+        mock_request.return_value = MockResponse(201, subscriber_json)
+        subscriber = self.client.create_resthook_subscriber(resthook="new-mother", target_url="http://foo.bar/mothers")
+
+        self.assertRequest(mock_request, 'post', 'resthook_subscribers', data={
+            'resthook': "new-mother",
+            'target_url': "http://foo.bar/mothers"
+        })
+        self.assertEqual(subscriber.id, 1001)
+
     def test_update_contact(self, mock_request):
-        mock_request.return_value = MockResponse(201, self.read_json('contact_created'))
+        mock_request.return_value = MockResponse(201, self.read_json('contacts', extract_result=0))
 
         # check update by UUID
         contact = self.client.update_contact(
@@ -645,7 +710,7 @@ class TembaClientTest(TembaTest):
         self.assertRequest(mock_request, 'post', 'contacts', data={'urn': "tel:+250973635665", 'language': "fre"})
 
     def test_update_group(self, mock_request):
-        mock_request.return_value = MockResponse(201, self.read_json('group_created'))
+        mock_request.return_value = MockResponse(201, self.read_json('groups', extract_result=0))
         group = self.client.update_group(uuid="04a4752b-0f49-480e-ae60-3a3f2bea485c", name="Reporters")
 
         self.assertRequest(mock_request, 'post', 'groups', data={
@@ -655,7 +720,7 @@ class TembaClientTest(TembaTest):
         self.assertEqual(group.uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
 
     def test_update_label(self, mock_request):
-        mock_request.return_value = MockResponse(201, self.read_json('label_created'))
+        mock_request.return_value = MockResponse(201, self.read_json('labels', extract_result=0))
         label = self.client.update_label(uuid="04a4752b-0f49-480e-ae60-3a3f2bea485c", name="Important")
 
         self.assertRequest(mock_request, 'post', 'labels', data={
@@ -690,3 +755,10 @@ class TembaClientTest(TembaTest):
         self.client.delete_label(uuid="5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
 
         self.assertRequest(mock_request, 'delete', 'labels', params={'uuid': "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9"})
+
+    def test_delete_resthook_subscriber(self, mock_request):
+        mock_request.return_value = MockResponse(204, "")
+
+        self.client.delete_resthook_subscriber(id=1001)
+
+        self.assertRequest(mock_request, 'delete', 'resthook_subscribers', params={'id': 1001})
