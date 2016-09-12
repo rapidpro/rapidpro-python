@@ -402,6 +402,36 @@ class TembaClientTest(TembaTest):
 
         self.assertRequest(mock_request, 'get', 'flows', params={'uuid': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a"})
 
+    def test_get_flow_starts(self, mock_request):
+        # check no params
+        mock_request.return_value = MockResponse(200, self.read_json('flow_starts'))
+
+        # check with no params
+        results = self.client.get_flow_starts().all()
+
+        self.assertRequest(mock_request, 'get', 'flow_starts')
+        self.assertEqual(len(results), 2)
+
+        self.assertEqual(results[0].id, 15051)
+        self.assertEqual(results[0].flow.uuid, "f5901b62-ba76-4003-9c62-72fdacc1b7b7")
+        self.assertEqual(results[0].flow.name, "Registration")
+        self.assertEqual(len(results[0].groups), 1)
+        self.assertEqual(results[0].groups[0].uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
+        self.assertEqual(results[0].groups[0].name, "The A-Team")
+        self.assertEqual(len(results[0].contacts), 2)
+        self.assertEqual(results[0].contacts[0].uuid, "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
+        self.assertEqual(results[0].contacts[0].name, "Joe")
+        self.assertEqual(results[0].restart_participants, True)
+        self.assertEqual(results[0].status, "pending")
+        self.assertEqual(results[0].extra, {"day": "Monday"})
+        self.assertEqual(results[0].created_on, datetime.datetime(2015, 8, 26, 10, 4, 9, 737686, pytz.utc))
+        self.assertEqual(results[0].modified_on, datetime.datetime(2015, 9, 26, 10, 4, 9, 737686, pytz.utc))
+
+        # check with all params
+        self.client.get_flow_starts(id=15051).all()
+
+        self.assertRequest(mock_request, 'get', 'flow_starts', params={'id': 15051})
+
     def test_get_groups(self, mock_request):
         # check no params
         mock_request.return_value = MockResponse(200, self.read_json('groups'))
@@ -654,6 +684,25 @@ class TembaClientTest(TembaTest):
             'groups': ["d29eca7c-a475-4d8d-98ca-bff968341356"]
         })
         self.assertEqual(contact.uuid, "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
+
+    def test_create_flow_start(self, mock_request):
+        mock_request.return_value = MockResponse(201, self.read_json('flow_starts', extract_result=0))
+        start = self.client.create_flow_start(flow="f5901b62-ba76-4003-9c62-72fdacc1b7b7",
+                                              contacts=["5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9"],
+                                              groups=["04a4752b-0f49-480e-ae60-3a3f2bea485c"],
+                                              urns=[],
+                                              restart_participants=False,
+                                              extra={'day': "Monday"})
+
+        self.assertRequest(mock_request, 'post', 'flow_starts', data={
+            'flow': "f5901b62-ba76-4003-9c62-72fdacc1b7b7",
+            'contacts': ["5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9"],
+            'groups': ["04a4752b-0f49-480e-ae60-3a3f2bea485c"],
+            'urns': [],
+            'restart_participants': False,
+            'extra': {'day': "Monday"}
+        })
+        self.assertEqual(start.id, 15051)
 
     def test_create_group(self, mock_request):
         mock_request.return_value = MockResponse(201, self.read_json('groups', extract_result=0))

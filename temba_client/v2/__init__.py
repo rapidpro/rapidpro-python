@@ -5,8 +5,8 @@ This version of the API is still under development and so is subject to change w
 that users continue using the existing API v1.
 """
 
-from .types import Boundary, Broadcast, Campaign, CampaignEvent, Channel, ChannelEvent, Contact, Export
-from .types import Field, Flow, Group, Label, Message, Org, Resthook, ResthookSubscriber, ResthookEvent, Run
+from .types import Boundary, Broadcast, Campaign, CampaignEvent, Channel, ChannelEvent, Contact, Export, Field
+from .types import FlowStart, Flow, Group, Label, Message, Org, Resthook, ResthookSubscriber, ResthookEvent, Run
 from ..clients import BaseCursorClient
 
 
@@ -135,6 +135,15 @@ class TembaClient(BaseCursorClient):
         """
         return self._get_query('flows', self._build_params(uuid=uuid), Flow)
 
+    def get_flow_starts(self, id=None):
+        """
+        Gets all matching flows starts
+
+        :param id: flow start id
+        :return: flow start query
+        """
+        return self._get_query('flow_starts', self._build_params(id=id), FlowStart)
+
     def get_groups(self, uuid=None):
         """
         Gets all matching contact groups
@@ -253,6 +262,22 @@ class TembaClient(BaseCursorClient):
         """
         params = self._build_params(name=name, language=language, urns=urns, fields=fields, groups=groups)
         return Contact.deserialize(self._post('contacts', params))
+
+    def create_flow_start(self, flow, urns=None, contacts=None, groups=None, restart_participants=None, extra=None):
+        """
+        Creates a new flow start
+
+        :param str flow: flow UUID
+        :param list[str] urns: URNs of contacts to start
+        :param list[str] contacts: UUIDs of contacts to start
+        :param list[str] groups: UUIDs of contact groups to start
+        :param bool restart_participants: whether to restart participants already in this flow
+        :param * extra: a dictionary of extra parameters to pass to the flow
+        :return: the new label
+        """
+        params = self._build_params(flow=flow, urns=urns, contacts=contacts, groups=groups,
+                                    restart_participants=restart_participants, extra=extra)
+        return FlowStart.deserialize(self._post('flow_starts', params))
 
     def create_group(self, name):
         """
