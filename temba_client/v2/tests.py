@@ -685,6 +685,25 @@ class TembaClientTest(TembaTest):
         })
         self.assertEqual(contact.uuid, "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
 
+    def test_create_flow_start(self, mock_request):
+        mock_request.return_value = MockResponse(201, self.read_json('flow_starts', extract_result=0))
+        start = self.client.create_flow_start(flow="f5901b62-ba76-4003-9c62-72fdacc1b7b7",
+                                              contacts=["5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9"],
+                                              groups=["04a4752b-0f49-480e-ae60-3a3f2bea485c"],
+                                              urns=[],
+                                              restart_participants=False,
+                                              extra={'day': "Monday"})
+
+        self.assertRequest(mock_request, 'post', 'flow_starts', data={
+            'flow': "f5901b62-ba76-4003-9c62-72fdacc1b7b7",
+            'contacts': ["5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9"],
+            'groups': ["04a4752b-0f49-480e-ae60-3a3f2bea485c"],
+            'urns': [],
+            'restart_participants': False,
+            'extra': {'day': "Monday"}
+        })
+        self.assertEqual(start.id, 15051)
+
     def test_create_group(self, mock_request):
         mock_request.return_value = MockResponse(201, self.read_json('groups', extract_result=0))
         group = self.client.create_group(name="Reporters")
