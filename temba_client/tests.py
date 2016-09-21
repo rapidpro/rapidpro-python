@@ -13,7 +13,7 @@ from . import __version__
 from .clients import BaseClient
 from .exceptions import TembaException, TembaSerializationException
 from .serialization import TembaObject, SimpleField, BooleanField, IntegerField, DatetimeField, ObjectField
-from .serialization import ObjectListField
+from .serialization import ObjectListField, ObjectDictField
 from .utils import format_iso8601, parse_iso8601
 
 
@@ -92,6 +92,7 @@ class TestType(TembaObject):
     doh = DatetimeField()
     gem = ObjectField(item_class=TestSubType)
     hum = ObjectListField(item_class=TestSubType)
+    meh = ObjectDictField(item_class=TestSubType)
 
 
 class FieldsTest(TembaTest):
@@ -152,13 +153,17 @@ class TembaObjectTest(TembaTest):
                                     'bar': 123,
                                     'doh': '2014-01-02T03:04:05',
                                     'gem': {'zed': 'c'},
-                                    'hum': [{'zed': 'b'}]})
+                                    'hum': [{'zed': 'b'}],
+                                    'meh': {'a': {'zed': 'c'}, 'b': {'zed': 'd'}}})
         self.assertEqual(obj.foo, 'a')
         self.assertEqual(obj.bar, 123)
         self.assertEqual(obj.doh, datetime.datetime(2014, 1, 2, 3, 4, 5, 0, pytz.UTC))
         self.assertEqual(obj.gem.zed, 'c')
         self.assertEqual(len(obj.hum), 1)
         self.assertEqual(obj.hum[0].zed, 'b')
+        self.assertEqual(len(obj.meh), 2)
+        self.assertEqual(obj.meh['a'].zed, 'c')
+        self.assertEqual(obj.meh['b'].zed, 'd')
 
         # exception when object list field receives non-list
         self.assertRaises(TembaSerializationException, TestType.deserialize,
@@ -167,14 +172,16 @@ class TembaObjectTest(TembaTest):
     def test_serialize(self):
         obj = TestType.create(foo='a', bar=123, doh=datetime.datetime(2014, 1, 2, 3, 4, 5, 0, pytz.UTC),
                               gem=TestSubType.create(zed='a'),
-                              hum=[TestSubType.create(zed='b')])
+                              hum=[TestSubType.create(zed='b')],
+                              meh={'a': TestSubType.create(zed='c'), 'b': TestSubType.create(zed='d')})
 
         json_obj = obj.serialize()
         self.assertEqual(json_obj, {'foo': 'a',
                                     'bar': 123,
                                     'doh': '2014-01-02T03:04:05.000000',
                                     'gem': {'zed': 'a'},
-                                    'hum': [{'zed': 'b'}]})
+                                    'hum': [{'zed': 'b'}],
+                                    'meh': {'a': {'zed': 'c'}, 'b': {'zed': 'd'}}})
 
 
 class BaseClientTest(TembaTest):
