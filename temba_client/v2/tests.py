@@ -743,15 +743,15 @@ class TembaClientTest(TembaTest):
             groups=["d29eca7c-a475-4d8d-98ca-bff968341356"]
         )
 
-        self.assertRequest(mock_request, 'post', 'contacts', params={
-            'uuid': "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9"
-        }, data={
-            'name': "Joe",
-            'language': "eng",
-            'urns': ["tel:+250973635665"],
-            'fields': {"nickname": "Jo", "age": 34},
-            'groups': ["d29eca7c-a475-4d8d-98ca-bff968341356"]
-        })
+        self.assertRequest(mock_request, 'post', 'contacts',
+                           params={'uuid': "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9"},
+                           data={
+                               'name': "Joe",
+                               'language': "eng",
+                               'urns': ["tel:+250973635665"],
+                               'fields': {"nickname": "Jo", "age": 34},
+                               'groups': ["d29eca7c-a475-4d8d-98ca-bff968341356"]
+                           })
         self.assertEqual(contact.uuid, "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
 
         # check partial update by URN
@@ -764,20 +764,18 @@ class TembaClientTest(TembaTest):
         mock_request.return_value = MockResponse(201, self.read_json('groups', extract_result=0))
         group = self.client.update_group(uuid="04a4752b-0f49-480e-ae60-3a3f2bea485c", name="Reporters")
 
-        self.assertRequest(mock_request, 'post', 'groups', data={
-            'uuid': "04a4752b-0f49-480e-ae60-3a3f2bea485c",
-            'name': "Reporters"
-        })
+        self.assertRequest(mock_request, 'post', 'groups',
+                           params={'uuid': "04a4752b-0f49-480e-ae60-3a3f2bea485c"},
+                           data={'name': "Reporters"})
         self.assertEqual(group.uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
 
     def test_update_label(self, mock_request):
         mock_request.return_value = MockResponse(201, self.read_json('labels', extract_result=0))
         label = self.client.update_label(uuid="04a4752b-0f49-480e-ae60-3a3f2bea485c", name="Important")
 
-        self.assertRequest(mock_request, 'post', 'labels', data={
-            'uuid': "04a4752b-0f49-480e-ae60-3a3f2bea485c",
-            'name': "Important"
-        })
+        self.assertRequest(mock_request, 'post', 'labels',
+                           params={'uuid': "04a4752b-0f49-480e-ae60-3a3f2bea485c"},
+                           data={'name': "Important"})
         self.assertEqual(label.uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
 
     def test_delete_contact(self, mock_request):

@@ -336,7 +336,7 @@ class TembaClient(BaseCursorClient):
         :param str name: group name
         :return: the updated group
         """
-        return Group.deserialize(self._post('groups', None, self._build_params(uuid=uuid, name=name)))
+        return Group.deserialize(self._post('groups', {'uuid': uuid}, self._build_params(name=name)))
 
     def update_label(self, uuid, name):
         """
@@ -346,7 +346,7 @@ class TembaClient(BaseCursorClient):
         :param str name: label name
         :return: the updated label
         """
-        return Label.deserialize(self._post('labels', None, self._build_params(uuid=uuid, name=name)))
+        return Label.deserialize(self._post('labels', {'uuid': uuid}, self._build_params(name=name)))
 
     # ==================================================================================================================
     # Delete object operations
