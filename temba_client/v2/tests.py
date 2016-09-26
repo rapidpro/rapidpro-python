@@ -743,8 +743,9 @@ class TembaClientTest(TembaTest):
             groups=["d29eca7c-a475-4d8d-98ca-bff968341356"]
         )
 
-        self.assertRequest(mock_request, 'post', 'contacts', data={
-            'uuid': "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9",
+        self.assertRequest(mock_request, 'post', 'contacts', params={
+            'uuid': "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9"
+        }, data={
             'name': "Joe",
             'language': "eng",
             'urns': ["tel:+250973635665"],
@@ -756,7 +757,8 @@ class TembaClientTest(TembaTest):
         # check partial update by URN
         self.client.update_contact(uuid_or_urn="tel:+250973635665", language="fre")
 
-        self.assertRequest(mock_request, 'post', 'contacts', data={'urn': "tel:+250973635665", 'language': "fre"})
+        self.assertRequest(mock_request, 'post', 'contacts',
+                           params={'urn': "tel:+250973635665"}, data={'language': "fre"})
 
     def test_update_group(self, mock_request):
         mock_request.return_value = MockResponse(201, self.read_json('groups', extract_result=0))

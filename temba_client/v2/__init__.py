@@ -246,8 +246,8 @@ class TembaClient(BaseCursorClient):
         :param list groups: list of group objects or UUIDs
         :return: the new broadcast
         """
-        params = self._build_params(text=text, urns=urns, contacts=contacts, groups=groups)
-        return Broadcast.deserialize(self._post('broadcasts', params))
+        payload = self._build_params(text=text, urns=urns, contacts=contacts, groups=groups)
+        return Broadcast.deserialize(self._post('broadcasts', None, payload))
 
     def create_contact(self, name=None, language=None, urns=None, fields=None, groups=None):
         """
@@ -260,8 +260,8 @@ class TembaClient(BaseCursorClient):
         :param list groups: list of group objects or UUIDs
         :return: the new contact
         """
-        params = self._build_params(name=name, language=language, urns=urns, fields=fields, groups=groups)
-        return Contact.deserialize(self._post('contacts', params))
+        payload = self._build_params(name=name, language=language, urns=urns, fields=fields, groups=groups)
+        return Contact.deserialize(self._post('contacts', None, payload))
 
     def create_flow_start(self, flow, urns=None, contacts=None, groups=None, restart_participants=None, extra=None):
         """
@@ -275,9 +275,9 @@ class TembaClient(BaseCursorClient):
         :param * extra: a dictionary of extra parameters to pass to the flow
         :return: the new label
         """
-        params = self._build_params(flow=flow, urns=urns, contacts=contacts, groups=groups,
-                                    restart_participants=restart_participants, extra=extra)
-        return FlowStart.deserialize(self._post('flow_starts', params))
+        payload = self._build_params(flow=flow, urns=urns, contacts=contacts, groups=groups,
+                                     restart_participants=restart_participants, extra=extra)
+        return FlowStart.deserialize(self._post('flow_starts', None, payload))
 
     def create_group(self, name):
         """
@@ -286,7 +286,7 @@ class TembaClient(BaseCursorClient):
         :param str name: group name
         :return: the new group
         """
-        return Group.deserialize(self._post('groups', self._build_params(name=name)))
+        return Group.deserialize(self._post('groups', None, self._build_params(name=name)))
 
     def create_label(self, name):
         """
@@ -295,7 +295,7 @@ class TembaClient(BaseCursorClient):
         :param str name: label name
         :return: the new label
         """
-        return Label.deserialize(self._post('labels', self._build_params(name=name)))
+        return Label.deserialize(self._post('labels', None, self._build_params(name=name)))
 
     def create_resthook_subscriber(self, resthook, target_url):
         """
@@ -305,8 +305,8 @@ class TembaClient(BaseCursorClient):
         :param target_url: the target URL
         :return: the new subscriber
         """
-        params = self._build_params(resthook=resthook, target_url=target_url)
-        return ResthookSubscriber.deserialize(self._post('resthook_subscribers', params))
+        payload = self._build_params(resthook=resthook, target_url=target_url)
+        return ResthookSubscriber.deserialize(self._post('resthook_subscribers', None, payload))
 
     # ==================================================================================================================
     # Update object operations
@@ -324,9 +324,9 @@ class TembaClient(BaseCursorClient):
         :param list groups: list of group objects or UUIDs
         :return: the updated contact
         """
-        params = dict(name=name, language=language, urns=urns, fields=fields, groups=groups)
-        params['urn' if ':' in uuid_or_urn else 'uuid'] = uuid_or_urn
-        return Contact.deserialize(self._post('contacts', self._build_params(**params)))
+        params = {'urn' if ':' in uuid_or_urn else 'uuid': uuid_or_urn}
+        payload = self._build_params(name=name, language=language, urns=urns, fields=fields, groups=groups)
+        return Contact.deserialize(self._post('contacts', params, self._build_params(**payload)))
 
     def update_group(self, uuid, name):
         """
@@ -336,7 +336,7 @@ class TembaClient(BaseCursorClient):
         :param str name: group name
         :return: the updated group
         """
-        return Group.deserialize(self._post('groups', self._build_params(uuid=uuid, name=name)))
+        return Group.deserialize(self._post('groups', None, self._build_params(uuid=uuid, name=name)))
 
     def update_label(self, uuid, name):
         """
@@ -346,7 +346,7 @@ class TembaClient(BaseCursorClient):
         :param str name: label name
         :return: the updated label
         """
-        return Label.deserialize(self._post('labels', self._build_params(uuid=uuid, name=name)))
+        return Label.deserialize(self._post('labels', None, self._build_params(uuid=uuid, name=name)))
 
     # ==================================================================================================================
     # Delete object operations
