@@ -7,6 +7,7 @@ import pytz
 from mock import patch
 from requests.exceptions import ConnectionError
 from . import TembaClient
+from .types import Contact, Group, Label, ResthookSubscriber
 from ..exceptions import TembaBadRequestError, TembaTokenError, TembaRateExceededError, TembaHttpError
 from ..exceptions import TembaConnectionError
 from ..tests import TembaTest, MockResponse
@@ -735,7 +736,7 @@ class TembaClientTest(TembaTest):
 
         # check update by UUID
         contact = self.client.update_contact(
-            uuid_or_urn="5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9",
+            contact="5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9",
             name="Joe",
             language="eng",
             urns=["tel:+250973635665"],
@@ -743,71 +744,98 @@ class TembaClientTest(TembaTest):
             groups=["d29eca7c-a475-4d8d-98ca-bff968341356"]
         )
 
-        self.assertRequest(mock_request, 'post', 'contacts', data={
-            'uuid': "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9",
-            'name': "Joe",
-            'language': "eng",
-            'urns': ["tel:+250973635665"],
-            'fields': {"nickname": "Jo", "age": 34},
-            'groups': ["d29eca7c-a475-4d8d-98ca-bff968341356"]
-        })
+        self.assertRequest(mock_request, 'post', 'contacts',
+                           params={'uuid': "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9"},
+                           data={
+                               'name': "Joe",
+                               'language': "eng",
+                               'urns': ["tel:+250973635665"],
+                               'fields': {"nickname": "Jo", "age": 34},
+                               'groups': ["d29eca7c-a475-4d8d-98ca-bff968341356"]
+                           })
         self.assertEqual(contact.uuid, "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
 
         # check partial update by URN
-        self.client.update_contact(uuid_or_urn="tel:+250973635665", language="fre")
+        self.client.update_contact(contact="tel:+250973635665", language="fre")
 
-        self.assertRequest(mock_request, 'post', 'contacts', data={'urn': "tel:+250973635665", 'language': "fre"})
+        self.assertRequest(mock_request, 'post', 'contacts',
+                           params={'urn': "tel:+250973635665"}, data={'language': "fre"})
 
     def test_update_group(self, mock_request):
         mock_request.return_value = MockResponse(201, self.read_json('groups', extract_result=0))
-        group = self.client.update_group(uuid="04a4752b-0f49-480e-ae60-3a3f2bea485c", name="Reporters")
 
-        self.assertRequest(mock_request, 'post', 'groups', data={
-            'uuid': "04a4752b-0f49-480e-ae60-3a3f2bea485c",
-            'name': "Reporters"
-        })
+        # check update by UUID
+        group = self.client.update_group(group="04a4752b-0f49-480e-ae60-3a3f2bea485c", name="Reporters")
+
+        self.assertRequest(mock_request, 'post', 'groups',
+                           params={'uuid': "04a4752b-0f49-480e-ae60-3a3f2bea485c"},
+                           data={'name': "Reporters"})
         self.assertEqual(group.uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
 
     def test_update_label(self, mock_request):
         mock_request.return_value = MockResponse(201, self.read_json('labels', extract_result=0))
-        label = self.client.update_label(uuid="04a4752b-0f49-480e-ae60-3a3f2bea485c", name="Important")
 
-        self.assertRequest(mock_request, 'post', 'labels', data={
-            'uuid': "04a4752b-0f49-480e-ae60-3a3f2bea485c",
-            'name': "Important"
-        })
+        # check update by UUID
+        label = self.client.update_label(label="04a4752b-0f49-480e-ae60-3a3f2bea485c", name="Important")
+
+        self.assertRequest(mock_request, 'post', 'labels',
+                           params={'uuid': "04a4752b-0f49-480e-ae60-3a3f2bea485c"},
+                           data={'name': "Important"})
         self.assertEqual(label.uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
 
     def test_delete_contact(self, mock_request):
         mock_request.return_value = MockResponse(204, "")
 
+        # check delete by object
+        self.client.delete_contact(Contact.create(uuid="5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9"))
+
+        self.assertRequest(mock_request, 'delete', 'contacts', params={'uuid': "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9"})
+
         # check delete by UUID
-        self.client.delete_contact(uuid_or_urn="5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
+        self.client.delete_contact("5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
 
         self.assertRequest(mock_request, 'delete', 'contacts', params={'uuid': "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9"})
 
         # check delete by URN
-        self.client.delete_contact(uuid_or_urn="tel:+250973635665")
+        self.client.delete_contact("tel:+250973635665")
 
         self.assertRequest(mock_request, 'delete', 'contacts', params={'urn': "tel:+250973635665"})
 
     def test_delete_group(self, mock_request):
         mock_request.return_value = MockResponse(204, "")
 
-        self.client.delete_group(uuid="04a4752b-0f49-480e-ae60-3a3f2bea485c")
+        # check delete by object
+        self.client.delete_group(Group.create(uuid="04a4752b-0f49-480e-ae60-3a3f2bea485c"))
+
+        self.assertRequest(mock_request, 'delete', 'groups', params={'uuid': "04a4752b-0f49-480e-ae60-3a3f2bea485c"})
+
+        # check delete by UUID
+        self.client.delete_group("04a4752b-0f49-480e-ae60-3a3f2bea485c")
 
         self.assertRequest(mock_request, 'delete', 'groups', params={'uuid': "04a4752b-0f49-480e-ae60-3a3f2bea485c"})
 
     def test_delete_label(self, mock_request):
         mock_request.return_value = MockResponse(204, "")
 
-        self.client.delete_label(uuid="5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
+        # check delete by object
+        self.client.delete_label(Label.create(uuid="5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9"))
+
+        self.assertRequest(mock_request, 'delete', 'labels', params={'uuid': "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9"})
+
+        # check delete by UUID
+        self.client.delete_label("5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
 
         self.assertRequest(mock_request, 'delete', 'labels', params={'uuid': "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9"})
 
     def test_delete_resthook_subscriber(self, mock_request):
         mock_request.return_value = MockResponse(204, "")
 
-        self.client.delete_resthook_subscriber(id=1001)
+        # check delete by object
+        self.client.delete_resthook_subscriber(ResthookSubscriber.create(id=1001))
+
+        self.assertRequest(mock_request, 'delete', 'resthook_subscribers', params={'id': 1001})
+
+        # check delete by id
+        self.client.delete_resthook_subscriber(1001)
 
         self.assertRequest(mock_request, 'delete', 'resthook_subscribers', params={'id': 1001})

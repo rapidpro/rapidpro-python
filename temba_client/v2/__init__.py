@@ -5,6 +5,8 @@ This version of the API is still under development and so is subject to change w
 that users continue using the existing API v1.
 """
 
+import six
+
 from .types import Boundary, Broadcast, Campaign, CampaignEvent, Channel, ChannelEvent, Contact, Export, Field
 from .types import FlowStart, Flow, Group, Label, Message, Org, Resthook, ResthookSubscriber, ResthookEvent, Run
 from ..clients import BaseCursorClient
@@ -246,8 +248,8 @@ class TembaClient(BaseCursorClient):
         :param list groups: list of group objects or UUIDs
         :return: the new broadcast
         """
-        params = self._build_params(text=text, urns=urns, contacts=contacts, groups=groups)
-        return Broadcast.deserialize(self._post('broadcasts', params))
+        payload = self._build_params(text=text, urns=urns, contacts=contacts, groups=groups)
+        return Broadcast.deserialize(self._post('broadcasts', None, payload))
 
     def create_contact(self, name=None, language=None, urns=None, fields=None, groups=None):
         """
@@ -260,8 +262,8 @@ class TembaClient(BaseCursorClient):
         :param list groups: list of group objects or UUIDs
         :return: the new contact
         """
-        params = self._build_params(name=name, language=language, urns=urns, fields=fields, groups=groups)
-        return Contact.deserialize(self._post('contacts', params))
+        payload = self._build_params(name=name, language=language, urns=urns, fields=fields, groups=groups)
+        return Contact.deserialize(self._post('contacts', None, payload))
 
     def create_flow_start(self, flow, urns=None, contacts=None, groups=None, restart_participants=None, extra=None):
         """
@@ -275,9 +277,9 @@ class TembaClient(BaseCursorClient):
         :param * extra: a dictionary of extra parameters to pass to the flow
         :return: the new label
         """
-        params = self._build_params(flow=flow, urns=urns, contacts=contacts, groups=groups,
-                                    restart_participants=restart_participants, extra=extra)
-        return FlowStart.deserialize(self._post('flow_starts', params))
+        payload = self._build_params(flow=flow, urns=urns, contacts=contacts, groups=groups,
+                                     restart_participants=restart_participants, extra=extra)
+        return FlowStart.deserialize(self._post('flow_starts', None, payload))
 
     def create_group(self, name):
         """
@@ -286,7 +288,7 @@ class TembaClient(BaseCursorClient):
         :param str name: group name
         :return: the new group
         """
-        return Group.deserialize(self._post('groups', self._build_params(name=name)))
+        return Group.deserialize(self._post('groups', None, self._build_params(name=name)))
 
     def create_label(self, name):
         """
@@ -295,7 +297,7 @@ class TembaClient(BaseCursorClient):
         :param str name: label name
         :return: the new label
         """
-        return Label.deserialize(self._post('labels', self._build_params(name=name)))
+        return Label.deserialize(self._post('labels', None, self._build_params(name=name)))
 
     def create_resthook_subscriber(self, resthook, target_url):
         """
@@ -305,18 +307,18 @@ class TembaClient(BaseCursorClient):
         :param target_url: the target URL
         :return: the new subscriber
         """
-        params = self._build_params(resthook=resthook, target_url=target_url)
-        return ResthookSubscriber.deserialize(self._post('resthook_subscribers', params))
+        payload = self._build_params(resthook=resthook, target_url=target_url)
+        return ResthookSubscriber.deserialize(self._post('resthook_subscribers', None, payload))
 
     # ==================================================================================================================
     # Update object operations
     # ==================================================================================================================
 
-    def update_contact(self, uuid_or_urn, name=None, language=None, urns=None, fields=None, groups=None):
+    def update_contact(self, contact, name=None, language=None, urns=None, fields=None, groups=None):
         """
         Updates an existing contact
 
-        :param str uuid_or_urn: contact UUID or URN
+        :param * contact: contact object, UUID or URN
         :param str name: full name
         :param str language: the language code, e.g. "eng"
         :param list[str] urns: list of URN strings
@@ -324,63 +326,65 @@ class TembaClient(BaseCursorClient):
         :param list groups: list of group objects or UUIDs
         :return: the updated contact
         """
-        params = dict(name=name, language=language, urns=urns, fields=fields, groups=groups)
-        params['urn' if ':' in uuid_or_urn else 'uuid'] = uuid_or_urn
-        return Contact.deserialize(self._post('contacts', self._build_params(**params)))
+        is_urn = isinstance(contact, six.string_types) and ':' in contact
+        params = self._build_params(**{'urn' if is_urn else 'uuid': contact})
+        payload = self._build_params(name=name, language=language, urns=urns, fields=fields, groups=groups)
+        return Contact.deserialize(self._post('contacts', params, self._build_params(**payload)))
 
-    def update_group(self, uuid, name):
+    def update_group(self, group, name):
         """
         Updates an existing contact group
 
-        :param str uuid: group UUID
+        :param * group: group object or UUID
         :param str name: group name
         :return: the updated group
         """
-        return Group.deserialize(self._post('groups', self._build_params(uuid=uuid, name=name)))
+        return Group.deserialize(self._post('groups', self._build_params(uuid=group), self._build_params(name=name)))
 
-    def update_label(self, uuid, name):
+    def update_label(self, label, name):
         """
         Updates an existing message label
 
-        :param str uuid: label UUID
+        :param * label: label object or UUID
         :param str name: label name
         :return: the updated label
         """
-        return Label.deserialize(self._post('labels', self._build_params(uuid=uuid, name=name)))
+        return Label.deserialize(self._post('labels', self._build_params(uuid=label), self._build_params(name=name)))
 
     # ==================================================================================================================
     # Delete object operations
     # ==================================================================================================================
 
-    def delete_contact(self, uuid_or_urn):
+    def delete_contact(self, contact):
         """
         Deletes an existing contact
 
-        :param str uuid_or_urn: contact UUID or URN
+        :param * contact: contact object, UUID or URN
         """
-        params = {'urn' if ':' in uuid_or_urn else 'uuid': uuid_or_urn}
-        self._delete('contacts', self._build_params(**params))
+        is_urn = isinstance(contact, six.string_types) and ':' in contact
+        params = self._build_params(**{'urn' if is_urn else 'uuid': contact})
+        self._delete('contacts', params)
 
-    def delete_group(self, uuid):
+    def delete_group(self, group):
         """
         Deletes an existing contact group
 
-        :param str uuid: group UUID
+        :param * group: group object or UUID
         """
-        self._delete('groups', self._build_params(uuid=uuid))
+        self._delete('groups', self._build_params(uuid=group))
 
-    def delete_label(self, uuid):
+    def delete_label(self, label):
         """
         Deletes an existing message label
 
-        :param str uuid: label UUID
+        :param * label: label object or UUID
         """
-        self._delete('labels', self._build_params(uuid=uuid))
+        self._delete('labels', self._build_params(uuid=label))
 
-    def delete_resthook_subscriber(self, id):
+    def delete_resthook_subscriber(self, subscriber):
         """
         Deletes an existing resthook subscriber
 
-        :param id: the resthook subscriber id
+        :param * subscriber: the resthook subscriber or id
         """
-        self._delete('resthook_subscribers', self._build_params(id=id))
+        self._delete('resthook_subscribers', self._build_params(id=subscriber))
