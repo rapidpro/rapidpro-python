@@ -1,6 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 
 import datetime
+import json
 import pytz
 
 from mock import patch
@@ -53,8 +54,10 @@ class TembaClientTest(TembaTest):
 
         self.assertRaisesWithMessage(TembaConnectionError, "Unable to connect to host", query.all)
 
-    def test_get_cursor(self, mock_request):
-        mock_request.return_value = MockResponse(200, self.read_json('runs_with_next'))
+    def test_get_and_resume_cursor(self, mock_request):
+        response_json = json.loads(self.read_json('runs'))
+        response_json['next'] = "https://app.rapidpro.io/api/v2/runs.json?cursor=qwerty%3D&flow=flow_uuid"
+        mock_request.return_value = MockResponse(200, json.dumps(response_json))
 
         iterator = self.client.get_runs().iterfetches(retry_on_rate_exceed=True)
         self.assertEqual(iterator.get_cursor(), None)
@@ -64,9 +67,6 @@ class TembaClientTest(TembaTest):
 
         iterator.url = None
         self.assertEqual(iterator.get_cursor(), None)
-
-    def test_resume_cursor(self, mock_request):
-        mock_request.return_value = MockResponse(200, self.read_json('runs_with_next'))
 
         iterator = self.client.get_runs().iterfetches(retry_on_rate_exceed=True, resume_cursor='qwERty=')
 
