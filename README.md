@@ -2,6 +2,7 @@ RapidPro Python Client
 ======================
 
 ![Build Status](https://travis-ci.org/rapidpro/rapidpro-python.svg?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/rapidpro/rapidpro-python/badge.svg?branch=master)](https://coveralls.io/github/rapidpro/rapidpro-python)
 
 Official Python client library for the [RapidPro](http://rapidpro.github.io/rapidpro/). Supports latest Python 2 and 3.
 
