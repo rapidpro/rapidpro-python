@@ -7,7 +7,7 @@ import pytz
 from mock import patch
 from requests.exceptions import ConnectionError
 from . import TembaClient
-from .types import Contact, Group, Label, ResthookSubscriber
+from .types import Campaign, CampaignEvent, Contact, Flow, Group, Label, ResthookSubscriber
 from ..exceptions import TembaBadRequestError, TembaTokenError, TembaRateExceededError, TembaHttpError
 from ..exceptions import TembaConnectionError
 from ..tests import TembaTest, MockResponse
@@ -667,6 +667,34 @@ class TembaClientTest(TembaTest):
         })
         self.assertEqual(broadcast.id, 1234)
 
+    def test_create_campaign(self, mock_request):
+        mock_request.return_value = MockResponse(201, self.read_json('campaigns', extract_result=0))
+        campaign = self.client.create_campaign(name="Reminders", group="Reporters")
+
+        self.assertRequest(mock_request, 'post', 'campaigns', data={'name': "Reminders", 'group': "Reporters"})
+        self.assertEqual(campaign.uuid, "09d23a05-47fe-11e4-bfe9-b8f6b119e9ab")
+
+    def test_create_campaign_event(self, mock_request):
+        mock_request.return_value = MockResponse(201, self.read_json('campaign_events', extract_result=0))
+        event = self.client.create_campaign_event(
+            campaign=Campaign.create(uuid="9ccae91f-b3f8-4c18-ad92-e795a2332c11"),
+            relative_to="edd",
+            offset=14,
+            unit='days',
+            delivery_hour=-1,
+            flow=Flow.create(uuid="70c38f94-ab42-4666-86fd-3c76139110d3")
+        )
+
+        self.assertRequest(mock_request, 'post', 'campaign_events', data={
+            'campaign': "9ccae91f-b3f8-4c18-ad92-e795a2332c11",
+            'relative_to': "edd",
+            'offset': 14,
+            'unit': 'days',
+            'delivery_hour': -1,
+            'flow': "70c38f94-ab42-4666-86fd-3c76139110d3"
+        })
+        self.assertEqual(event.uuid, "9e6beda-0ce2-46cd-8810-91157f261cbd")
+
     def test_create_contact(self, mock_request):
         mock_request.return_value = MockResponse(201, self.read_json('contacts', extract_result=0))
         contact = self.client.create_contact(
@@ -731,6 +759,40 @@ class TembaClientTest(TembaTest):
         })
         self.assertEqual(subscriber.id, 1001)
 
+    def test_update_campaign(self, mock_request):
+        mock_request.return_value = MockResponse(201, self.read_json('campaigns', extract_result=0))
+
+        # check update by UUID
+        campaign = self.client.update_campaign(campaign="09d23a05-47fe-11e4-bfe9-b8f6b119e9ab",
+                                               name="Reminders", group="Reporters")
+
+        self.assertRequest(mock_request, 'post', 'campaigns',
+                           params={'uuid': "09d23a05-47fe-11e4-bfe9-b8f6b119e9ab"},
+                           data={'name': "Reminders", 'group': "Reporters"})
+        self.assertEqual(campaign.uuid, "09d23a05-47fe-11e4-bfe9-b8f6b119e9ab")
+
+    def test_update_campaign_event(self, mock_request):
+        mock_request.return_value = MockResponse(201, self.read_json('campaign_events', extract_result=0))
+        event = self.client.update_campaign_event(
+            event=CampaignEvent.create(uuid="9e6beda-0ce2-46cd-8810-91157f261cbd"),
+            relative_to="edd",
+            offset=14,
+            unit='days',
+            delivery_hour=-1,
+            flow=Flow.create(uuid="70c38f94-ab42-4666-86fd-3c76139110d3")
+        )
+
+        self.assertRequest(mock_request, 'post', 'campaign_events',
+                           params={'uuid': "9e6beda-0ce2-46cd-8810-91157f261cbd"},
+                           data={
+                               'relative_to': "edd",
+                               'offset': 14,
+                               'unit': 'days',
+                               'delivery_hour': -1,
+                               'flow': "70c38f94-ab42-4666-86fd-3c76139110d3"
+                           })
+        self.assertEqual(event.uuid, "9e6beda-0ce2-46cd-8810-91157f261cbd")
+
     def test_update_contact(self, mock_request):
         mock_request.return_value = MockResponse(201, self.read_json('contacts', extract_result=0))
 
@@ -782,6 +844,15 @@ class TembaClientTest(TembaTest):
                            params={'uuid': "04a4752b-0f49-480e-ae60-3a3f2bea485c"},
                            data={'name': "Important"})
         self.assertEqual(label.uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
+
+    def test_delete_campaign_event(self, mock_request):
+        mock_request.return_value = MockResponse(204, "")
+
+        # check delete by object
+        self.client.delete_campaign_event(CampaignEvent.create(uuid="9e6beda-0ce2-46cd-8810-91157f261cbd"))
+
+        self.assertRequest(mock_request, 'delete', 'campaign_events',
+                           params={'uuid': "9e6beda-0ce2-46cd-8810-91157f261cbd"})
 
     def test_delete_contact(self, mock_request):
         mock_request.return_value = MockResponse(204, "")
