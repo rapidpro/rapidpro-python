@@ -872,6 +872,9 @@ class TembaClientTest(TembaTest):
 
         self.assertRequest(mock_request, 'delete', 'contacts', params={'urn': "tel:+250973635665"})
 
+        # error if neither is provided
+        self.assertRaises(ValueError, self.client.delete_contact, None)
+
     def test_delete_group(self, mock_request):
         mock_request.return_value = MockResponse(204, "")
 

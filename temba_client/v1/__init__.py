@@ -281,7 +281,7 @@ class TembaClient(BasePagingClient):
         params = self._build_params(uuid=uuids, archived=archived, label=labels, before=before, after=after)
         return Flow.deserialize_list(self._get_multiple('flows', params, pager))
 
-    def get_flow_definition(self, uuid):
+    def get_flow_definition(self, uuid):  # pragma: no cover
         """
         Gets a single flow definition by its UUID
 
