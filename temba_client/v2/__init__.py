@@ -251,6 +251,34 @@ class TembaClient(BaseCursorClient):
         payload = self._build_params(text=text, urns=urns, contacts=contacts, groups=groups)
         return Broadcast.deserialize(self._post('broadcasts', None, payload))
 
+    def create_campaign(self, name, group):
+        """
+        Creates a new campaign
+
+        :param str name: campaign name
+        :param * group: group object, UUID or name
+        :return: the new campaign
+        """
+        payload = self._build_params(name=name, group=group)
+        return Campaign.deserialize(self._post('campaigns', None, payload))
+
+    def create_campaign_event(self, campaign, relative_to, offset, unit, delivery_hour, message=None, flow=None):
+        """
+        Creates a new campaign event
+
+        :param * campaign: campaign object, UUID or name
+        :param str relative_to: contact field key
+        :param int offset:
+        :param str unit:
+        :param int delivery_hour:
+        :param str message:
+        :param * flow: flow object, UUID or name
+        :return: the new campaign
+        """
+        payload = self._build_params(campaign=campaign, relative_to=relative_to, offset=offset, unit=unit,
+                                     delivery_hour=delivery_hour, message=message, flow=flow)
+        return CampaignEvent.deserialize(self._post('campaign_events', None, payload))
+
     def create_contact(self, name=None, language=None, urns=None, fields=None, groups=None):
         """
         Creates a new contact
@@ -259,7 +287,7 @@ class TembaClient(BaseCursorClient):
         :param str language: the language code, e.g. "eng"
         :param list[str] urns: list of URN strings
         :param dict[str,str] fields: dictionary of contact field values
-        :param list groups: list of group objects or UUIDs
+        :param list groups: list of group objects, UUIDs or names
         :return: the new contact
         """
         payload = self._build_params(name=name, language=language, urns=urns, fields=fields, groups=groups)
@@ -314,6 +342,37 @@ class TembaClient(BaseCursorClient):
     # Update object operations
     # ==================================================================================================================
 
+    def update_campaign(self, campaign, name, group):
+        """
+        Updates an existing campaign
+
+        :param * campaign: campaign object, UUID or URN
+        :param str name: campaign name
+        :param * group: group object, UUID or name
+        :return: the updated campaign
+        """
+        params = self._build_id_param(uuid=campaign)
+        payload = self._build_params(name=name, group=group)
+        return Campaign.deserialize(self._post('campaigns', params, payload))
+
+    def update_campaign_event(self, event, relative_to, offset, unit, delivery_hour, message=None, flow=None):
+        """
+        Updates an existing campaign event
+
+        :param * event: campaign event object, UUID or name
+        :param str relative_to: contact field key
+        :param int offset:
+        :param str unit:
+        :param int delivery_hour:
+        :param str message:
+        :param * flow: flow object, UUID or name
+        :return: the new campaign
+        """
+        params = self._build_id_param(uuid=event)
+        payload = self._build_params(relative_to=relative_to, offset=offset, unit=unit,
+                                     delivery_hour=delivery_hour, message=message, flow=flow)
+        return CampaignEvent.deserialize(self._post('campaign_events', params, payload))
+
     def update_contact(self, contact, name=None, language=None, urns=None, fields=None, groups=None):
         """
         Updates an existing contact
@@ -327,7 +386,7 @@ class TembaClient(BaseCursorClient):
         :return: the updated contact
         """
         is_urn = isinstance(contact, six.string_types) and ':' in contact
-        params = self._build_params(**{'urn' if is_urn else 'uuid': contact})
+        params = self._build_id_param(**{'urn' if is_urn else 'uuid': contact})
         payload = self._build_params(name=name, language=language, urns=urns, fields=fields, groups=groups)
         return Contact.deserialize(self._post('contacts', params, self._build_params(**payload)))
 
@@ -339,7 +398,7 @@ class TembaClient(BaseCursorClient):
         :param str name: group name
         :return: the updated group
         """
-        return Group.deserialize(self._post('groups', self._build_params(uuid=group), self._build_params(name=name)))
+        return Group.deserialize(self._post('groups', self._build_id_param(uuid=group), self._build_params(name=name)))
 
     def update_label(self, label, name):
         """
@@ -349,11 +408,19 @@ class TembaClient(BaseCursorClient):
         :param str name: label name
         :return: the updated label
         """
-        return Label.deserialize(self._post('labels', self._build_params(uuid=label), self._build_params(name=name)))
+        return Label.deserialize(self._post('labels', self._build_id_param(uuid=label), self._build_params(name=name)))
 
     # ==================================================================================================================
     # Delete object operations
     # ==================================================================================================================
+
+    def delete_campaign_event(self, event):
+        """
+        Deletes an existing contact group
+
+        :param * event: campaign event object or UUID
+        """
+        self._delete('campaign_events', self._build_id_param(uuid=event))
 
     def delete_contact(self, contact):
         """
@@ -362,7 +429,7 @@ class TembaClient(BaseCursorClient):
         :param * contact: contact object, UUID or URN
         """
         is_urn = isinstance(contact, six.string_types) and ':' in contact
-        params = self._build_params(**{'urn' if is_urn else 'uuid': contact})
+        params = self._build_id_param(**{'urn' if is_urn else 'uuid': contact})
         self._delete('contacts', params)
 
     def delete_group(self, group):
@@ -371,7 +438,7 @@ class TembaClient(BaseCursorClient):
 
         :param * group: group object or UUID
         """
-        self._delete('groups', self._build_params(uuid=group))
+        self._delete('groups', self._build_id_param(uuid=group))
 
     def delete_label(self, label):
         """
@@ -379,7 +446,7 @@ class TembaClient(BaseCursorClient):
 
         :param * label: label object or UUID
         """
-        self._delete('labels', self._build_params(uuid=label))
+        self._delete('labels', self._build_id_param(uuid=label))
 
     def delete_resthook_subscriber(self, subscriber):
         """
@@ -387,4 +454,4 @@ class TembaClient(BaseCursorClient):
 
         :param * subscriber: the resthook subscriber or id
         """
-        self._delete('resthook_subscribers', self._build_params(id=subscriber))
+        self._delete('resthook_subscribers', self._build_id_param(id=subscriber))

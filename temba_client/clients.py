@@ -123,6 +123,18 @@ class BaseClient(object):
         return params
 
     @classmethod
+    def _build_id_param(cls, **kwargs):
+        """
+        Helper method for case where an endpoint (e.g. a v2 update) requires a single identifying param (usually UUID)
+        """
+        params = cls._build_params(**kwargs)
+
+        if len(params) != 1:
+            raise ValueError("Endpoint requires a single identifier parameter")
+
+        return params
+
+    @classmethod
     def _serialize_value(cls, value):
         if isinstance(value, list) or isinstance(value, tuple):
             serialized = []
