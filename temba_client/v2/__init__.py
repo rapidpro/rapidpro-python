@@ -293,6 +293,16 @@ class TembaClient(BaseCursorClient):
         payload = self._build_params(name=name, language=language, urns=urns, fields=fields, groups=groups)
         return Contact.deserialize(self._post('contacts', None, payload))
 
+    def create_field(self, label, value_type):
+        """
+        Creates a new contact field
+
+        :param str label: field label
+        :param str value_type: field value type
+        :return: the new field
+        """
+        return Field.deserialize(self._post('fields', None, self._build_params(label=label, value_type=value_type)))
+
     def create_flow_start(self, flow, urns=None, contacts=None, groups=None, restart_participants=None, extra=None):
         """
         Creates a new flow start
@@ -389,6 +399,19 @@ class TembaClient(BaseCursorClient):
         params = self._build_id_param(**{'urn' if is_urn else 'uuid': contact})
         payload = self._build_params(name=name, language=language, urns=urns, fields=fields, groups=groups)
         return Contact.deserialize(self._post('contacts', params, self._build_params(**payload)))
+
+    def update_field(self, field, label, value_type):
+        """
+        Updates an existing contact field
+
+        :param * field: contact field object or key
+        :param str label: field label
+        :param str value_type: field value type
+        :return: the updated field
+        """
+        params = self._build_id_param(key=field)
+        payload = self._build_params(label=label, value_type=value_type)
+        return Field.deserialize(self._post('fields', params, payload))
 
     def update_group(self, group, name):
         """
