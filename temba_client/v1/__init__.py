@@ -39,8 +39,8 @@ class TembaClient(BasePagingClient):
         :param list groups: list of group objects or UUIDs
         :return: the new broadcast
         """
-        params = self._build_params(text=text, urns=urns, contacts=contacts, groups=groups)
-        return Broadcast.deserialize(self._post('broadcasts', params))
+        payload = self._build_params(text=text, urns=urns, contacts=contacts, groups=groups)
+        return Broadcast.deserialize(self._post('broadcasts', None, payload))
 
     def create_campaign(self, name, group):
         """
@@ -50,8 +50,8 @@ class TembaClient(BasePagingClient):
         :param str group: contact group object or UUID
         :return: the new campaign
         """
-        params = self._build_params(name=name, group_uuid=group)
-        return Campaign.deserialize(self._post('campaigns', params))
+        payload = self._build_params(name=name, group_uuid=group)
+        return Campaign.deserialize(self._post('campaigns', None, payload))
 
     def create_contact(self, name, urns, fields, groups):
         """
@@ -63,8 +63,8 @@ class TembaClient(BasePagingClient):
         :param list groups: list of group objects or UUIDs
         :return: the new contact
         """
-        params = self._build_params(name=name, urns=urns, fields=fields, group_uuids=groups)
-        return Contact.deserialize(self._post('contacts', params))
+        payload = self._build_params(name=name, urns=urns, fields=fields, group_uuids=groups)
+        return Contact.deserialize(self._post('contacts', None, payload))
 
     def create_event(self, campaign, relative_to, offset, unit, delivery_hour, message=None, flow=None):
         """
@@ -79,9 +79,9 @@ class TembaClient(BasePagingClient):
         :param str flow: flow object or UUID to start (optional)
         :return: the new event
         """
-        params = self._build_params(campaign_uuid=campaign, relative_to=relative_to, offset=offset, unit=unit,
-                                    delivery_hour=delivery_hour, message=message, flow_uuid=flow)
-        return Event.deserialize(self._post('events', params))
+        payload = self._build_params(campaign_uuid=campaign, relative_to=relative_to, offset=offset, unit=unit,
+                                     delivery_hour=delivery_hour, message=message, flow_uuid=flow)
+        return Event.deserialize(self._post('events', None, payload))
 
     def create_field(self, label, value_type, key=None):
         """
@@ -92,8 +92,8 @@ class TembaClient(BasePagingClient):
         :param str key: field key (optional)
         :return: the new field
         """
-        params = self._build_params(label=label, value_type=value_type, key=key)
-        return Field.deserialize(self._post('fields', params))
+        payload = self._build_params(label=label, value_type=value_type, key=key)
+        return Field.deserialize(self._post('fields', None, payload))
 
     def create_label(self, name):
         """
@@ -102,8 +102,8 @@ class TembaClient(BasePagingClient):
         :param str name: label name
         :return: the new message label
         """
-        params = self._build_params(name=name)
-        return Label.deserialize(self._post('labels', params))
+        payload = self._build_params(name=name)
+        return Label.deserialize(self._post('labels', None, payload))
 
     def create_runs(self, flow, contacts, restart_participants, extra=None):
         """
@@ -115,9 +115,9 @@ class TembaClient(BasePagingClient):
         :param dict extra: extras variables added to the flow and accessed from @extra
         :return: list of new runs
         """
-        params = self._build_params(flow_uuid=flow, contacts=contacts, restart_participants=restart_participants,
-                                    extra=extra)
-        return Run.deserialize_list(self._post('runs', params))
+        payload = self._build_params(flow_uuid=flow, contacts=contacts, restart_participants=restart_participants,
+                                     extra=extra)
+        return Run.deserialize_list(self._post('runs', None, payload))
 
     # ==================================================================================================================
     # Delete object operations
@@ -281,7 +281,7 @@ class TembaClient(BasePagingClient):
         params = self._build_params(uuid=uuids, archived=archived, label=labels, before=before, after=after)
         return Flow.deserialize_list(self._get_multiple('flows', params, pager))
 
-    def get_flow_definition(self, uuid):
+    def get_flow_definition(self, uuid):  # pragma: no cover
         """
         Gets a single flow definition by its UUID
 
@@ -426,7 +426,7 @@ class TembaClient(BasePagingClient):
         :param definition: the flow definition
         :return: the saved definition
         """
-        return FlowDefinition.deserialize(self._post('flow_definition', definition.serialize()))
+        return FlowDefinition.deserialize(self._post('flow_definition', None, definition.serialize()))
 
     # ==================================================================================================================
     # Update object operations
@@ -443,8 +443,8 @@ class TembaClient(BasePagingClient):
         :param list groups: list of group objects or UUIDs
         :return: the updated contact
         """
-        params = self._build_params(uuid=uuid, name=name, urns=urns, fields=fields, group_uuids=groups)
-        return Contact.deserialize(self._post('contacts', params))
+        payload = self._build_params(uuid=uuid, name=name, urns=urns, fields=fields, group_uuids=groups)
+        return Contact.deserialize(self._post('contacts', None, payload))
 
     def update_label(self, uuid, name):
         """
@@ -454,8 +454,8 @@ class TembaClient(BasePagingClient):
         :param str name: label name
         :return: the updated message label
         """
-        params = self._build_params(uuid=uuid, name=name)
-        return Label.deserialize(self._post('labels', params))
+        payload = self._build_params(uuid=uuid, name=name)
+        return Label.deserialize(self._post('labels', None, payload))
 
     # ==================================================================================================================
     # Bulk contact operations
@@ -469,8 +469,8 @@ class TembaClient(BasePagingClient):
         :param str group: the group name
         :param str group_uuid: the group UUID
         """
-        params = self._build_params(contacts=contacts, action='add', group=group, group_uuid=group_uuid)
-        self._post('contact_actions', params)
+        payload = self._build_params(contacts=contacts, action='add', group=group, group_uuid=group_uuid)
+        self._post('contact_actions', None, payload)
 
     def remove_contacts(self, contacts, group=None, group_uuid=None):
         """
@@ -480,8 +480,8 @@ class TembaClient(BasePagingClient):
         :param str group: the group name
         :param str group_uuid: the group UUID
         """
-        params = self._build_params(contacts=contacts, action='remove', group=group, group_uuid=group_uuid)
-        self._post('contact_actions', params)
+        payload = self._build_params(contacts=contacts, action='remove', group=group, group_uuid=group_uuid)
+        self._post('contact_actions', None, payload)
 
     def block_contacts(self, contacts):
         """
@@ -489,7 +489,7 @@ class TembaClient(BasePagingClient):
 
         :param list[str] contacts: the contact UUIDs
         """
-        self._post('contact_actions', self._build_params(contacts=contacts, action='block'))
+        self._post('contact_actions', None, self._build_params(contacts=contacts, action='block'))
 
     def unblock_contacts(self, contacts):
         """
@@ -497,7 +497,7 @@ class TembaClient(BasePagingClient):
 
         :param list[str] contacts: the contact UUIDs
         """
-        self._post('contact_actions', self._build_params(contacts=contacts, action='unblock'))
+        self._post('contact_actions', None, self._build_params(contacts=contacts, action='unblock'))
 
     def archive_contacts(self, contacts):
         """
@@ -505,7 +505,7 @@ class TembaClient(BasePagingClient):
 
         :param list[str] contacts: the contact UUIDs
         """
-        self._post('contact_actions', self._build_params(contacts=contacts, action='archive'))
+        self._post('contact_actions', None, self._build_params(contacts=contacts, action='archive'))
 
     def expire_contacts(self, contacts):
         """
@@ -513,7 +513,7 @@ class TembaClient(BasePagingClient):
 
         :param list[str] contacts: the contact UUIDs
         """
-        self._post('contact_actions', self._build_params(contacts=contacts, action='expire'))
+        self._post('contact_actions', None, self._build_params(contacts=contacts, action='expire'))
 
     def delete_contacts(self, contacts):
         """
@@ -521,7 +521,7 @@ class TembaClient(BasePagingClient):
 
         :param list[str] contacts: the contact UUIDs
         """
-        self._post('contact_actions', self._build_params(contacts=contacts, action='delete'))
+        self._post('contact_actions', None, self._build_params(contacts=contacts, action='delete'))
 
     # ==================================================================================================================
     # Bulk message operations
@@ -536,8 +536,8 @@ class TembaClient(BasePagingClient):
         :param str label: the label name
         :param str label_uuid: the label UUID
         """
-        params = self._build_params(messages=messages, action='label', label=label, label_uuid=label_uuid)
-        self._post('message_actions', params)
+        payload = self._build_params(messages=messages, action='label', label=label, label_uuid=label_uuid)
+        self._post('message_actions', None, payload)
 
     def unlabel_messages(self, messages, label=None, label_uuid=None):
         """
@@ -547,8 +547,8 @@ class TembaClient(BasePagingClient):
         :param str label: the label name
         :param str label_uuid: the label UUID
         """
-        params = self._build_params(messages=messages, action='unlabel', label=label, label_uuid=label_uuid)
-        self._post('message_actions', params)
+        payload = self._build_params(messages=messages, action='unlabel', label=label, label_uuid=label_uuid)
+        self._post('message_actions', None, payload)
 
     def archive_messages(self, messages):
         """
@@ -556,7 +556,7 @@ class TembaClient(BasePagingClient):
 
         :param list[int] messages: the message ids
         """
-        self._post('message_actions', self._build_params(messages=messages, action='archive'))
+        self._post('message_actions', None, self._build_params(messages=messages, action='archive'))
 
     def unarchive_messages(self, messages):
         """
@@ -564,7 +564,7 @@ class TembaClient(BasePagingClient):
 
         :param list[int] messages: the message ids
         """
-        self._post('message_actions', self._build_params(messages=messages, action='unarchive'))
+        self._post('message_actions', None, self._build_params(messages=messages, action='unarchive'))
 
     def delete_messages(self, messages):
         """
@@ -572,4 +572,4 @@ class TembaClient(BasePagingClient):
 
         :param list[int] messages: the message ids
         """
-        self._post('message_actions', self._build_params(messages=messages, action='delete'))
+        self._post('message_actions', None, self._build_params(messages=messages, action='delete'))

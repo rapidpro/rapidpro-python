@@ -1,11 +1,13 @@
 from __future__ import absolute_import, unicode_literals
 
 import datetime
+import json
 import pytz
 
 from mock import patch
 from requests.exceptions import ConnectionError
 from . import TembaClient
+from .types import Campaign, CampaignEvent, Contact, Field, Flow, Group, Label, Message, ResthookSubscriber
 from ..exceptions import TembaBadRequestError, TembaTokenError, TembaRateExceededError, TembaHttpError
 from ..exceptions import TembaConnectionError
 from ..tests import TembaTest, MockResponse
@@ -53,8 +55,10 @@ class TembaClientTest(TembaTest):
 
         self.assertRaisesWithMessage(TembaConnectionError, "Unable to connect to host", query.all)
 
-    def test_get_cursor(self, mock_request):
-        mock_request.return_value = MockResponse(200, self.read_json('runs_with_next'))
+    def test_get_and_resume_cursor(self, mock_request):
+        response_json = json.loads(self.read_json('runs'))
+        response_json['next'] = "https://app.rapidpro.io/api/v2/runs.json?cursor=qwerty%3D&flow=flow_uuid"
+        mock_request.return_value = MockResponse(200, json.dumps(response_json))
 
         iterator = self.client.get_runs().iterfetches(retry_on_rate_exceed=True)
         self.assertEqual(iterator.get_cursor(), None)
@@ -64,9 +68,6 @@ class TembaClientTest(TembaTest):
 
         iterator.url = None
         self.assertEqual(iterator.get_cursor(), None)
-
-    def test_resume_cursor(self, mock_request):
-        mock_request.return_value = MockResponse(200, self.read_json('runs_with_next'))
 
         iterator = self.client.get_runs().iterfetches(retry_on_rate_exceed=True, resume_cursor='qwERty=')
 
@@ -116,6 +117,10 @@ class TembaClientTest(TembaTest):
 
         self.assertRaises(TembaRateExceededError, self.client.get_runs().all, retry_on_rate_exceed=False)
         self.assertRaises(TembaRateExceededError, self.client.get_runs().all, retry_on_rate_exceed=True)
+
+    # ==================================================================================================================
+    # Fetch object operations
+    # ==================================================================================================================
 
     def test_get_boundaries(self, mock_request):
         # check no params
@@ -642,6 +647,10 @@ class TembaClientTest(TembaTest):
         self.assertEqual(query.all(), [])
         self.assertEqual(query.first(), None)
 
+    # ==================================================================================================================
+    # Create object operations
+    # ==================================================================================================================
+
     def test_create_broadcast(self, mock_request):
         mock_request.return_value = MockResponse(200, self.read_json('broadcasts', extract_result=0))
         broadcast = self.client.create_broadcast(
@@ -658,6 +667,34 @@ class TembaClientTest(TembaTest):
             'groups': ['04a4752b-0f49-480e-ae60-3a3f2bea485c']
         })
         self.assertEqual(broadcast.id, 1234)
+
+    def test_create_campaign(self, mock_request):
+        mock_request.return_value = MockResponse(201, self.read_json('campaigns', extract_result=0))
+        campaign = self.client.create_campaign(name="Reminders", group="Reporters")
+
+        self.assertRequest(mock_request, 'post', 'campaigns', data={'name': "Reminders", 'group': "Reporters"})
+        self.assertEqual(campaign.uuid, "09d23a05-47fe-11e4-bfe9-b8f6b119e9ab")
+
+    def test_create_campaign_event(self, mock_request):
+        mock_request.return_value = MockResponse(201, self.read_json('campaign_events', extract_result=0))
+        event = self.client.create_campaign_event(
+            campaign=Campaign.create(uuid="9ccae91f-b3f8-4c18-ad92-e795a2332c11"),
+            relative_to="edd",
+            offset=14,
+            unit='days',
+            delivery_hour=-1,
+            flow=Flow.create(uuid="70c38f94-ab42-4666-86fd-3c76139110d3")
+        )
+
+        self.assertRequest(mock_request, 'post', 'campaign_events', data={
+            'campaign': "9ccae91f-b3f8-4c18-ad92-e795a2332c11",
+            'relative_to': "edd",
+            'offset': 14,
+            'unit': 'days',
+            'delivery_hour': -1,
+            'flow': "70c38f94-ab42-4666-86fd-3c76139110d3"
+        })
+        self.assertEqual(event.uuid, "9e6beda-0ce2-46cd-8810-91157f261cbd")
 
     def test_create_contact(self, mock_request):
         mock_request.return_value = MockResponse(201, self.read_json('contacts', extract_result=0))
@@ -677,6 +714,13 @@ class TembaClientTest(TembaTest):
             'groups': ["d29eca7c-a475-4d8d-98ca-bff968341356"]
         })
         self.assertEqual(contact.uuid, "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
+
+    def test_create_field(self, mock_request):
+        mock_request.return_value = MockResponse(201, self.read_json('fields', extract_result=0))
+        field = self.client.create_field(label="Chat Name", value_type="text")
+
+        self.assertRequest(mock_request, 'post', 'fields', data={'label': "Chat Name", 'value_type': "text"})
+        self.assertEqual(field.key, "chat_name")
 
     def test_create_flow_start(self, mock_request):
         mock_request.return_value = MockResponse(201, self.read_json('flow_starts', extract_result=0))
@@ -723,12 +767,50 @@ class TembaClientTest(TembaTest):
         })
         self.assertEqual(subscriber.id, 1001)
 
+    # ==================================================================================================================
+    # Update object operations
+    # ==================================================================================================================
+
+    def test_update_campaign(self, mock_request):
+        mock_request.return_value = MockResponse(201, self.read_json('campaigns', extract_result=0))
+
+        # check update by UUID
+        campaign = self.client.update_campaign(campaign="09d23a05-47fe-11e4-bfe9-b8f6b119e9ab",
+                                               name="Reminders", group="Reporters")
+
+        self.assertRequest(mock_request, 'post', 'campaigns',
+                           params={'uuid': "09d23a05-47fe-11e4-bfe9-b8f6b119e9ab"},
+                           data={'name': "Reminders", 'group': "Reporters"})
+        self.assertEqual(campaign.uuid, "09d23a05-47fe-11e4-bfe9-b8f6b119e9ab")
+
+    def test_update_campaign_event(self, mock_request):
+        mock_request.return_value = MockResponse(201, self.read_json('campaign_events', extract_result=0))
+        event = self.client.update_campaign_event(
+            event=CampaignEvent.create(uuid="9e6beda-0ce2-46cd-8810-91157f261cbd"),
+            relative_to="edd",
+            offset=14,
+            unit='days',
+            delivery_hour=-1,
+            flow=Flow.create(uuid="70c38f94-ab42-4666-86fd-3c76139110d3")
+        )
+
+        self.assertRequest(mock_request, 'post', 'campaign_events',
+                           params={'uuid': "9e6beda-0ce2-46cd-8810-91157f261cbd"},
+                           data={
+                               'relative_to': "edd",
+                               'offset': 14,
+                               'unit': 'days',
+                               'delivery_hour': -1,
+                               'flow': "70c38f94-ab42-4666-86fd-3c76139110d3"
+                           })
+        self.assertEqual(event.uuid, "9e6beda-0ce2-46cd-8810-91157f261cbd")
+
     def test_update_contact(self, mock_request):
         mock_request.return_value = MockResponse(201, self.read_json('contacts', extract_result=0))
 
         # check update by UUID
         contact = self.client.update_contact(
-            uuid_or_urn="5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9",
+            contact="5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9",
             name="Joe",
             language="eng",
             urns=["tel:+250973635665"],
@@ -736,71 +818,197 @@ class TembaClientTest(TembaTest):
             groups=["d29eca7c-a475-4d8d-98ca-bff968341356"]
         )
 
-        self.assertRequest(mock_request, 'post', 'contacts', data={
-            'uuid': "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9",
-            'name': "Joe",
-            'language': "eng",
-            'urns': ["tel:+250973635665"],
-            'fields': {"nickname": "Jo", "age": 34},
-            'groups': ["d29eca7c-a475-4d8d-98ca-bff968341356"]
-        })
+        self.assertRequest(mock_request, 'post', 'contacts',
+                           params={'uuid': "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9"},
+                           data={
+                               'name': "Joe",
+                               'language': "eng",
+                               'urns': ["tel:+250973635665"],
+                               'fields': {"nickname": "Jo", "age": 34},
+                               'groups': ["d29eca7c-a475-4d8d-98ca-bff968341356"]
+                           })
         self.assertEqual(contact.uuid, "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
 
         # check partial update by URN
-        self.client.update_contact(uuid_or_urn="tel:+250973635665", language="fre")
+        self.client.update_contact(contact="tel:+250973635665", language="fre")
 
-        self.assertRequest(mock_request, 'post', 'contacts', data={'urn': "tel:+250973635665", 'language': "fre"})
+        self.assertRequest(mock_request, 'post', 'contacts',
+                           params={'urn': "tel:+250973635665"}, data={'language': "fre"})
+
+    def test_update_field(self, mock_request):
+        mock_request.return_value = MockResponse(201, self.read_json('fields', extract_result=0))
+
+        # check update by object
+        field = self.client.update_field(Field.create(key="chat_name"), label="Chat Name", value_type="text")
+
+        self.assertRequest(mock_request, 'post', 'fields',
+                           params={'key': "chat_name"},
+                           data={'label': "Chat Name", 'value_type': "text"})
+        self.assertEqual(field.key, "chat_name")
 
     def test_update_group(self, mock_request):
         mock_request.return_value = MockResponse(201, self.read_json('groups', extract_result=0))
-        group = self.client.update_group(uuid="04a4752b-0f49-480e-ae60-3a3f2bea485c", name="Reporters")
 
-        self.assertRequest(mock_request, 'post', 'groups', data={
-            'uuid': "04a4752b-0f49-480e-ae60-3a3f2bea485c",
-            'name': "Reporters"
-        })
+        # check update by UUID
+        group = self.client.update_group(group="04a4752b-0f49-480e-ae60-3a3f2bea485c", name="Reporters")
+
+        self.assertRequest(mock_request, 'post', 'groups',
+                           params={'uuid': "04a4752b-0f49-480e-ae60-3a3f2bea485c"},
+                           data={'name': "Reporters"})
         self.assertEqual(group.uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
 
     def test_update_label(self, mock_request):
         mock_request.return_value = MockResponse(201, self.read_json('labels', extract_result=0))
-        label = self.client.update_label(uuid="04a4752b-0f49-480e-ae60-3a3f2bea485c", name="Important")
 
-        self.assertRequest(mock_request, 'post', 'labels', data={
-            'uuid': "04a4752b-0f49-480e-ae60-3a3f2bea485c",
-            'name': "Important"
-        })
+        # check update by UUID
+        label = self.client.update_label(label="04a4752b-0f49-480e-ae60-3a3f2bea485c", name="Important")
+
+        self.assertRequest(mock_request, 'post', 'labels',
+                           params={'uuid': "04a4752b-0f49-480e-ae60-3a3f2bea485c"},
+                           data={'name': "Important"})
         self.assertEqual(label.uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
+
+    # ==================================================================================================================
+    # Delete object operations
+    # ==================================================================================================================
+
+    def test_delete_campaign_event(self, mock_request):
+        mock_request.return_value = MockResponse(204, "")
+
+        # check delete by object
+        self.client.delete_campaign_event(CampaignEvent.create(uuid="9e6beda-0ce2-46cd-8810-91157f261cbd"))
+
+        self.assertRequest(mock_request, 'delete', 'campaign_events',
+                           params={'uuid': "9e6beda-0ce2-46cd-8810-91157f261cbd"})
 
     def test_delete_contact(self, mock_request):
         mock_request.return_value = MockResponse(204, "")
 
+        # check delete by object
+        self.client.delete_contact(Contact.create(uuid="5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9"))
+
+        self.assertRequest(mock_request, 'delete', 'contacts', params={'uuid': "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9"})
+
         # check delete by UUID
-        self.client.delete_contact(uuid_or_urn="5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
+        self.client.delete_contact("5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
 
         self.assertRequest(mock_request, 'delete', 'contacts', params={'uuid': "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9"})
 
         # check delete by URN
-        self.client.delete_contact(uuid_or_urn="tel:+250973635665")
+        self.client.delete_contact("tel:+250973635665")
 
         self.assertRequest(mock_request, 'delete', 'contacts', params={'urn': "tel:+250973635665"})
+
+        # error if neither is provided
+        self.assertRaises(ValueError, self.client.delete_contact, None)
 
     def test_delete_group(self, mock_request):
         mock_request.return_value = MockResponse(204, "")
 
-        self.client.delete_group(uuid="04a4752b-0f49-480e-ae60-3a3f2bea485c")
+        # check delete by object
+        self.client.delete_group(Group.create(uuid="04a4752b-0f49-480e-ae60-3a3f2bea485c"))
+
+        self.assertRequest(mock_request, 'delete', 'groups', params={'uuid': "04a4752b-0f49-480e-ae60-3a3f2bea485c"})
+
+        # check delete by UUID
+        self.client.delete_group("04a4752b-0f49-480e-ae60-3a3f2bea485c")
 
         self.assertRequest(mock_request, 'delete', 'groups', params={'uuid': "04a4752b-0f49-480e-ae60-3a3f2bea485c"})
 
     def test_delete_label(self, mock_request):
         mock_request.return_value = MockResponse(204, "")
 
-        self.client.delete_label(uuid="5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
+        # check delete by object
+        self.client.delete_label(Label.create(uuid="5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9"))
+
+        self.assertRequest(mock_request, 'delete', 'labels', params={'uuid': "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9"})
+
+        # check delete by UUID
+        self.client.delete_label("5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
 
         self.assertRequest(mock_request, 'delete', 'labels', params={'uuid': "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9"})
 
     def test_delete_resthook_subscriber(self, mock_request):
         mock_request.return_value = MockResponse(204, "")
 
-        self.client.delete_resthook_subscriber(id=1001)
+        # check delete by object
+        self.client.delete_resthook_subscriber(ResthookSubscriber.create(id=1001))
 
         self.assertRequest(mock_request, 'delete', 'resthook_subscribers', params={'id': 1001})
+
+        # check delete by id
+        self.client.delete_resthook_subscriber(1001)
+
+        self.assertRequest(mock_request, 'delete', 'resthook_subscribers', params={'id': 1001})
+
+    # ==================================================================================================================
+    # Bulk object operations
+    # ==================================================================================================================
+
+    def test_contact_actions(self, mock_request):
+        mock_request.return_value = MockResponse(204, "")
+
+        contacts = [
+            Contact.create(uuid="bfff9984-38f4-4e59-998d-3663ec3c650d"),
+            "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9",
+            "tel:+250783835665"
+        ]
+        resolved_contacts = [
+            "bfff9984-38f4-4e59-998d-3663ec3c650d",
+            "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9",
+            "tel:+250783835665"
+        ]
+
+        self.client.bulk_add_contacts(contacts=contacts, group="Testers")
+        self.assertRequest(mock_request, 'post', 'contact_actions',
+                           data={'contacts': resolved_contacts, 'action': 'add', 'group': "Testers"})
+
+        self.client.bulk_remove_contacts(contacts=contacts, group="Testers")
+        self.assertRequest(mock_request, 'post', 'contact_actions',
+                           data={'contacts': resolved_contacts, 'action': 'remove', 'group': "Testers"})
+
+        self.client.bulk_block_contacts(contacts=contacts)
+        self.assertRequest(mock_request, 'post', 'contact_actions',
+                           data={'contacts': resolved_contacts, 'action': 'block'})
+
+        self.client.bulk_unblock_contacts(contacts=contacts)
+        self.assertRequest(mock_request, 'post', 'contact_actions',
+                           data={'contacts': resolved_contacts, 'action': 'unblock'})
+
+        self.client.bulk_expire_contacts(contacts=contacts)
+        self.assertRequest(mock_request, 'post', 'contact_actions',
+                           data={'contacts': resolved_contacts, 'action': 'expire'})
+
+        self.client.bulk_archive_contacts(contacts=contacts)
+        self.assertRequest(mock_request, 'post', 'contact_actions',
+                           data={'contacts': resolved_contacts, 'action': 'archive'})
+
+        self.client.bulk_delete_contacts(contacts=contacts)
+        self.assertRequest(mock_request, 'post', 'contact_actions',
+                           data={'contacts': resolved_contacts, 'action': 'delete'})
+
+    def test_message_actions(self, mock_request):
+        mock_request.return_value = MockResponse(204, "")
+
+        messages = [Message.create(id=1001), 1002]
+        resolved_messages = [1001, 1002]
+
+        self.client.bulk_label_messages(messages=messages, label="Testing")
+        self.assertRequest(mock_request, 'post', 'message_actions',
+                           data={'messages': resolved_messages, 'action': 'label', 'label': "Testing"})
+
+        self.client.bulk_unlabel_messages(messages=messages, label="Testing")
+        self.assertRequest(mock_request, 'post', 'message_actions',
+                           data={'messages': resolved_messages, 'action': 'unlabel', 'label': "Testing"})
+
+        self.client.bulk_archive_messages(messages=messages)
+        self.assertRequest(mock_request, 'post', 'message_actions',
+                           data={'messages': resolved_messages, 'action': 'archive'})
+
+        self.client.bulk_restore_messages(messages=messages)
+        self.assertRequest(mock_request, 'post', 'message_actions',
+                           data={'messages': resolved_messages, 'action': 'restore'})
+
+        self.client.bulk_delete_messages(messages=messages)
+        self.assertRequest(mock_request, 'post', 'message_actions',
+                           data={'messages': resolved_messages, 'action': 'delete'})

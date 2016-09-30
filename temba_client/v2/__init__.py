@@ -5,6 +5,8 @@ This version of the API is still under development and so is subject to change w
 that users continue using the existing API v1.
 """
 
+import six
+
 from .types import Boundary, Broadcast, Campaign, CampaignEvent, Channel, ChannelEvent, Contact, Export, Field
 from .types import FlowStart, Flow, Group, Label, Message, Org, Resthook, ResthookSubscriber, ResthookEvent, Run
 from ..clients import BaseCursorClient
@@ -246,8 +248,36 @@ class TembaClient(BaseCursorClient):
         :param list groups: list of group objects or UUIDs
         :return: the new broadcast
         """
-        params = self._build_params(text=text, urns=urns, contacts=contacts, groups=groups)
-        return Broadcast.deserialize(self._post('broadcasts', params))
+        payload = self._build_params(text=text, urns=urns, contacts=contacts, groups=groups)
+        return Broadcast.deserialize(self._post('broadcasts', None, payload))
+
+    def create_campaign(self, name, group):
+        """
+        Creates a new campaign
+
+        :param str name: campaign name
+        :param * group: group object, UUID or name
+        :return: the new campaign
+        """
+        payload = self._build_params(name=name, group=group)
+        return Campaign.deserialize(self._post('campaigns', None, payload))
+
+    def create_campaign_event(self, campaign, relative_to, offset, unit, delivery_hour, message=None, flow=None):
+        """
+        Creates a new campaign event
+
+        :param * campaign: campaign object, UUID or name
+        :param str relative_to: contact field key
+        :param int offset:
+        :param str unit:
+        :param int delivery_hour:
+        :param str message:
+        :param * flow: flow object, UUID or name
+        :return: the new campaign
+        """
+        payload = self._build_params(campaign=campaign, relative_to=relative_to, offset=offset, unit=unit,
+                                     delivery_hour=delivery_hour, message=message, flow=flow)
+        return CampaignEvent.deserialize(self._post('campaign_events', None, payload))
 
     def create_contact(self, name=None, language=None, urns=None, fields=None, groups=None):
         """
@@ -257,11 +287,21 @@ class TembaClient(BaseCursorClient):
         :param str language: the language code, e.g. "eng"
         :param list[str] urns: list of URN strings
         :param dict[str,str] fields: dictionary of contact field values
-        :param list groups: list of group objects or UUIDs
+        :param list groups: list of group objects, UUIDs or names
         :return: the new contact
         """
-        params = self._build_params(name=name, language=language, urns=urns, fields=fields, groups=groups)
-        return Contact.deserialize(self._post('contacts', params))
+        payload = self._build_params(name=name, language=language, urns=urns, fields=fields, groups=groups)
+        return Contact.deserialize(self._post('contacts', None, payload))
+
+    def create_field(self, label, value_type):
+        """
+        Creates a new contact field
+
+        :param str label: field label
+        :param str value_type: field value type
+        :return: the new field
+        """
+        return Field.deserialize(self._post('fields', None, self._build_params(label=label, value_type=value_type)))
 
     def create_flow_start(self, flow, urns=None, contacts=None, groups=None, restart_participants=None, extra=None):
         """
@@ -275,9 +315,9 @@ class TembaClient(BaseCursorClient):
         :param * extra: a dictionary of extra parameters to pass to the flow
         :return: the new label
         """
-        params = self._build_params(flow=flow, urns=urns, contacts=contacts, groups=groups,
-                                    restart_participants=restart_participants, extra=extra)
-        return FlowStart.deserialize(self._post('flow_starts', params))
+        payload = self._build_params(flow=flow, urns=urns, contacts=contacts, groups=groups,
+                                     restart_participants=restart_participants, extra=extra)
+        return FlowStart.deserialize(self._post('flow_starts', None, payload))
 
     def create_group(self, name):
         """
@@ -286,7 +326,7 @@ class TembaClient(BaseCursorClient):
         :param str name: group name
         :return: the new group
         """
-        return Group.deserialize(self._post('groups', self._build_params(name=name)))
+        return Group.deserialize(self._post('groups', None, self._build_params(name=name)))
 
     def create_label(self, name):
         """
@@ -295,7 +335,7 @@ class TembaClient(BaseCursorClient):
         :param str name: label name
         :return: the new label
         """
-        return Label.deserialize(self._post('labels', self._build_params(name=name)))
+        return Label.deserialize(self._post('labels', None, self._build_params(name=name)))
 
     def create_resthook_subscriber(self, resthook, target_url):
         """
@@ -305,18 +345,49 @@ class TembaClient(BaseCursorClient):
         :param target_url: the target URL
         :return: the new subscriber
         """
-        params = self._build_params(resthook=resthook, target_url=target_url)
-        return ResthookSubscriber.deserialize(self._post('resthook_subscribers', params))
+        payload = self._build_params(resthook=resthook, target_url=target_url)
+        return ResthookSubscriber.deserialize(self._post('resthook_subscribers', None, payload))
 
     # ==================================================================================================================
     # Update object operations
     # ==================================================================================================================
 
-    def update_contact(self, uuid_or_urn, name=None, language=None, urns=None, fields=None, groups=None):
+    def update_campaign(self, campaign, name, group):
+        """
+        Updates an existing campaign
+
+        :param * campaign: campaign object, UUID or URN
+        :param str name: campaign name
+        :param * group: group object, UUID or name
+        :return: the updated campaign
+        """
+        params = self._build_id_param(uuid=campaign)
+        payload = self._build_params(name=name, group=group)
+        return Campaign.deserialize(self._post('campaigns', params, payload))
+
+    def update_campaign_event(self, event, relative_to, offset, unit, delivery_hour, message=None, flow=None):
+        """
+        Updates an existing campaign event
+
+        :param * event: campaign event object, UUID or name
+        :param str relative_to: contact field key
+        :param int offset:
+        :param str unit:
+        :param int delivery_hour:
+        :param str message:
+        :param * flow: flow object, UUID or name
+        :return: the new campaign
+        """
+        params = self._build_id_param(uuid=event)
+        payload = self._build_params(relative_to=relative_to, offset=offset, unit=unit,
+                                     delivery_hour=delivery_hour, message=message, flow=flow)
+        return CampaignEvent.deserialize(self._post('campaign_events', params, payload))
+
+    def update_contact(self, contact, name=None, language=None, urns=None, fields=None, groups=None):
         """
         Updates an existing contact
 
-        :param str uuid_or_urn: contact UUID or URN
+        :param * contact: contact object, UUID or URN
         :param str name: full name
         :param str language: the language code, e.g. "eng"
         :param list[str] urns: list of URN strings
@@ -324,63 +395,190 @@ class TembaClient(BaseCursorClient):
         :param list groups: list of group objects or UUIDs
         :return: the updated contact
         """
-        params = dict(name=name, language=language, urns=urns, fields=fields, groups=groups)
-        params['urn' if ':' in uuid_or_urn else 'uuid'] = uuid_or_urn
-        return Contact.deserialize(self._post('contacts', self._build_params(**params)))
+        is_urn = isinstance(contact, six.string_types) and ':' in contact
+        params = self._build_id_param(**{'urn' if is_urn else 'uuid': contact})
+        payload = self._build_params(name=name, language=language, urns=urns, fields=fields, groups=groups)
+        return Contact.deserialize(self._post('contacts', params, self._build_params(**payload)))
 
-    def update_group(self, uuid, name):
+    def update_field(self, field, label, value_type):
+        """
+        Updates an existing contact field
+
+        :param * field: contact field object or key
+        :param str label: field label
+        :param str value_type: field value type
+        :return: the updated field
+        """
+        params = self._build_id_param(key=field)
+        payload = self._build_params(label=label, value_type=value_type)
+        return Field.deserialize(self._post('fields', params, payload))
+
+    def update_group(self, group, name):
         """
         Updates an existing contact group
 
-        :param str uuid: group UUID
+        :param * group: group object or UUID
         :param str name: group name
         :return: the updated group
         """
-        return Group.deserialize(self._post('groups', self._build_params(uuid=uuid, name=name)))
+        return Group.deserialize(self._post('groups', self._build_id_param(uuid=group), self._build_params(name=name)))
 
-    def update_label(self, uuid, name):
+    def update_label(self, label, name):
         """
         Updates an existing message label
 
-        :param str uuid: label UUID
+        :param * label: label object or UUID
         :param str name: label name
         :return: the updated label
         """
-        return Label.deserialize(self._post('labels', self._build_params(uuid=uuid, name=name)))
+        return Label.deserialize(self._post('labels', self._build_id_param(uuid=label), self._build_params(name=name)))
 
     # ==================================================================================================================
     # Delete object operations
     # ==================================================================================================================
 
-    def delete_contact(self, uuid_or_urn):
-        """
-        Deletes an existing contact
-
-        :param str uuid_or_urn: contact UUID or URN
-        """
-        params = {'urn' if ':' in uuid_or_urn else 'uuid': uuid_or_urn}
-        self._delete('contacts', self._build_params(**params))
-
-    def delete_group(self, uuid):
+    def delete_campaign_event(self, event):
         """
         Deletes an existing contact group
 
-        :param str uuid: group UUID
+        :param * event: campaign event object or UUID
         """
-        self._delete('groups', self._build_params(uuid=uuid))
+        self._delete('campaign_events', self._build_id_param(uuid=event))
 
-    def delete_label(self, uuid):
+    def delete_contact(self, contact):
+        """
+        Deletes an existing contact
+
+        :param * contact: contact object, UUID or URN
+        """
+        is_urn = isinstance(contact, six.string_types) and ':' in contact
+        params = self._build_id_param(**{'urn' if is_urn else 'uuid': contact})
+        self._delete('contacts', params)
+
+    def delete_group(self, group):
+        """
+        Deletes an existing contact group
+
+        :param * group: group object or UUID
+        """
+        self._delete('groups', self._build_id_param(uuid=group))
+
+    def delete_label(self, label):
         """
         Deletes an existing message label
 
-        :param str uuid: label UUID
+        :param * label: label object or UUID
         """
-        self._delete('labels', self._build_params(uuid=uuid))
+        self._delete('labels', self._build_id_param(uuid=label))
 
-    def delete_resthook_subscriber(self, id):
+    def delete_resthook_subscriber(self, subscriber):
         """
         Deletes an existing resthook subscriber
 
-        :param id: the resthook subscriber id
+        :param * subscriber: the resthook subscriber or id
         """
-        self._delete('resthook_subscribers', self._build_params(id=id))
+        self._delete('resthook_subscribers', self._build_id_param(id=subscriber))
+
+    # ==================================================================================================================
+    # Bulk object operations
+    # ==================================================================================================================
+
+    def bulk_add_contacts(self, contacts, group):
+        """
+        Adds contacts to a group
+
+        :param list[*] contacts: contact objects, UUIDs or URNs
+        :param * group: contact group object or UUID
+        """
+        self._post('contact_actions', None, self._build_params(contacts=contacts, action='add', group=group))
+
+    def bulk_remove_contacts(self, contacts, group):
+        """
+        Removes contacts from a group
+
+        :param list[*] contacts: contact objects, UUIDs or URNs
+        :param * group: contact group object or UUID
+        """
+        self._post('contact_actions', None, self._build_params(contacts=contacts, action='remove', group=group))
+
+    def bulk_block_contacts(self, contacts):
+        """
+        Blocks contacts
+
+        :param list[*] contacts: contact objects, UUIDs or URNs
+        """
+        self._post('contact_actions', None, self._build_params(contacts=contacts, action='block'))
+
+    def bulk_unblock_contacts(self, contacts):
+        """
+        Un-blocks contacts
+
+        :param list[*] contacts: contact objects, UUIDs or URNs
+        """
+        self._post('contact_actions', None, self._build_params(contacts=contacts, action='unblock'))
+
+    def bulk_expire_contacts(self, contacts):
+        """
+        Expires active flow runs for contacts
+
+        :param list[*] contacts: contact objects, UUIDs or URNs
+        """
+        self._post('contact_actions', None, self._build_params(contacts=contacts, action='expire'))
+
+    def bulk_archive_contacts(self, contacts):
+        """
+        Archives all messages for contacts
+
+        :param list[*] contacts: contact objects, UUIDs or URNs
+        """
+        self._post('contact_actions', None, self._build_params(contacts=contacts, action='archive'))
+
+    def bulk_delete_contacts(self, contacts):
+        """
+        Deletes contacts
+
+        :param list[*] contacts: contact objects, UUIDs or URNs
+        """
+        self._post('contact_actions', None, self._build_params(contacts=contacts, action='delete'))
+
+    def bulk_label_messages(self, messages, label):
+        """
+        Labels messages
+
+        :param list[*] messages: message objects or ids
+        :param * label: label object or UUID
+        """
+        self._post('message_actions', None, self._build_params(messages=messages, action='label', label=label))
+
+    def bulk_unlabel_messages(self, messages, label):
+        """
+        Un-labels messages
+
+        :param list[*] messages: message objects or ids
+        :param * label: label object or UUID
+        """
+        self._post('message_actions', None, self._build_params(messages=messages, action='unlabel', label=label))
+
+    def bulk_archive_messages(self, messages):
+        """
+        Archives messages
+
+        :param list[*] messages: message objects or ids
+        """
+        self._post('message_actions', None, self._build_params(messages=messages, action='archive'))
+
+    def bulk_restore_messages(self, messages):
+        """
+        Restores previously archived messages
+
+        :param list[*] messages: message objects or ids
+        """
+        self._post('message_actions', None, self._build_params(messages=messages, action='restore'))
+
+    def bulk_delete_messages(self, messages):
+        """
+        Deletes messages
+
+        :param list[*] messages: message objects or ids
+        """
+        self._post('message_actions', None, self._build_params(messages=messages, action='delete'))

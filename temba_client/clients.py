@@ -53,12 +53,12 @@ class BaseClient(object):
                 'Authorization': 'Token %s' % token,
                 'User-Agent': user_agent_header}
 
-    def _post(self, endpoint, payload):
+    def _post(self, endpoint, params, payload):
         """
         POSTs to the given endpoint which must return a single item or list of items
         """
         url = '%s/%s.json' % (self.root_url, endpoint)
-        return self._request('post', url, body=payload)
+        return self._request('post', url, params=params, body=payload)
 
     def _delete(self, endpoint, params):
         """
@@ -123,6 +123,18 @@ class BaseClient(object):
         return params
 
     @classmethod
+    def _build_id_param(cls, **kwargs):
+        """
+        Helper method for case where an endpoint (e.g. a v2 update) requires a single identifying param (usually UUID)
+        """
+        params = cls._build_params(**kwargs)
+
+        if len(params) != 1:
+            raise ValueError("Endpoint requires a single identifier parameter")
+
+        return params
+
+    @classmethod
     def _serialize_value(cls, value):
         if isinstance(value, list) or isinstance(value, tuple):
             serialized = []
@@ -132,8 +144,10 @@ class BaseClient(object):
         elif isinstance(value, TembaObject):
             if hasattr(value, 'uuid'):
                 return value.uuid
-            elif hasattr(value, 'id'):
+            elif hasattr(value, 'id'):  # messages, runs, etc
                 return value.id
+            elif hasattr(value, 'key'):  # fields
+                return value.key
         elif isinstance(value, datetime.datetime):
             return format_iso8601(value)
         elif isinstance(value, bool):
