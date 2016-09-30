@@ -144,8 +144,10 @@ class BaseClient(object):
         elif isinstance(value, TembaObject):
             if hasattr(value, 'uuid'):
                 return value.uuid
-            elif hasattr(value, 'id'):
+            elif hasattr(value, 'id'):  # messages, runs, etc
                 return value.id
+            elif hasattr(value, 'key'):  # fields
+                return value.key
         elif isinstance(value, datetime.datetime):
             return format_iso8601(value)
         elif isinstance(value, bool):

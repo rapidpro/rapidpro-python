@@ -7,7 +7,7 @@ import pytz
 from mock import patch
 from requests.exceptions import ConnectionError
 from . import TembaClient
-from .types import Campaign, CampaignEvent, Contact, Flow, Group, Label, Message, ResthookSubscriber
+from .types import Campaign, CampaignEvent, Contact, Field, Flow, Group, Label, Message, ResthookSubscriber
 from ..exceptions import TembaBadRequestError, TembaTokenError, TembaRateExceededError, TembaHttpError
 from ..exceptions import TembaConnectionError
 from ..tests import TembaTest, MockResponse
@@ -722,6 +722,13 @@ class TembaClientTest(TembaTest):
         })
         self.assertEqual(contact.uuid, "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9")
 
+    def test_create_field(self, mock_request):
+        mock_request.return_value = MockResponse(201, self.read_json('fields', extract_result=0))
+        field = self.client.create_field(label="Chat Name", value_type="text")
+
+        self.assertRequest(mock_request, 'post', 'fields', data={'label': "Chat Name", 'value_type': "text"})
+        self.assertEqual(field.key, "chat_name")
+
     def test_create_flow_start(self, mock_request):
         mock_request.return_value = MockResponse(201, self.read_json('flow_starts', extract_result=0))
         start = self.client.create_flow_start(flow="f5901b62-ba76-4003-9c62-72fdacc1b7b7",
@@ -834,6 +841,17 @@ class TembaClientTest(TembaTest):
 
         self.assertRequest(mock_request, 'post', 'contacts',
                            params={'urn': "tel:+250973635665"}, data={'language': "fre"})
+
+    def test_update_field(self, mock_request):
+        mock_request.return_value = MockResponse(201, self.read_json('fields', extract_result=0))
+
+        # check update by object
+        field = self.client.update_field(Field.create(key="chat_name"), label="Chat Name", value_type="text")
+
+        self.assertRequest(mock_request, 'post', 'fields',
+                           params={'key': "chat_name"},
+                           data={'label': "Chat Name", 'value_type': "text"})
+        self.assertEqual(field.key, "chat_name")
 
     def test_update_group(self, mock_request):
         mock_request.return_value = MockResponse(201, self.read_json('groups', extract_result=0))
