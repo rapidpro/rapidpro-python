@@ -478,3 +478,107 @@ class TembaClient(BaseCursorClient):
         :param * subscriber: the resthook subscriber or id
         """
         self._delete('resthook_subscribers', self._build_id_param(id=subscriber))
+
+    # ==================================================================================================================
+    # Bulk object operations
+    # ==================================================================================================================
+
+    def bulk_add_contacts(self, contacts, group):
+        """
+        Adds contacts to a group
+
+        :param list[*] contacts: contact objects, UUIDs or URNs
+        :param * group: contact group object or UUID
+        """
+        self._post('contact_actions', None, self._build_params(contacts=contacts, action='add', group=group))
+
+    def bulk_remove_contacts(self, contacts, group):
+        """
+        Removes contacts from a group
+
+        :param list[*] contacts: contact objects, UUIDs or URNs
+        :param * group: contact group object or UUID
+        """
+        self._post('contact_actions', None, self._build_params(contacts=contacts, action='remove', group=group))
+
+    def bulk_block_contacts(self, contacts):
+        """
+        Blocks contacts
+
+        :param list[*] contacts: contact objects, UUIDs or URNs
+        """
+        self._post('contact_actions', None, self._build_params(contacts=contacts, action='block'))
+
+    def bulk_unblock_contacts(self, contacts):
+        """
+        Un-blocks contacts
+
+        :param list[*] contacts: contact objects, UUIDs or URNs
+        """
+        self._post('contact_actions', None, self._build_params(contacts=contacts, action='unblock'))
+
+    def bulk_expire_contacts(self, contacts):
+        """
+        Expires active flow runs for contacts
+
+        :param list[*] contacts: contact objects, UUIDs or URNs
+        """
+        self._post('contact_actions', None, self._build_params(contacts=contacts, action='expire'))
+
+    def bulk_archive_contacts(self, contacts):
+        """
+        Archives all messages for contacts
+
+        :param list[*] contacts: contact objects, UUIDs or URNs
+        """
+        self._post('contact_actions', None, self._build_params(contacts=contacts, action='archive'))
+
+    def bulk_delete_contacts(self, contacts):
+        """
+        Deletes contacts
+
+        :param list[*] contacts: contact objects, UUIDs or URNs
+        """
+        self._post('contact_actions', None, self._build_params(contacts=contacts, action='delete'))
+
+    def bulk_label_messages(self, messages, label):
+        """
+        Labels messages
+
+        :param list[*] messages: message objects or ids
+        :param * label: label object or UUID
+        """
+        self._post('message_actions', None, self._build_params(messages=messages, action='label', label=label))
+
+    def bulk_unlabel_messages(self, messages, label):
+        """
+        Un-labels messages
+
+        :param list[*] messages: message objects or ids
+        :param * label: label object or UUID
+        """
+        self._post('message_actions', None, self._build_params(messages=messages, action='unlabel', label=label))
+
+    def bulk_archive_messages(self, messages):
+        """
+        Archives messages
+
+        :param list[*] messages: message objects or ids
+        """
+        self._post('message_actions', None, self._build_params(messages=messages, action='archive'))
+
+    def bulk_restore_messages(self, messages):
+        """
+        Restores previously archived messages
+
+        :param list[*] messages: message objects or ids
+        """
+        self._post('message_actions', None, self._build_params(messages=messages, action='restore'))
+
+    def bulk_delete_messages(self, messages):
+        """
+        Deletes messages
+
+        :param list[*] messages: message objects or ids
+        """
+        self._post('message_actions', None, self._build_params(messages=messages, action='delete'))

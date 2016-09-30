@@ -7,7 +7,7 @@ import pytz
 from mock import patch
 from requests.exceptions import ConnectionError
 from . import TembaClient
-from .types import Campaign, CampaignEvent, Contact, Field, Flow, Group, Label, ResthookSubscriber
+from .types import Campaign, CampaignEvent, Contact, Field, Flow, Group, Label, Message, ResthookSubscriber
 from ..exceptions import TembaBadRequestError, TembaTokenError, TembaRateExceededError, TembaHttpError
 from ..exceptions import TembaConnectionError
 from ..tests import TembaTest, MockResponse
@@ -117,6 +117,10 @@ class TembaClientTest(TembaTest):
 
         self.assertRaises(TembaRateExceededError, self.client.get_runs().all, retry_on_rate_exceed=False)
         self.assertRaises(TembaRateExceededError, self.client.get_runs().all, retry_on_rate_exceed=True)
+
+    # ==================================================================================================================
+    # Fetch object operations
+    # ==================================================================================================================
 
     def test_get_boundaries(self, mock_request):
         # check no params
@@ -650,6 +654,10 @@ class TembaClientTest(TembaTest):
         self.assertEqual(query.all(), [])
         self.assertEqual(query.first(), None)
 
+    # ==================================================================================================================
+    # Create object operations
+    # ==================================================================================================================
+
     def test_create_broadcast(self, mock_request):
         mock_request.return_value = MockResponse(200, self.read_json('broadcasts', extract_result=0))
         broadcast = self.client.create_broadcast(
@@ -766,6 +774,10 @@ class TembaClientTest(TembaTest):
         })
         self.assertEqual(subscriber.id, 1001)
 
+    # ==================================================================================================================
+    # Update object operations
+    # ==================================================================================================================
+
     def test_update_campaign(self, mock_request):
         mock_request.return_value = MockResponse(201, self.read_json('campaigns', extract_result=0))
 
@@ -863,6 +875,10 @@ class TembaClientTest(TembaTest):
                            data={'name': "Important"})
         self.assertEqual(label.uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
 
+    # ==================================================================================================================
+    # Delete object operations
+    # ==================================================================================================================
+
     def test_delete_campaign_event(self, mock_request):
         mock_request.return_value = MockResponse(204, "")
 
@@ -931,3 +947,75 @@ class TembaClientTest(TembaTest):
         self.client.delete_resthook_subscriber(1001)
 
         self.assertRequest(mock_request, 'delete', 'resthook_subscribers', params={'id': 1001})
+
+    # ==================================================================================================================
+    # Bulk object operations
+    # ==================================================================================================================
+
+    def test_contact_actions(self, mock_request):
+        mock_request.return_value = MockResponse(204, "")
+
+        contacts = [
+            Contact.create(uuid="bfff9984-38f4-4e59-998d-3663ec3c650d"),
+            "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9",
+            "tel:+250783835665"
+        ]
+        resolved_contacts = [
+            "bfff9984-38f4-4e59-998d-3663ec3c650d",
+            "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9",
+            "tel:+250783835665"
+        ]
+
+        self.client.bulk_add_contacts(contacts=contacts, group="Testers")
+        self.assertRequest(mock_request, 'post', 'contact_actions',
+                           data={'contacts': resolved_contacts, 'action': 'add', 'group': "Testers"})
+
+        self.client.bulk_remove_contacts(contacts=contacts, group="Testers")
+        self.assertRequest(mock_request, 'post', 'contact_actions',
+                           data={'contacts': resolved_contacts, 'action': 'remove', 'group': "Testers"})
+
+        self.client.bulk_block_contacts(contacts=contacts)
+        self.assertRequest(mock_request, 'post', 'contact_actions',
+                           data={'contacts': resolved_contacts, 'action': 'block'})
+
+        self.client.bulk_unblock_contacts(contacts=contacts)
+        self.assertRequest(mock_request, 'post', 'contact_actions',
+                           data={'contacts': resolved_contacts, 'action': 'unblock'})
+
+        self.client.bulk_expire_contacts(contacts=contacts)
+        self.assertRequest(mock_request, 'post', 'contact_actions',
+                           data={'contacts': resolved_contacts, 'action': 'expire'})
+
+        self.client.bulk_archive_contacts(contacts=contacts)
+        self.assertRequest(mock_request, 'post', 'contact_actions',
+                           data={'contacts': resolved_contacts, 'action': 'archive'})
+
+        self.client.bulk_delete_contacts(contacts=contacts)
+        self.assertRequest(mock_request, 'post', 'contact_actions',
+                           data={'contacts': resolved_contacts, 'action': 'delete'})
+
+    def test_message_actions(self, mock_request):
+        mock_request.return_value = MockResponse(204, "")
+
+        messages = [Message.create(id=1001), 1002]
+        resolved_messages = [1001, 1002]
+
+        self.client.bulk_label_messages(messages=messages, label="Testing")
+        self.assertRequest(mock_request, 'post', 'message_actions',
+                           data={'messages': resolved_messages, 'action': 'label', 'label': "Testing"})
+
+        self.client.bulk_unlabel_messages(messages=messages, label="Testing")
+        self.assertRequest(mock_request, 'post', 'message_actions',
+                           data={'messages': resolved_messages, 'action': 'unlabel', 'label': "Testing"})
+
+        self.client.bulk_archive_messages(messages=messages)
+        self.assertRequest(mock_request, 'post', 'message_actions',
+                           data={'messages': resolved_messages, 'action': 'archive'})
+
+        self.client.bulk_restore_messages(messages=messages)
+        self.assertRequest(mock_request, 'post', 'message_actions',
+                           data={'messages': resolved_messages, 'action': 'restore'})
+
+        self.client.bulk_delete_messages(messages=messages)
+        self.assertRequest(mock_request, 'post', 'message_actions',
+                           data={'messages': resolved_messages, 'action': 'delete'})
