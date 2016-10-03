@@ -982,9 +982,9 @@ class TembaClientTest(TembaTest):
         self.assertRequest(mock_request, 'post', 'contact_actions',
                            data={'contacts': resolved_contacts, 'action': 'unblock'})
 
-        self.client.bulk_expire_contacts(contacts=contacts)
+        self.client.bulk_interrupt_contacts(contacts=contacts)
         self.assertRequest(mock_request, 'post', 'contact_actions',
-                           data={'contacts': resolved_contacts, 'action': 'expire'})
+                           data={'contacts': resolved_contacts, 'action': 'interrupt'})
 
         self.client.bulk_archive_contacts(contacts=contacts)
         self.assertRequest(mock_request, 'post', 'contact_actions',

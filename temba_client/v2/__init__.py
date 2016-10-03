@@ -517,13 +517,13 @@ class TembaClient(BaseCursorClient):
         """
         self._post('contact_actions', None, self._build_params(contacts=contacts, action='unblock'))
 
-    def bulk_expire_contacts(self, contacts):
+    def bulk_interrupt_contacts(self, contacts):
         """
-        Expires active flow runs for contacts
+        Interrupt active flow runs for contacts
 
         :param list[*] contacts: contact objects, UUIDs or URNs
         """
-        self._post('contact_actions', None, self._build_params(contacts=contacts, action='expire'))
+        self._post('contact_actions', None, self._build_params(contacts=contacts, action='interrupt'))
 
     def bulk_archive_contacts(self, contacts):
         """
