@@ -541,23 +541,27 @@ class TembaClient(BaseCursorClient):
         """
         self._post('contact_actions', None, self._build_params(contacts=contacts, action='delete'))
 
-    def bulk_label_messages(self, messages, label):
+    def bulk_label_messages(self, messages, label=None, label_name=None):
         """
         Labels messages
 
         :param list[*] messages: message objects or ids
-        :param * label: label object or UUID
+        :param * label: existing label object or UUID
+        :param str label_name: label name which can be created if required
         """
-        self._post('message_actions', None, self._build_params(messages=messages, action='label', label=label))
+        payload = self._build_params(messages=messages, action='label', label=label, label_name=label_name)
+        self._post('message_actions', None, payload)
 
-    def bulk_unlabel_messages(self, messages, label):
+    def bulk_unlabel_messages(self, messages, label=None, label_name=None):
         """
         Un-labels messages
 
         :param list[*] messages: message objects or ids
-        :param * label: label object or UUID
+        :param * label: existing label object or UUID
+        :param str label_name: label name which is ignored if doesn't exist
         """
-        self._post('message_actions', None, self._build_params(messages=messages, action='unlabel', label=label))
+        payload = self._build_params(messages=messages, action='unlabel', label=label, label_name=label_name)
+        self._post('message_actions', None, payload)
 
     def bulk_archive_messages(self, messages):
         """

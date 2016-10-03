@@ -1000,13 +1000,23 @@ class TembaClientTest(TembaTest):
         messages = [Message.create(id=1001), 1002]
         resolved_messages = [1001, 1002]
 
-        self.client.bulk_label_messages(messages=messages, label="Testing")
+        self.client.bulk_label_messages(messages=messages, label="Testing", label_name="Spam")
         self.assertRequest(mock_request, 'post', 'message_actions',
-                           data={'messages': resolved_messages, 'action': 'label', 'label': "Testing"})
+                           data={
+                               'messages': resolved_messages,
+                               'action': 'label',
+                               'label': "Testing",
+                               'label_name': "Spam"
+                           })
 
-        self.client.bulk_unlabel_messages(messages=messages, label="Testing")
+        self.client.bulk_unlabel_messages(messages=messages, label="Testing", label_name="Spam")
         self.assertRequest(mock_request, 'post', 'message_actions',
-                           data={'messages': resolved_messages, 'action': 'unlabel', 'label': "Testing"})
+                           data={
+                               'messages': resolved_messages,
+                               'action': 'unlabel',
+                               'label': "Testing",
+                               'label_name': "Spam"
+                           })
 
         self.client.bulk_archive_messages(messages=messages)
         self.assertRequest(mock_request, 'post', 'message_actions',
