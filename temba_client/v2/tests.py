@@ -453,9 +453,12 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].count, 4)
 
         # check with all params
-        self.client.get_groups(uuid="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a").all()
+        self.client.get_groups(uuid="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a", name="Testers").all()
 
-        self.assertRequest(mock_request, 'get', 'groups', params={'uuid': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a"})
+        self.assertRequest(mock_request, 'get', 'groups', params={
+            'uuid': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
+            'name': "Testers"
+        })
 
     def test_get_labels(self, mock_request):
         # check no params
@@ -472,9 +475,12 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].count, 4)
 
         # check with all params
-        self.client.get_labels(uuid="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a").all()
+        self.client.get_labels(uuid="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a", name="Testing").all()
 
-        self.assertRequest(mock_request, 'get', 'labels', params={'uuid': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a"})
+        self.assertRequest(mock_request, 'get', 'labels', params={
+            'uuid': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
+            'name': "Testing"
+        })
 
     def test_get_messages(self, mock_request):
         # check no params
