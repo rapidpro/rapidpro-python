@@ -146,23 +146,25 @@ class TembaClient(BaseCursorClient):
         """
         return self._get_query('flow_starts', self._build_params(id=id), FlowStart)
 
-    def get_groups(self, uuid=None):
+    def get_groups(self, uuid=None, name=None):
         """
         Gets all matching contact groups
 
         :param uuid: group UUID
+        :param name: group name
         :return: group query
         """
-        return self._get_query('groups', self._build_params(uuid=uuid), Group)
+        return self._get_query('groups', self._build_params(uuid=uuid, name=name), Group)
 
-    def get_labels(self, uuid=None):
+    def get_labels(self, uuid=None, name=None):
         """
         Gets all matching message labels
 
         :param uuid: label UUID
+        :param name: label name
         :return: label query
         """
-        return self._get_query('labels', self._build_params(uuid=uuid), Label)
+        return self._get_query('labels', self._build_params(uuid=uuid, name=name), Label)
 
     def get_messages(self, id=None, broadcast=None, contact=None, folder=None, label=None, before=None, after=None):
         """
