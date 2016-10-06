@@ -36,7 +36,7 @@ def format_iso8601(value):
     Formats a datetime as a UTC ISO8601 date or returns None if value is None
     """
     if value is None:
-        return
+        return None
 
     _format = ISO8601_DATETIME_FORMAT + '.%f'
 
