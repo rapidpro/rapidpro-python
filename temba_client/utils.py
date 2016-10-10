@@ -31,7 +31,7 @@ def parse_iso8601(value):
     return datetime.datetime.strptime(value, _format).replace(tzinfo=pytz.utc)
 
 
-def format_iso8601(value):
+def format_iso8601(value, micros=False):
     """
     Formats a datetime as a UTC ISO8601 date or returns None if value is None
     """
@@ -40,7 +40,8 @@ def format_iso8601(value):
 
     _format = ISO8601_DATETIME_FORMAT + '.%f'
 
-    return six.text_type(value.astimezone(pytz.UTC).strftime(_format))
+    as_str = six.text_type(value.astimezone(pytz.UTC).strftime(_format))
+    return (as_str if micros else as_str[:-3]) + 'Z'
 
 
 def request(method, url, **kwargs):  # pragma: no cover
