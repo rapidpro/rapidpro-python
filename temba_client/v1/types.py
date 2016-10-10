@@ -165,6 +165,18 @@ class Run(TembaObject):
 
         return run
 
+    def serialize(self):
+        item = {}
+
+        for attr_name, field in six.iteritems(self._get_fields()):
+            attr_value = getattr(self, attr_name, None)
+            field_value = field.serialize(attr_value)
+
+            field_source = field.src if field.src else six.text_type(attr_name)
+            item[field_source] = field_value
+
+        return item
+
 
 class Geometry(TembaObject):
     type = SimpleField()
