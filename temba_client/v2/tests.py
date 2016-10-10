@@ -173,8 +173,8 @@ class TembaClientTest(TembaTest):
 
         self.assertRequest(mock_request, 'get', 'broadcasts', params={
             'id': 12345,
-            'after': "2014-12-12T22:34:36.978123",
-            'before': "2014-12-12T22:56:58.917123"
+            'after': "2014-12-12T22:34:36.978Z",
+            'before': "2014-12-12T22:56:58.917Z"
         })
 
     def test_get_campaigns(self, mock_request):
@@ -298,8 +298,8 @@ class TembaClientTest(TembaTest):
         self.assertRequest(mock_request, 'get', 'channel_events', params={
             'id': 12345,
             'contact': "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9",
-            'after': "2014-12-12T22:34:36.978123",
-            'before': "2014-12-12T22:56:58.917123"
+            'after': "2014-12-12T22:34:36.978Z",
+            'before': "2014-12-12T22:56:58.917Z"
         })
 
     def test_get_contacts(self, mock_request):
@@ -340,8 +340,8 @@ class TembaClientTest(TembaTest):
             'urn': "tel:+250973635665",
             'group': "Customers",
             'deleted': False,
-            'after': "2014-12-12T22:34:36.978123",
-            'before': "2014-12-12T22:56:58.917123"
+            'after': "2014-12-12T22:34:36.978Z",
+            'before': "2014-12-12T22:56:58.917Z"
         })
 
     def test_get_definitions(self, mock_request):
@@ -526,8 +526,8 @@ class TembaClientTest(TembaTest):
             'contact': "d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
             'folder': "inbox",
             'label': "Spam",
-            'after': "2014-12-12T22:34:36.978123",
-            'before': "2014-12-12T22:56:58.917123"
+            'after': "2014-12-12T22:34:36.978Z",
+            'before': "2014-12-12T22:56:58.917Z"
         })
 
     def test_get_org(self, mock_request):
@@ -649,8 +649,8 @@ class TembaClientTest(TembaTest):
             'flow': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
             'contact': "d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
             'responded': True,
-            'after': "2014-12-12T22:34:36.978123",
-            'before': "2014-12-12T22:56:58.917123"
+            'after': "2014-12-12T22:34:36.978Z",
+            'before': "2014-12-12T22:56:58.917Z"
         })
 
         # check when result is empty

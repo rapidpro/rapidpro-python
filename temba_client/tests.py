@@ -69,11 +69,24 @@ class UtilsTest(TembaTest):
             return datetime.timedelta(hours=-5)
 
     def test_format_iso8601(self):
-        d = datetime.datetime(2014, 1, 2, 3, 4, 5, 6, UtilsTest.TestTZ())
-        self.assertEqual(format_iso8601(d), '2014-01-02T08:04:05.000006')
+        d = datetime.datetime(2014, 1, 2, 3, 4, 5, 0, UtilsTest.TestTZ())
+        self.assertEqual(format_iso8601(d), '2014-01-02T08:04:05.000Z')
 
     def test_format_iso8601_should_return_none_when_no_datetime_given(self):
         self.assertIs(format_iso8601(None), None)
+
+    def test_format_iso8601_should_include_time_zone_designator(self):
+        dt = datetime.datetime(2014, 1, 2, 3, 4, 5, 0, pytz.UTC)
+        self.assertEqual(format_iso8601(dt)[-1:], 'Z')
+
+    def test_format_iso8601_should_use_millisecond_precision_by_default(self):
+        dt = datetime.datetime(2014, 1, 2, 3, 4, 5, 0, pytz.UTC)
+        self.assertEqual(format_iso8601(dt), '2014-01-02T03:04:05.000Z')
+
+    def test_format_iso8601_should_use_microsecond_precision_when_asked(self):
+        dt = datetime.datetime(2014, 1, 2, 3, 4, 5, 6, pytz.UTC)
+        self.assertEqual(format_iso8601(dt, micros=True),
+                         '2014-01-02T03:04:05.000006Z')
 
     def test_parse_iso8601(self):
         dt = datetime.datetime(2014, 1, 2, 3, 4, 5, 0, pytz.UTC)
@@ -175,7 +188,7 @@ class TembaObjectTest(TembaTest):
         json_obj = obj.serialize()
         self.assertEqual(json_obj, {'foo': 'a',
                                     'bar': 123,
-                                    'doh': '2014-01-02T03:04:05.000000',
+                                    'doh': '2014-01-02T03:04:05.000Z',
                                     'gem': {'zed': 'a'},
                                     'hum': [{'zed': 'b'}]})
 
