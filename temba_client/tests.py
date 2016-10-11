@@ -138,6 +138,21 @@ class FieldsTest(TembaTest):
         self.assertRaises(TembaSerializationException, field.deserialize, None)
         self.assertRaises(TembaSerializationException, field.deserialize, "")
 
+    def test_object_dict(self):
+        field = ObjectDictField(item_class=TestSubType)
+        self.assertEqual(field.serialize({'a': TestSubType.create(zed='c'), 'b': TestSubType.create(zed=2)}),
+                         {'a': {'zed': 'c'}, 'b': {'zed': 2}})
+
+        self.assertRaises(TembaSerializationException, field.serialize, "Not a list")
+
+        obj_dict = field.deserialize({'a': {'zed': 'c'}, 'b': {'zed': 2}})
+        self.assertEqual(len(obj_dict), 2)
+        self.assertEqual(obj_dict['a'].zed, 'c')
+        self.assertEqual(obj_dict['b'].zed, 2)
+
+        self.assertRaises(TembaSerializationException, field.deserialize, None)
+        self.assertRaises(TembaSerializationException, field.deserialize, "")
+
 
 class TembaObjectTest(TembaTest):
     def test_create(self):
