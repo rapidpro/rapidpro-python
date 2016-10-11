@@ -38,7 +38,7 @@ def format_iso8601(value):
     if value is None:
         return None
 
-    _format = ISO8601_DATETIME_FORMAT + '.%f'
+    _format = ISO8601_DATETIME_FORMAT + '.%fZ'
 
     return six.text_type(value.astimezone(pytz.UTC).strftime(_format))
 

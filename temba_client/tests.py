@@ -70,9 +70,8 @@ class UtilsTest(TembaTest):
 
     def test_format_iso8601(self):
         d = datetime.datetime(2014, 1, 2, 3, 4, 5, 6, UtilsTest.TestTZ())
-        self.assertEqual(format_iso8601(d), '2014-01-02T08:04:05.000006')
-
-    def test_format_iso8601_should_return_none_when_no_datetime_given(self):
+        self.assertEqual(format_iso8601(d), '2014-01-02T08:04:05.000006Z')
+        # it should return None when no datetime given
         self.assertIs(format_iso8601(None), None)
 
     def test_parse_iso8601(self):
@@ -175,7 +174,7 @@ class TembaObjectTest(TembaTest):
         json_obj = obj.serialize()
         self.assertEqual(json_obj, {'foo': 'a',
                                     'bar': 123,
-                                    'doh': '2014-01-02T03:04:05.000000',
+                                    'doh': '2014-01-02T03:04:05.000000Z',
                                     'gem': {'zed': 'a'},
                                     'hum': [{'zed': 'b'}]})
 
