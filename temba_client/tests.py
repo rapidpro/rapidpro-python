@@ -71,13 +71,8 @@ class UtilsTest(TembaTest):
     def test_format_iso8601(self):
         d = datetime.datetime(2014, 1, 2, 3, 4, 5, 6, UtilsTest.TestTZ())
         self.assertEqual(format_iso8601(d), '2014-01-02T08:04:05.000006Z')
-
-    def test_format_iso8601_should_return_none_when_no_datetime_given(self):
+        # it should return None when no datetime given
         self.assertIs(format_iso8601(None), None)
-
-    def test_format_iso8601_should_include_time_zone_designator(self):
-        dt = datetime.datetime(2014, 1, 2, 3, 4, 5, 0, pytz.UTC)
-        self.assertEqual(format_iso8601(dt)[-1:], 'Z')
 
     def test_parse_iso8601(self):
         dt = datetime.datetime(2014, 1, 2, 3, 4, 5, 0, pytz.UTC)
