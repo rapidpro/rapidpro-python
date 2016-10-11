@@ -453,9 +453,12 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].count, 4)
 
         # check with all params
-        self.client.get_groups(uuid="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a").all()
+        self.client.get_groups(uuid="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a", name="Testers").all()
 
-        self.assertRequest(mock_request, 'get', 'groups', params={'uuid': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a"})
+        self.assertRequest(mock_request, 'get', 'groups', params={
+            'uuid': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
+            'name': "Testers"
+        })
 
     def test_get_labels(self, mock_request):
         # check no params
@@ -472,9 +475,12 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].count, 4)
 
         # check with all params
-        self.client.get_labels(uuid="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a").all()
+        self.client.get_labels(uuid="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a", name="Testing").all()
 
-        self.assertRequest(mock_request, 'get', 'labels', params={'uuid': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a"})
+        self.assertRequest(mock_request, 'get', 'labels', params={
+            'uuid': "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
+            'name': "Testing"
+        })
 
     def test_get_messages(self, mock_request):
         # check no params
@@ -975,9 +981,9 @@ class TembaClientTest(TembaTest):
         self.assertRequest(mock_request, 'post', 'contact_actions',
                            data={'contacts': resolved_contacts, 'action': 'unblock'})
 
-        self.client.bulk_expire_contacts(contacts=contacts)
+        self.client.bulk_interrupt_contacts(contacts=contacts)
         self.assertRequest(mock_request, 'post', 'contact_actions',
-                           data={'contacts': resolved_contacts, 'action': 'expire'})
+                           data={'contacts': resolved_contacts, 'action': 'interrupt'})
 
         self.client.bulk_archive_contacts(contacts=contacts)
         self.assertRequest(mock_request, 'post', 'contact_actions',
@@ -993,13 +999,23 @@ class TembaClientTest(TembaTest):
         messages = [Message.create(id=1001), 1002]
         resolved_messages = [1001, 1002]
 
-        self.client.bulk_label_messages(messages=messages, label="Testing")
+        self.client.bulk_label_messages(messages=messages, label="Testing", label_name="Spam")
         self.assertRequest(mock_request, 'post', 'message_actions',
-                           data={'messages': resolved_messages, 'action': 'label', 'label': "Testing"})
+                           data={
+                               'messages': resolved_messages,
+                               'action': 'label',
+                               'label': "Testing",
+                               'label_name': "Spam"
+                           })
 
-        self.client.bulk_unlabel_messages(messages=messages, label="Testing")
+        self.client.bulk_unlabel_messages(messages=messages, label="Testing", label_name="Spam")
         self.assertRequest(mock_request, 'post', 'message_actions',
-                           data={'messages': resolved_messages, 'action': 'unlabel', 'label': "Testing"})
+                           data={
+                               'messages': resolved_messages,
+                               'action': 'unlabel',
+                               'label': "Testing",
+                               'label_name': "Spam"
+                           })
 
         self.client.bulk_archive_messages(messages=messages)
         self.assertRequest(mock_request, 'post', 'message_actions',

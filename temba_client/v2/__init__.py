@@ -146,23 +146,25 @@ class TembaClient(BaseCursorClient):
         """
         return self._get_query('flow_starts', self._build_params(id=id), FlowStart)
 
-    def get_groups(self, uuid=None):
+    def get_groups(self, uuid=None, name=None):
         """
         Gets all matching contact groups
 
         :param uuid: group UUID
+        :param name: group name
         :return: group query
         """
-        return self._get_query('groups', self._build_params(uuid=uuid), Group)
+        return self._get_query('groups', self._build_params(uuid=uuid, name=name), Group)
 
-    def get_labels(self, uuid=None):
+    def get_labels(self, uuid=None, name=None):
         """
         Gets all matching message labels
 
         :param uuid: label UUID
+        :param name: label name
         :return: label query
         """
-        return self._get_query('labels', self._build_params(uuid=uuid), Label)
+        return self._get_query('labels', self._build_params(uuid=uuid, name=name), Label)
 
     def get_messages(self, id=None, broadcast=None, contact=None, folder=None, label=None, before=None, after=None):
         """
@@ -517,13 +519,13 @@ class TembaClient(BaseCursorClient):
         """
         self._post('contact_actions', None, self._build_params(contacts=contacts, action='unblock'))
 
-    def bulk_expire_contacts(self, contacts):
+    def bulk_interrupt_contacts(self, contacts):
         """
-        Expires active flow runs for contacts
+        Interrupt active flow runs for contacts
 
         :param list[*] contacts: contact objects, UUIDs or URNs
         """
-        self._post('contact_actions', None, self._build_params(contacts=contacts, action='expire'))
+        self._post('contact_actions', None, self._build_params(contacts=contacts, action='interrupt'))
 
     def bulk_archive_contacts(self, contacts):
         """
@@ -541,23 +543,27 @@ class TembaClient(BaseCursorClient):
         """
         self._post('contact_actions', None, self._build_params(contacts=contacts, action='delete'))
 
-    def bulk_label_messages(self, messages, label):
+    def bulk_label_messages(self, messages, label=None, label_name=None):
         """
         Labels messages
 
         :param list[*] messages: message objects or ids
-        :param * label: label object or UUID
+        :param * label: existing label object or UUID
+        :param str label_name: label name which can be created if required
         """
-        self._post('message_actions', None, self._build_params(messages=messages, action='label', label=label))
+        payload = self._build_params(messages=messages, action='label', label=label, label_name=label_name)
+        self._post('message_actions', None, payload)
 
-    def bulk_unlabel_messages(self, messages, label):
+    def bulk_unlabel_messages(self, messages, label=None, label_name=None):
         """
         Un-labels messages
 
         :param list[*] messages: message objects or ids
-        :param * label: label object or UUID
+        :param * label: existing label object or UUID
+        :param str label_name: label name which is ignored if doesn't exist
         """
-        self._post('message_actions', None, self._build_params(messages=messages, action='unlabel', label=label))
+        payload = self._build_params(messages=messages, action='unlabel', label=label, label_name=label_name)
+        self._post('message_actions', None, payload)
 
     def bulk_archive_messages(self, messages):
         """
