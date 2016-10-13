@@ -208,6 +208,8 @@ class Run(TembaObject):
     class Value(TembaObject):
         value = SimpleField()
         category = SimpleField()
+        node = SimpleField()
+        time = DatetimeField()
 
     id = IntegerField()
     flow = ObjectField(item_class=ObjectRef)
