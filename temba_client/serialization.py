@@ -144,3 +144,17 @@ class ObjectListField(ObjectField):
             raise TembaSerializationException("Value '%s' field is not a list" % six.text_type(value))
 
         return [self.item_class.serialize(item) for item in value]
+
+
+class ObjectDictField(ObjectField):
+    def deserialize(self, value):
+        if not isinstance(value, dict):
+            raise TembaSerializationException("Value '%s' field is not a dict" % six.text_type(value))
+
+        return {key: self.item_class.deserialize(item) for key, item in six.iteritems(value)}
+
+    def serialize(self, value):
+        if not isinstance(value, dict):
+            raise TembaSerializationException("Value '%s' field is not a dict" % six.text_type(value))
+
+        return {key: self.item_class.serialize(item) for key, item in six.iteritems(value)}
