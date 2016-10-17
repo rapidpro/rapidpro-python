@@ -205,6 +205,10 @@ class ResthookSubscriber(TembaObject):
 
 
 class Run(TembaObject):
+    class Step(TembaObject):
+        node = SimpleField()
+        time = DatetimeField()
+
     class Value(TembaObject):
         value = SimpleField()
         category = SimpleField()
@@ -215,6 +219,7 @@ class Run(TembaObject):
     flow = ObjectField(item_class=ObjectRef)
     contact = ObjectField(item_class=ObjectRef)
     responded = BooleanField()
+    path = ObjectListField(item_class=Step)
     values = ObjectDictField(item_class=Value)
     created_on = DatetimeField()
     modified_on = DatetimeField()
