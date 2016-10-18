@@ -1,22 +1,19 @@
 language: python
 python:
-- '2.7'
+ - '2.7'
+ - '3.4'
+ - '3.5'
 sudo: false
 cache:
   directories:
   - $HOME/.cache/pip
-env:
-- TOXENV=py27
-- TOXENV=py34
 install:
-- pip install -q --use-mirrors tox
-- pip install coveralls
-- pip install flake8
+ - pip install -r requirements/tests.txt
 script:
-- tox
-- flake8
+ - nosetests --with-coverage --cover-erase --cover-package=temba_client
+ - flake8
 after_success:
-- coveralls
+ - coveralls
 notifications:
   slack:
     secure: F6HxphE09WAOd1ux2oEzrgKAoyCLGqauqR/nH5vXHVFUZrKZHvGmhCPFKkLHJnpeNIE4l4xMtRAqNb5EuFJJzjO5myNJ2Ihx1pfYUJF+5GuYvWttpdRrPh6MSVmR3/oZWSKD67abrVKhX85zg4RNLz7RmblooSbPLa8Jj+p72/s=
