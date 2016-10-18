@@ -1,7 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 
 from ..serialization import TembaObject, SimpleField, BooleanField, IntegerField, DatetimeField, ObjectField
-from ..serialization import ObjectListField
+from ..serialization import ObjectListField, ObjectDictField
 
 
 class ObjectRef(TembaObject):
@@ -206,24 +206,21 @@ class ResthookSubscriber(TembaObject):
 
 class Run(TembaObject):
     class Step(TembaObject):
-        class MessageRef(TembaObject):
-            id = IntegerField()
-            broadcast = IntegerField()
-            text = SimpleField()
-
         node = SimpleField()
-        messages = ObjectListField(item_class=MessageRef)
+        time = DatetimeField()
+
+    class Value(TembaObject):
         value = SimpleField()
         category = SimpleField()
-        type = SimpleField()
-        arrived_on = DatetimeField()
-        left_on = DatetimeField()
+        node = SimpleField()
+        time = DatetimeField()
 
     id = IntegerField()
     flow = ObjectField(item_class=ObjectRef)
     contact = ObjectField(item_class=ObjectRef)
     responded = BooleanField()
-    steps = ObjectListField(item_class=Step)
+    path = ObjectListField(item_class=Step)
+    values = ObjectDictField(item_class=Value)
     created_on = DatetimeField()
     modified_on = DatetimeField()
     exited_on = DatetimeField()

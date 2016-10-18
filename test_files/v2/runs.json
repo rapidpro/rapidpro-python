@@ -7,54 +7,26 @@
             "flow": {"uuid": "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a", "name": "Water Survey"},
             "contact": {"uuid": "d33e9ad5-5c35-414c-abd4-e7451c69ff1d", "name": "Frank McFlow"},
             "responded": true,
-            "steps": [
-                {
-                    "node": "ca6c092a-1615-474e-ab64-4e7ce75a808f",
-                    "category": null,
-                    "left_on": "2015-08-26T10:04:10.006241Z",
-                    "messages": [
-                        {
-                            "id": 1234567,
-                            "broadcast": 2345,
-                            "text": "Hi Bobby, is your water filter working? Answer with Yes or No."
-                        }
-                    ],
-                    "value": null,
-                    "arrived_on": "2015-08-26T10:04:09.824114Z",
-                    "type": "actionset"
-                },
-                {
-                    "node": "858c1184-4180-47de-bbbd-5f46587d35ce",
-                    "category": "Yes",
-                    "left_on": "2015-08-26T10:05:47.509180Z",
-                    "messages": [
-                        {
-                            "id": 1234568,
-                            "broadcast": null,
-                            "text": "Hi Bobby, is your water filter working? Answer with Yes or No."
-                        }
-                    ],
-                    "text": "yes",
-                    "value": "yes",
-                    "arrived_on": "2015-08-26T10:04:10.006241Z",
-                    "type": "ruleset"
-                },
-                {
-                    "node": "ea136a93-d03d-4f2b-b08a-ff43831d0c64",
-                    "category": null,
-                    "left_on": null,
-                    "messages": [
-                        {
-                            "id": 1234569,
-                            "broadcast": 2346,
-                            "text": "Great to hear, Thanks for your time!"
-                        }
-                    ],
-                    "value": null,
-                    "arrived_on": "2015-08-26T10:05:47.512854Z",
-                    "type": "actionset"
-                }
+            "path": [
+                {"node": "27a86a1b-6cc4-4ae3-b73d-89650966a82f", "time": "2015-11-11T13:05:50.457742Z"},
+                {"node": "fc32aeb0-ac3e-42a8-9ea7-10248fdf52a1", "time": "2015-11-11T13:03:51.635662Z"},
+                {"node": "93a624ad-5440-415e-b49f-17bf42754acb", "time": "2015-11-11T13:03:52.532151Z"},
+                {"node": "4c9cb68d-474f-4b9a-b65e-c2aa593a3466", "time": "2015-11-11T13:05:57.576056Z"}
             ],
+            "values": {
+                "color": {
+                    "value": "blue",
+                    "category": "Blue",
+                    "node": "fc32aeb0-ac3e-42a8-9ea7-10248fdf52a1",
+                    "time": "2015-11-11T13:03:51.635662Z"
+                },
+                "reason": {
+                    "value": "Because it's the color of sky",
+                    "category": "All Responses",
+                    "node": "4c9cb68d-474f-4b9a-b65e-c2aa593a3466",
+                    "time": "2015-11-11T13:05:57.576056Z"
+                }
+            },
             "created_on": "2015-08-26T10:04:09.737686Z",
             "modified_on": "2015-08-26T10:05:47.516562Z",
             "exited_on": "2015-08-26T10:05:47.516562Z",
@@ -65,26 +37,8 @@
             "flow": {"uuid": "7b75bcb0-3c86-482f-bdce-06a3d6cd5cf7", "name": "Test"},
             "contact": {"uuid": "d33e9ad5-5c35-414c-abd4-e7451c69ff1d", "name": "Frank McFlow"},
             "responded": false,
-            "steps": [
-                {
-                    "node": "f11213ae-f71a-4109-8d97-a4434bfa34b6",
-                    "category": null,
-                    "left_on": "2015-05-22T06:31:52.593473Z",
-                    "messages": [],
-                    "value": null,
-                    "arrived_on": "2015-05-22T06:31:52.479766Z",
-                    "type": "actionset"
-                },
-                {
-                    "node": "6af73c98-677b-4703-9b33-24057d8ef1dc",
-                    "category": null,
-                    "left_on": null,
-                    "messages": [],
-                    "value": null,
-                    "arrived_on": "2015-05-22T06:31:52.593473Z",
-                    "type": "ruleset"
-                }
-            ],
+            "path": [],
+            "values": {},
             "created_on": "2015-05-22T06:31:52.463317Z",
             "modified_on": "2015-05-29T06:32:04.061007Z",
             "exited_on": "2015-05-29T06:32:04.061007Z",
