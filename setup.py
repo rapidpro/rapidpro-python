@@ -2,9 +2,10 @@ from setuptools import setup, find_packages
 
 try:
     import pypandoc
-    long_description = pypandoc.convert('README.md', 'rst')
+    long_description = pypandoc.convert('README.md', 'rst', 'md')
 except ImportError:
-    long_description = open('README.md').read()
+    print("Warning: pypandoc module not found, could not convert Markdown to RST")
+    long_description = open('README.md', 'r').read()
 
 
 def _is_requirement(line):
