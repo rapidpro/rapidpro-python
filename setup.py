@@ -1,5 +1,11 @@
 from setuptools import setup, find_packages
 
+try:
+    import pypandoc
+    long_description = pypandoc.convert('README.md', 'rst')
+except ImportError:
+    long_description = open('README.md').read()
+
 
 def _is_requirement(line):
     """Returns whether the line is a valid package requirement."""
@@ -21,12 +27,14 @@ setup(
     name='rapidpro-python',
     version=__import__('temba_client').__version__,
     description='Python client library for the RapidPro',
+    long_description=long_description,
+
+    keywords='rapidpro client',
     url='https://github.com/rapidpro',
+    license='BSD',
 
     author='Nyaruka',
     author_email='code@nyaruka.com',
-
-    license='BSD',
 
     classifiers=[
         'Development Status :: 5 - Production/Stable',
@@ -37,7 +45,6 @@ setup(
         'Programming Language :: Python :: 3',
     ],
 
-    keywords='rapidpro client',
     packages=find_packages(),
     install_requires=required_packages,
 
