@@ -120,6 +120,7 @@ class Field(TembaObject):
 
 class Flow(TembaObject):
     class Runs(TembaObject):
+        active = IntegerField()
         completed = IntegerField()
         interrupted = IntegerField()
         expired = IntegerField()

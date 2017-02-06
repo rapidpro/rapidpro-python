@@ -398,6 +398,7 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].labels[0].name, "Important")
         self.assertEqual(results[0].expires, 600)
         self.assertEqual(results[0].created_on, datetime.datetime(2014, 6, 23, 9, 34, 12, 866000, pytz.utc))
+        self.assertEqual(results[0].runs.active, 56)
         self.assertEqual(results[0].runs.completed, 123)
         self.assertEqual(results[0].runs.interrupted, 2)
         self.assertEqual(results[0].runs.expired, 34)
