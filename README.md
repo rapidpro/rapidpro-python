@@ -20,16 +20,13 @@ Example
 -------
 
 ```python
-from temba_client.v1 import TembaClient
+from temba_client.v2 import TembaClient
 client = TembaClient('rapidpro.io', 'your-api-token')
-for contact in client.get_contacts():
+for contact in client.get_contacts(group='Reporters').iterfetches(retry_on_rate_exceed=True):
     print(contact.name)
-
-client.create_broadcast(text="Howdy", contacts=contacts[0:5])
-client.block_contacts(contacts[1:3])
 ```
 
-If you don't know your API token then visit the [API Explorer](http://rapidpro.io/api/v1/explorer)
+If you don't know your API token then visit the [API Explorer](http://rapidpro.io/api/v2/explorer)
 
 Development
 -----------
