@@ -143,6 +143,17 @@ class TembaClientTest(TembaTest):
             [[[29.5025959, -3.2634468], [29.4886074, -3.2496493], [29.4170303, -3.2721906]]]
         ])
 
+        results = self.client.get_boundaries(geometry=False).all()
+
+        self.assertRequest(mock_request, 'get', 'boundaries', params={'geometry': False})
+
+        results = self.client.get_boundaries(geometry=True).all()
+
+        self.assertRequest(mock_request, 'get', 'boundaries', params={'geometry': True})
+
+
+
+
     def test_get_broadcasts(self, mock_request):
         # check no params
         mock_request.return_value = MockResponse(200, self.read_json('broadcasts'))
