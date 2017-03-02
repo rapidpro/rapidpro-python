@@ -27,13 +27,14 @@ class TembaClient(BaseCursorClient):
     # Fetch object operations
     # ==================================================================================================================
 
-    def get_boundaries(self):
+    def get_boundaries(self, geometry=None):
         """
         Gets all administrative boundaries
 
         :return: boundary query
         """
-        return self._get_query('boundaries', {}, Boundary)
+        params = self._build_params(geometry=geometry)
+        return self._get_query('boundaries', params, Boundary)
 
     def get_broadcasts(self, id=None, before=None, after=None):
         """
