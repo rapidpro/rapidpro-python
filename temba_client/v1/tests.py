@@ -843,3 +843,23 @@ class TembaClientTest(TembaTest):
             self.assertEqual(six.text_type(ex), "xyz")
         else:
             self.fail("Should have thrown exception")
+
+
+@patch('temba_client.clients.request')
+class TembaClientVerifyTest(TembaTest):
+
+    def test_verify_false(self, mock_request):
+        client = TembaClient('example.com', '12345', verify_ssl=False)
+        self.assertFalse(client.verify_ssl)
+
+    def test_verify_true(self, mock_request):
+        client = TembaClient('example.com', '12345', verify_ssl=True)
+        self.assertTrue(client.verify_ssl)
+
+    def test_verify_path(self, mock_request):
+        client = TembaClient('example.com', '12345', verify_ssl='/path/to/cert')
+        self.assertEqual(client.verify_ssl, '/path/to/cert')
+
+    def test_verify_notset(self, mock_request):
+        client = TembaClient('example.com', '12345')
+        self.assertEqual(client.verify_ssl, None)

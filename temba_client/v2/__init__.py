@@ -20,8 +20,8 @@ class TembaClient(BaseCursorClient):
     :param str token: organization API token
     :param str user_agent: string to be included in the User-Agent header
     """
-    def __init__(self, host, token, user_agent=None, verify=None):
-        super(TembaClient, self).__init__(host, token, 2, user_agent, verify)
+    def __init__(self, host, token, user_agent=None, verify_ssl=None):
+        super(TembaClient, self).__init__(host, token, 2, user_agent, verify_ssl)
 
     # ==================================================================================================================
     # Fetch object operations
