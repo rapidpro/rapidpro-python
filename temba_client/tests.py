@@ -51,7 +51,7 @@ class TembaTest(unittest.TestCase):
                                 headers={'Content-type': 'application/json',
                                          'Authorization': 'Token 1234567890',
                                          'Accept': u'application/json',
-                                         'User-Agent': 'test/0.1 rapidpro-python/%s' % __version__}, **kwargs)
+                                         'User-Agent': 'test/0.1 rapidpro-python/%s' % __version__}, verify=None, **kwargs)
         mock.reset_mock()
 
     def assertRequest(self, mock, method, endpoint, **kwargs):
@@ -226,14 +226,14 @@ class BaseClientTest(TembaTest):
         client = BaseClientTest.Client('http://example.com/', '1234567890', 1)
         self.assertEqual(client.root_url, 'http://example.com/api/v1')
 
-        # verify parameter for requests
+        # verify_ssl parameter for requests
         client = BaseClientTest.Client('example.com', '1234567890', 2)
-        self.assertEqual(client.verify, None)
-        client = BaseClientTest.Client('example.com', '1234567890', 2, verify=False)
-        self.assertFalse(client.verify)
-        client = BaseClientTest.Client('example.com', '1234567890', 2, verify='/path/to/certfile')
-        self.assertTrue(client.verify)
-        self.assertEqual(client.verify, '/path/to/certfile')
+        self.assertEqual(client.verify_ssl, None)
+        client = BaseClientTest.Client('example.com', '1234567890', 2, verify_ssl=False)
+        self.assertFalse(client.verify_ssl)
+        client = BaseClientTest.Client('example.com', '1234567890', 2, verify_ssl='/path/to/certfile')
+        self.assertTrue(client.verify_ssl)
+        self.assertEqual(client.verify_ssl, '/path/to/certfile')
 
 
 # ====================================================================================
