@@ -226,6 +226,15 @@ class BaseClientTest(TembaTest):
         client = BaseClientTest.Client('http://example.com/', '1234567890', 1)
         self.assertEqual(client.root_url, 'http://example.com/api/v1')
 
+        # verify parameter for requests
+        client = BaseClientTest.Client('example.com', '1234567890', 2)
+        self.assertEqual(client.verify, None)
+        client = BaseClientTest.Client('example.com', '1234567890', 2, verify=False)
+        self.assertFalse(client.verify)
+        client = BaseClientTest.Client('example.com', '1234567890', 2, verify='/path/to/certfile')
+        self.assertTrue(client.verify)
+        self.assertEqual(client.verify, '/path/to/certfile')
+
 
 # ====================================================================================
 # Test utilities
