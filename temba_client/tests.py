@@ -51,7 +51,8 @@ class TembaTest(unittest.TestCase):
                                 headers={'Content-type': 'application/json',
                                          'Authorization': 'Token 1234567890',
                                          'Accept': u'application/json',
-                                         'User-Agent': 'test/0.1 rapidpro-python/%s' % __version__}, verify=None, **kwargs)
+                                         'User-Agent': 'test/0.1 rapidpro-python/%s' % __version__},
+                                verify=None, **kwargs)
         mock.reset_mock()
 
     def assertRequest(self, mock, method, endpoint, **kwargs):
