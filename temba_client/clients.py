@@ -29,7 +29,7 @@ class BaseClient(object):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, host, token, api_version, user_agent=None):
+    def __init__(self, host, token, api_version, user_agent=None, verify_ssl=None):
         if host.startswith('http'):
             host_url = host
             if host_url.endswith('/'):  # trim a final slash
@@ -40,6 +40,8 @@ class BaseClient(object):
         self.root_url = '%s/api/v%d' % (host_url, api_version)
 
         self.headers = self._headers(token, user_agent)
+
+        self.verify_ssl = verify_ssl
 
     @staticmethod
     def _headers(token, user_agent):
@@ -80,6 +82,8 @@ class BaseClient(object):
                 kwargs['data'] = body
             if params:
                 kwargs['params'] = params
+
+            kwargs['verify'] = self.verify_ssl
 
             response = request(method, url, **kwargs)
 
