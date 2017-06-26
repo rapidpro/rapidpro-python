@@ -426,7 +426,7 @@ class TembaClientTest(TembaTest):
         self.assertRequest(mock_request, 'get', 'flow_starts')
         self.assertEqual(len(results), 2)
 
-        self.assertEqual(results[0].id, 15051)
+        self.assertEqual(results[0].uuid, "93a624ad-5440-415e-b49f-17bf42754acb")
         self.assertEqual(results[0].flow.uuid, "f5901b62-ba76-4003-9c62-72fdacc1b7b7")
         self.assertEqual(results[0].flow.name, "Registration")
         self.assertEqual(len(results[0].groups), 1)
@@ -442,9 +442,9 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].modified_on, datetime.datetime(2015, 9, 26, 10, 4, 9, 737686, pytz.utc))
 
         # check with all params
-        self.client.get_flow_starts(id=15051).all()
+        self.client.get_flow_starts(uuid="93a624ad-5440-415e-b49f-17bf42754acb").all()
 
-        self.assertRequest(mock_request, 'get', 'flow_starts', params={'id': 15051})
+        self.assertRequest(mock_request, 'get', 'flow_starts', params={'uuid': "93a624ad-5440-415e-b49f-17bf42754acb"})
 
     def test_get_groups(self, mock_request):
         # check no params
@@ -622,6 +622,7 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].flow.name, "Water Survey")
         self.assertEqual(results[0].contact.uuid, "d33e9ad5-5c35-414c-abd4-e7451c69ff1d")
         self.assertEqual(results[0].contact.name, "Frank McFlow")
+        self.assertEqual(results[0].start.uuid, "93a624ad-5440-415e-b49f-17bf42754acb")
         self.assertEqual(results[0].responded, True)
         self.assertEqual(len(results[0].path), 4)
         self.assertEqual(results[0].path[0].node, "27a86a1b-6cc4-4ae3-b73d-89650966a82f")
@@ -761,7 +762,7 @@ class TembaClientTest(TembaTest):
             'restart_participants': False,
             'extra': {'day': "Monday"}
         })
-        self.assertEqual(start.id, 15051)
+        self.assertEqual(start.uuid, "93a624ad-5440-415e-b49f-17bf42754acb")
 
     def test_create_group(self, mock_request):
         mock_request.return_value = MockResponse(201, self.read_json('groups', extract_result=0))

@@ -135,7 +135,7 @@ class Flow(TembaObject):
 
 
 class FlowStart(TembaObject):
-    id = IntegerField()
+    uuid = SimpleField()
     flow = ObjectField(item_class=ObjectRef)
     groups = ObjectListField(item_class=ObjectRef)
     contacts = ObjectListField(item_class=ObjectRef)
@@ -206,6 +206,9 @@ class ResthookSubscriber(TembaObject):
 
 
 class Run(TembaObject):
+    class StartRef(TembaObject):
+        uuid = SimpleField()
+
     class Step(TembaObject):
         node = SimpleField()
         time = DatetimeField()
@@ -219,6 +222,7 @@ class Run(TembaObject):
     id = IntegerField()
     flow = ObjectField(item_class=ObjectRef)
     contact = ObjectField(item_class=ObjectRef)
+    start = ObjectField(item_class=StartRef)
     responded = BooleanField()
     path = ObjectListField(item_class=Step)
     values = ObjectDictField(item_class=Value)

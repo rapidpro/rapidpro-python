@@ -138,14 +138,14 @@ class TembaClient(BaseCursorClient):
         """
         return self._get_query('flows', self._build_params(uuid=uuid), Flow)
 
-    def get_flow_starts(self, id=None):
+    def get_flow_starts(self, uuid=None):
         """
         Gets all matching flows starts
 
-        :param id: flow start id
+        :param uuid: flow start UUID
         :return: flow start query
         """
-        return self._get_query('flow_starts', self._build_params(id=id), FlowStart)
+        return self._get_query('flow_starts', self._build_params(uuid=uuid), FlowStart)
 
     def get_groups(self, uuid=None, name=None):
         """

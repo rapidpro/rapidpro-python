@@ -3,7 +3,7 @@
     "previous": null,
     "results": [
         {
-            "id": 15051,
+            "uuid": "93a624ad-5440-415e-b49f-17bf42754acb",
             "flow": {"uuid": "f5901b62-ba76-4003-9c62-72fdacc1b7b7", "name": "Registration"},
             "groups": [
                 {"uuid": "04a4752b-0f49-480e-ae60-3a3f2bea485c", "name": "The A-Team"}
@@ -19,7 +19,7 @@
             "modified_on": "2015-09-26T10:04:09.737686Z"
         },
         {
-            "id": 15050,
+            "uuid": "ed209f7d-ba00-4fb7-af82-e97b3c56842f",
             "flow": {"uuid": "f5901b62-ba76-4003-9c62-72fdacc1b7b7", "name": "Thrift Shop"},
             "groups": [
                 {"uuid": "f5901b62-ba76-4003-9c62-72fdacc1b7b7", "name": "Ryan & Macklemore"}
