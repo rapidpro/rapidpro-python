@@ -6,6 +6,7 @@
             "id": 4092373,
             "flow": {"uuid": "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a", "name": "Water Survey"},
             "contact": {"uuid": "d33e9ad5-5c35-414c-abd4-e7451c69ff1d", "name": "Frank McFlow"},
+            "start": {"uuid": "93a624ad-5440-415e-b49f-17bf42754acb"},
             "responded": true,
             "path": [
                 {"node": "27a86a1b-6cc4-4ae3-b73d-89650966a82f", "time": "2015-11-11T13:05:50.457742Z"},
@@ -36,6 +37,7 @@
             "id": 2504278,
             "flow": {"uuid": "7b75bcb0-3c86-482f-bdce-06a3d6cd5cf7", "name": "Test"},
             "contact": {"uuid": "d33e9ad5-5c35-414c-abd4-e7451c69ff1d", "name": "Frank McFlow"},
+            "start": null,
             "responded": false,
             "path": [],
             "values": {},
