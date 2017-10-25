@@ -1,3 +1,7 @@
+2.1.9 (2017-10-25)
+==================
+* Support flow minor versions (https://github.com/rapidpro/rapidpro-python/pull/50)
+
 2.1.8 (2017-06-26)
 ==================
 * Add uuid field to flow starts (https://github.com/rapidpro/rapidpro-python/pull/49)
