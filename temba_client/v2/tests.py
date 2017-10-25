@@ -367,7 +367,7 @@ class TembaClientTest(TembaTest):
             'dependencies': 0
         })
 
-        self.assertEqual(definitions.version, 8)
+        self.assertEqual(definitions.version, "10.1")
 
     def test_get_fields(self, mock_request):
         # check no params
