@@ -106,7 +106,7 @@ class Contact(TembaObject):
 
 
 class Export(TembaObject):
-    version = IntegerField()
+    version = SimpleField()
     flows = SimpleField()
     campaigns = SimpleField()
     triggers = SimpleField()
