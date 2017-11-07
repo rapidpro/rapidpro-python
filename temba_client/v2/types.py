@@ -49,6 +49,7 @@ class Broadcast(TembaObject):
 class Campaign(TembaObject):
     uuid = SimpleField()
     name = SimpleField()
+    archived = BooleanField()
     group = ObjectField(item_class=ObjectRef)
     created_on = DatetimeField()
 
