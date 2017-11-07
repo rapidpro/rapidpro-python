@@ -197,6 +197,7 @@ class TembaClientTest(TembaTest):
 
         self.assertEqual(results[0].uuid, "09d23a05-47fe-11e4-bfe9-b8f6b119e9ab")
         self.assertEqual(results[0].name, "Reminders")
+        self.assertEqual(results[0].archived, False)
         self.assertEqual(results[0].group.uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
         self.assertEqual(results[0].group.name, "The A-Team")
         self.assertEqual(results[0].created_on, datetime.datetime(2014, 6, 23, 9, 34, 12, 866000, pytz.utc))
