@@ -1,3 +1,7 @@
+2.1.10 (2017-11-08)
+==================
+* Update campaigns to include archived field (https://github.com/rapidpro/rapidpro-python/pull/51)
+
 2.1.9 (2017-10-25)
 ==================
 * Support flow minor versions (https://github.com/rapidpro/rapidpro-python/pull/50)
