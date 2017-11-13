@@ -1,3 +1,7 @@
+2.2 (2017-11-13)
+==================
+* Update campaign events to latest RapidPro changes (https://github.com/rapidpro/rapidpro-python/pull/52)
+
 2.1.10 (2017-11-08)
 ==================
 * Update campaigns to include archived field (https://github.com/rapidpro/rapidpro-python/pull/51)
