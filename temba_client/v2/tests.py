@@ -292,8 +292,8 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].contact.name, "Frank McFlow")
         self.assertEqual(results[0].channel.uuid, "9a8b001e-a913-486c-80f4-1356e23f582e")
         self.assertEqual(results[0].channel.name, "Nexmo")
-        self.assertEqual(results[0].time, datetime.datetime(2016, 1, 6, 15, 35, 3, 675716, pytz.utc))
-        self.assertEqual(results[0].duration, 123)
+        self.assertEqual(results[0].extra, {"foo": "bar"})
+        self.assertEqual(results[0].occurred_on, datetime.datetime(2016, 1, 6, 15, 35, 3, 675716, pytz.utc))
         self.assertEqual(results[0].created_on, datetime.datetime(2016, 1, 6, 15, 33, 0, 813162, pytz.utc))
 
         # check with all params

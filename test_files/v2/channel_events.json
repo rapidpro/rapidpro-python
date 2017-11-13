@@ -7,8 +7,8 @@
             "type": "in",
             "contact": {"uuid": "d33e9ad5-5c35-414c-abd4-e7451c69ff1d", "name": "Frank McFlow"},
             "channel": {"uuid": "9a8b001e-a913-486c-80f4-1356e23f582e", "name": "Nexmo"},
-            "time": "2016-01-06T15:35:03.675716Z",
-            "duration": 123,
+            "extra": {"foo": "bar"},
+            "occurred_on": "2016-01-06T15:35:03.675716Z",
             "created_on": "2016-01-06T15:33:00.813162Z"
         },
         {
@@ -16,8 +16,8 @@
             "type": "out",
             "contact": {"uuid": "d33e9ad5-5c35-414c-abd4-e7451c69ff1d", "name": "Frank McFlow"},
             "channel": {"uuid": "9a8b001e-a913-486c-80f4-1356e23f582e", "name": "Nexmo"},
-            "time": "2015-11-10T12:59:11.101787Z",
-            "duration": 123,
+            "extra": {},
+            "occurred_on": "2015-11-10T12:59:11.101787Z",
             "created_on": "2015-11-10T12:59:10.123456Z"
         }
     ]
