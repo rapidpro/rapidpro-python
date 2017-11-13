@@ -88,8 +88,8 @@ class ChannelEvent(TembaObject):
     type = SimpleField()
     contact = ObjectField(item_class=ObjectRef)
     channel = ObjectField(item_class=ObjectRef)
-    time = DatetimeField()
-    duration = IntegerField()
+    extra = SimpleField()
+    occurred_on = DatetimeField()
     created_on = DatetimeField()
 
 
