@@ -6,13 +6,13 @@
             "id": 1001,
             "resthook": "new-mother",
             "target_url": "http://foo.bar/mothers",
-            "created_on": "2015-08-26T10:04:09.737686Z"
+            "created_on": "2015-08-26T10:04:09.737686+00:00"
         },
         {
             "id": 1002,
             "resthook": "new-father",
             "target_url": "http://foo.bar/fathers",
-            "created_on": "2015-10-26T10:04:09.737686Z"
+            "created_on": "2015-10-26T10:04:09.737686+00:00"
         }
     ]
 }

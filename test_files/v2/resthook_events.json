@@ -5,12 +5,12 @@
         {
             "resthook": "new-mother",
             "data": {"foo": "bar"},
-            "created_on": "2015-08-26T10:04:09.737686Z"
+            "created_on": "2015-08-26T10:04:09.737686+00:00"
         },
         {
             "resthook": "new-father",
             "data": {"foo": "doh"},
-            "created_on": "2015-10-26T10:04:09.737686Z"
+            "created_on": "2015-10-26T10:04:09.737686+00:00"
         }
     ]
 }

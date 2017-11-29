@@ -1,14 +1,10 @@
 from __future__ import absolute_import, unicode_literals
 
-import datetime
 import json
 import pytz
 import requests
 import six
-
-
-ISO8601_DATE_FORMAT = '%Y-%m-%d'
-ISO8601_DATETIME_FORMAT = ISO8601_DATE_FORMAT + 'T' + '%H:%M:%S'
+import iso8601
 
 
 def parse_iso8601(value):
@@ -18,17 +14,7 @@ def parse_iso8601(value):
     if not value:
         return None
 
-    if 'T' in value:  # has time
-        _format = ISO8601_DATETIME_FORMAT
-
-        if '.' in value:  # has microseconds. Some values from RapidPro don't include this.
-            _format += '.%f'
-        if 'Z' in value:  # has zero offset marker
-            _format += 'Z'
-    else:
-        _format = ISO8601_DATE_FORMAT
-
-    return datetime.datetime.strptime(value, _format).replace(tzinfo=pytz.utc)
+    return iso8601.parse_date(value)
 
 
 def format_iso8601(value):
@@ -38,9 +24,7 @@ def format_iso8601(value):
     if value is None:
         return None
 
-    _format = ISO8601_DATETIME_FORMAT + '.%fZ'
-
-    return six.text_type(value.astimezone(pytz.UTC).strftime(_format))
+    return six.text_type(value.astimezone(pytz.UTC).strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
 
 
 def request(method, url, **kwargs):  # pragma: no cover

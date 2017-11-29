@@ -78,8 +78,12 @@ class UtilsTest(TembaTest):
     def test_parse_iso8601(self):
         dt = datetime.datetime(2014, 1, 2, 3, 4, 5, 0, pytz.UTC)
         self.assertEqual(parse_iso8601('2014-01-02T03:04:05.000000Z'), dt)
+        self.assertEqual(parse_iso8601('2014-01-02T03:04:05.000000+00:00'), dt)
+        self.assertEqual(parse_iso8601('2014-01-02T05:04:05.000000+02:00'), dt)
+        self.assertEqual(parse_iso8601('2014-01-02T00:04:05.000000-03:00'), dt)
         self.assertEqual(parse_iso8601('2014-01-02T03:04:05.000000'), dt)
         self.assertEqual(parse_iso8601('2014-01-02T03:04:05'), dt)
+        self.assertEqual(parse_iso8601(None), None)
 
         d = datetime.datetime(2014, 1, 2, 0, 0, 0, 0, pytz.UTC)
         self.assertEqual(parse_iso8601('2014-01-02'), d)
