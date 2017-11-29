@@ -256,8 +256,8 @@ class TembaClientTest(TembaTest):
                                    after=datetime.datetime(2014, 12, 12, 22, 34, 36, 234000, pytz.utc))
         self.assertRequest(mock_request, 'get', 'broadcasts', params={'id': [1234, 2345],
                                                                       'status': ['P', 'Q'],
-                                                                      'before': '2014-12-12T22:34:36.123000Z',
-                                                                      'after': '2014-12-12T22:34:36.234000Z'})
+                                                                      'before': '2014-12-12T22:34:36.123000+00:00',
+                                                                      'after': '2014-12-12T22:34:36.234000+00:00'})
 
     def test_get_campaign(self, mock_request):
         # check single item response
@@ -341,21 +341,21 @@ class TembaClientTest(TembaTest):
         mock_request.return_value = MockResponse(200, self.read_json('contacts_multiple'))
         self.client.get_contacts(after=datetime.datetime(2014, 12, 12, 22, 34, 36, 123000, pytz.utc))
 
-        self.assertRequest(mock_request, 'get', 'contacts', params={'after': '2014-12-12T22:34:36.123000Z'})
+        self.assertRequest(mock_request, 'get', 'contacts', params={'after': '2014-12-12T22:34:36.123000+00:00'})
 
         # check filtering modified before a date
         mock_request.return_value = MockResponse(200, self.read_json('contacts_multiple'))
         self.client.get_contacts(before=datetime.datetime(2014, 12, 12, 22, 34, 36, 123000, pytz.utc))
 
-        self.assertRequest(mock_request, 'get', 'contacts', params={'before': '2014-12-12T22:34:36.123000Z'})
+        self.assertRequest(mock_request, 'get', 'contacts', params={'before': '2014-12-12T22:34:36.123000+00:00'})
 
         # check filtering modified between dates
         mock_request.return_value = MockResponse(200, self.read_json('contacts_multiple'))
         self.client.get_contacts(after=datetime.datetime(2014, 12, 12, 22, 34, 36, 123000, pytz.utc),
                                  before=datetime.datetime(2014, 12, 12, 22, 34, 36, 123000, pytz.utc))
 
-        self.assertRequest(mock_request, 'get', 'contacts', params={'after': '2014-12-12T22:34:36.123000Z',
-                                                                    'before': '2014-12-12T22:34:36.123000Z'})
+        self.assertRequest(mock_request, 'get', 'contacts', params={'after': '2014-12-12T22:34:36.123000+00:00',
+                                                                    'before': '2014-12-12T22:34:36.123000+00:00'})
 
         # check multiple pages
         mock_request.side_effect = (MockResponse(200, self.read_json('contacts_multipage_1')),
@@ -507,8 +507,8 @@ class TembaClientTest(TembaTest):
         self.assertRequest(mock_request, 'get', 'flows', params={'uuid': ['abc', 'xyz'],
                                                                  'archived': 0,
                                                                  'label': ['polls', 'events'],
-                                                                 'before': '2014-12-12T22:34:36.123000Z',
-                                                                 'after': '2014-12-12T22:34:36.234000Z'})
+                                                                 'before': '2014-12-12T22:34:36.123000+00:00',
+                                                                 'after': '2014-12-12T22:34:36.234000+00:00'})
 
     def test_get_group(self, mock_request):
         # check single item response
@@ -627,8 +627,8 @@ class TembaClientTest(TembaTest):
                                                                     'broadcast': [345, 456],
                                                                     'contact': ['abc'],
                                                                     'label': ['polls', '+events', '-flagged'],
-                                                                    'before': '2014-12-12T22:34:36.123000Z',
-                                                                    'after': '2014-12-12T22:34:36.234000Z',
+                                                                    'before': '2014-12-12T22:34:36.123000+00:00',
+                                                                    'after': '2014-12-12T22:34:36.234000+00:00',
                                                                     'text': 'heists',
                                                                     'archived': 0})
 
@@ -727,8 +727,8 @@ class TembaClientTest(TembaTest):
 
         self.assertRequest(mock_request, 'get', 'runs', params={'run': [123, 234],
                                                                 'flow_uuid': ['a68567fa-ad95-45fc-b5f7-3ce90ebbd46d'],
-                                                                'after': '2014-12-12T22:34:36.978000Z',
-                                                                'before': '2014-12-12T22:56:58.917000Z'})
+                                                                'after': '2014-12-12T22:34:36.978000+00:00',
+                                                                'before': '2014-12-12T22:56:58.917000+00:00'})
 
     def test_label_messages(self, mock_request):
         mock_request.return_value = MockResponse(204)

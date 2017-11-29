@@ -71,13 +71,13 @@ class UtilsTest(TembaTest):
 
     def test_format_iso8601(self):
         d = datetime.datetime(2014, 1, 2, 3, 4, 5, 6, UtilsTest.TestTZ())
-        self.assertEqual(format_iso8601(d), '2014-01-02T08:04:05.000006Z')
+        self.assertEqual(format_iso8601(d), '2014-01-02T03:04:05.000006-05:00')
         # it should return None when no datetime given
         self.assertIs(format_iso8601(None), None)
 
     def test_parse_iso8601(self):
         dt = datetime.datetime(2014, 1, 2, 3, 4, 5, 0, pytz.UTC)
-        self.assertEqual(parse_iso8601('2014-01-02T03:04:05.000000Z'), dt)
+        self.assertEqual(parse_iso8601('2014-01-02T03:04:05.000000+00:00'), dt)
         self.assertEqual(parse_iso8601('2014-01-02T03:04:05.000000+00:00'), dt)
         self.assertEqual(parse_iso8601('2014-01-02T05:04:05.000000+02:00'), dt)
         self.assertEqual(parse_iso8601('2014-01-02T00:04:05.000000-03:00'), dt)
@@ -192,7 +192,7 @@ class TembaObjectTest(TembaTest):
                           {'foo': 'a', 'bar': 'x', 'doh': '2014-01-02T03:04:05', 'hum': {}})
 
     def test_serialize(self):
-        obj = TestType.create(foo='a', bar=123, doh=datetime.datetime(2014, 1, 2, 3, 4, 5, 0, pytz.UTC),
+        obj = TestType.create(foo='a', bar=123, doh=datetime.datetime(2014, 1, 2, 3, 4, 5, 7, pytz.UTC),
                               gem=TestSubType.create(zed='a'),
                               hum=[TestSubType.create(zed='b')],
                               meh={'a': TestSubType.create(zed='c'), 'b': TestSubType.create(zed='d')})
@@ -200,7 +200,7 @@ class TembaObjectTest(TembaTest):
         json_obj = obj.serialize()
         self.assertEqual(json_obj, {'foo': 'a',
                                     'bar': 123,
-                                    'doh': '2014-01-02T03:04:05.000000Z',
+                                    'doh': '2014-01-02T03:04:05.000007+00:00',
                                     'gem': {'zed': 'a'},
                                     'hum': [{'zed': 'b'}],
                                     'meh': {'a': {'zed': 'c'}, 'b': {'zed': 'd'}}})
