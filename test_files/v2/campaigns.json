@@ -7,14 +7,14 @@
             "name": "Reminders",
             "archived": false,
             "group": {"uuid": "04a4752b-0f49-480e-ae60-3a3f2bea485c", "name": "The A-Team"},
-            "created_on": "2014-06-23T09:34:12.866000Z"
+            "created_on": "2014-06-23T09:34:12.866000+00:00"
         },
         {
             "uuid": "9a8b001e-a913-486c-80f4-1356e23f582e",
             "name": "Notifications",
             "archived": false,
             "group": {"uuid": "1b1add1b-6ed4-4e13-9b08-9127b2d33c74", "name": "Support Team"},
-            "created_on": "2014-06-23T09:34:12.866000Z"
+            "created_on": "2014-06-23T09:34:12.866000+00:00"
         }
     ]
 }

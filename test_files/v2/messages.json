@@ -14,8 +14,8 @@
             "visibility": "visible",
             "text": "How are you?",
             "labels": [],
-            "created_on": "2016-01-06T15:33:00.813162Z",
-            "sent_on": "2016-01-06T15:35:03.675716Z",
+            "created_on": "2016-01-06T15:33:00.813162+00:00",
+            "sent_on": "2016-01-06T15:35:03.675716+00:00",
             "modified_on": null
         },
         {
@@ -35,9 +35,9 @@
                     "name": "Important"
                 }
             ],
-            "created_on": "2015-11-10T12:59:10Z",
+            "created_on": "2015-11-10T12:59:10+00:00",
             "sent_on": null,
-            "modified_on": "2015-11-10T12:59:11.101787Z"
+            "modified_on": "2015-11-10T12:59:11.101787+00:00"
         }
     ]
 }

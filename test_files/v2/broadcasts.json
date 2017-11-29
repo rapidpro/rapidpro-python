@@ -8,7 +8,7 @@
             "contacts": [{"uuid": "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9", "name": "Joe"}],
             "groups": [{"uuid": "04a4752b-0f49-480e-ae60-3a3f2bea485c", "name": "The A-Team"}],
             "text": "Hello",
-            "created_on": "2015-11-11T08:30:24.922024Z"
+            "created_on": "2015-11-11T08:30:24.922024+00:00"
         },
         {
             "id": 2345,
@@ -16,7 +16,7 @@
             "contacts": [],
             "groups": [],
             "text": "Goodbye",
-            "created_on": "2014-12-12T22:56:58.917123Z"
+            "created_on": "2014-12-12T22:56:58.917123+00:00"
         }
     ]
 }
