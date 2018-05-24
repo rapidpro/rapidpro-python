@@ -1,13 +1,8 @@
 from __future__ import absolute_import, unicode_literals
 
-"""
-This version of the API is still under development and so is subject to change without notice. We strongly recommend
-that users continue using the existing API v1.
-"""
-
 import six
 
-from .types import Boundary, Broadcast, Campaign, CampaignEvent, Channel, ChannelEvent, Contact, Export, Field
+from .types import Archive, Boundary, Broadcast, Campaign, CampaignEvent, Channel, ChannelEvent, Contact, Export, Field
 from .types import FlowStart, Flow, Group, Label, Message, Org, Resthook, ResthookSubscriber, ResthookEvent, Run
 from ..clients import BaseCursorClient
 
@@ -26,6 +21,20 @@ class TembaClient(BaseCursorClient):
     # ==================================================================================================================
     # Fetch object operations
     # ==================================================================================================================
+
+    def get_archives(self, archive_type=None, period=None, before=None, after=None):
+        """
+        Gets all matching archives
+
+        :param str archive_type: "message" or "run"
+        :param str period: "D" or "M"
+        :param datetime before: created before
+        :param datetime after: created after
+        :return: archive query
+        """
+
+        params = self._build_params(archive_type=archive_type, period=period, before=before, after=after)
+        return self._get_query('archives', params, Archive)
 
     def get_boundaries(self, geometry=None):
         """
