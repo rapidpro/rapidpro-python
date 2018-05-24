@@ -122,6 +122,35 @@ class TembaClientTest(TembaTest):
     # Fetch object operations
     # ==================================================================================================================
 
+    def test_get_archives(self, mock_request):
+        # check no params
+        mock_request.return_value = MockResponse(200, self.read_json('archives'))
+
+        # check with no params
+        results = self.client.get_archives().all()
+
+        self.assertRequest(mock_request, 'get', 'archives')
+        self.assertEqual(len(results), 4)
+
+        self.assertEqual(results[1].archive_type, "message")
+        self.assertEqual(results[1].start_date, datetime.datetime(2018, 4, 1, 0, 0, tzinfo=pytz.utc))
+        self.assertEqual(results[1].period, "M")
+        self.assertEqual(results[1].record_count, 10)
+        self.assertEqual(results[1].size, 23)
+        self.assertEqual(results[1].hash, "f0d79988b7772c003d04a28bd7417a62")
+        self.assertEqual(results[1].download_url, "http://s3-bucket.aws.com/my/archive.jsonl.gz")
+
+        self.client.get_archives(
+            archive_type="message", period="D",
+            after=datetime.datetime(2018, 1, 1, tzinfo=pytz.utc),
+            before=datetime.datetime(2018, 5, 1, tzinfo=pytz.utc)
+        ).all()
+
+        self.assertRequest(mock_request, 'get', 'archives', params={
+            "archive_type": "message", "period": "D",
+            "after": "2018-01-01T00:00:00.000000Z", "before": "2018-05-01T00:00:00.000000Z"
+        })
+
     def test_get_boundaries(self, mock_request):
         # check no params
         mock_request.return_value = MockResponse(200, self.read_json('boundaries'))

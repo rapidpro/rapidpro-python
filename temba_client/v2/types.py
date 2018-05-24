@@ -20,6 +20,16 @@ class FieldRef(TembaObject):
     label = SimpleField()
 
 
+class Archive(TembaObject):
+    archive_type = SimpleField()
+    start_date = DatetimeField()
+    period = SimpleField()
+    record_count = IntegerField()
+    size = IntegerField()
+    hash = SimpleField()
+    download_url = SimpleField()
+
+
 class Boundary(TembaObject):
     class BoundaryRef(TembaObject):
         osm_id = SimpleField()
