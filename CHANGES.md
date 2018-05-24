@@ -1,3 +1,7 @@
+2.3 (2018-05-24)
+==================
+* Add support for the new archives endpoint (https://github.com/rapidpro/rapidpro-python/pull/56)
+
 2.2 (2017-11-13)
 ==================
 * Update campaign events to latest RapidPro changes (https://github.com/rapidpro/rapidpro-python/pull/52)
