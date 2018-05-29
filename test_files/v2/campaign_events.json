@@ -3,7 +3,7 @@
     "previous": null,
     "results": [
         {
-            "uuid": "9e6beda-0ce2-46cd-8810-91157f261cbd",
+            "uuid": "9e6beda-0ce2-46cd-8810-91157f261cbde",
             "campaign": {"uuid": "9ccae91f-b3f8-4c18-ad92-e795a2332c11", "name": "Reminders"},
             "relative_to": {"key": "edd", "label": "EDD"},
             "offset": 14,
