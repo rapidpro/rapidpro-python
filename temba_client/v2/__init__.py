@@ -27,7 +27,7 @@ class TembaClient(BaseCursorClient):
         Gets all matching archives
 
         :param str archive_type: "message" or "run"
-        :param str period: "D" or "M"
+        :param str period: "daily" or "monthly"
         :param datetime before: created before
         :param datetime after: created after
         :return: archive query
