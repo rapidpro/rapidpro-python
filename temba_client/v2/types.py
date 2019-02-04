@@ -6,6 +6,7 @@ class ObjectRef(TembaObject):
     """
     Used for references to objects in other objects
     """
+
     uuid = SimpleField()
     name = SimpleField()
 
@@ -14,6 +15,7 @@ class FieldRef(TembaObject):
     """
     Used for references to fields in other objects
     """
+
     key = SimpleField()
     label = SimpleField()
 

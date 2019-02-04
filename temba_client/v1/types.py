@@ -1,5 +1,11 @@
 from ..serialization import (
-    TembaObject, SimpleField, BooleanField, IntegerField, DatetimeField, ObjectListField, ObjectField
+    TembaObject,
+    SimpleField,
+    BooleanField,
+    IntegerField,
+    DatetimeField,
+    ObjectListField,
+    ObjectField,
 )
 
 
@@ -16,7 +22,7 @@ class Broadcast(TembaObject):
 class Campaign(TembaObject):
     uuid = SimpleField()
     name = SimpleField()
-    group = SimpleField(src='group_uuid')
+    group = SimpleField(src="group_uuid")
     created_on = DatetimeField()
 
 
@@ -24,7 +30,7 @@ class Contact(TembaObject):
     uuid = SimpleField()
     name = SimpleField()
     urns = SimpleField()
-    groups = SimpleField(src='group_uuids')
+    groups = SimpleField(src="group_uuids")
     fields = SimpleField()
     language = SimpleField()
     blocked = SimpleField()
@@ -40,13 +46,13 @@ class Group(TembaObject):
 
 class Event(TembaObject):
     uuid = SimpleField()
-    campaign = SimpleField(src='campaign_uuid')
+    campaign = SimpleField(src="campaign_uuid")
     relative_to = SimpleField()
     offset = IntegerField()
     unit = SimpleField()
     delivery_hour = IntegerField()
     message = SimpleField()
-    flow = SimpleField(src='flow_uuid')
+    flow = SimpleField(src="flow_uuid")
     created_on = DatetimeField()
 
 
@@ -57,7 +63,7 @@ class Field(TembaObject):
 
 
 class RuleSet(TembaObject):
-    uuid = SimpleField(src='node')
+    uuid = SimpleField(src="node")
     label = SimpleField()
     response_type = SimpleField()
 
@@ -136,8 +142,8 @@ class FlowStep(TembaObject):
 
 
 class Run(TembaObject):
-    id = IntegerField(src='run')
-    flow = SimpleField(src='flow_uuid')
+    id = IntegerField(src="run")
+    flow = SimpleField(src="flow_uuid")
     contact = SimpleField()
     steps = ObjectListField(item_class=FlowStep)
     values = ObjectListField(item_class=RunValueSet)

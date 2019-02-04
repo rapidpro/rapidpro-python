@@ -21,7 +21,7 @@ def format_iso8601(value):
     if value is None:
         return None
 
-    return str(value.astimezone(pytz.UTC).strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
+    return str(value.astimezone(pytz.UTC).strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
 
 
 def request(method, url, **kwargs):  # pragma: no cover
@@ -29,7 +29,7 @@ def request(method, url, **kwargs):  # pragma: no cover
     For the purposes of testing, all calls to requests.request go through here before JSON bodies are encoded. It's
     easier to mock this and verify request data before it's encoded.
     """
-    if 'data' in kwargs:
-        kwargs['data'] = json.dumps(kwargs['data'])
+    if "data" in kwargs:
+        kwargs["data"] = json.dumps(kwargs["data"])
 
     return requests.request(method, url, **kwargs)

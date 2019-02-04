@@ -24,17 +24,18 @@ class BaseClient(object):
     """
     Abstract base client
     """
+
     __metaclass__ = ABCMeta
 
     def __init__(self, host, token, api_version, user_agent=None, verify_ssl=None):
-        if host.startswith('http'):
+        if host.startswith("http"):
             host_url = host
-            if host_url.endswith('/'):  # trim a final slash
+            if host_url.endswith("/"):  # trim a final slash
                 host_url = host[:-1]
         else:
-            host_url = 'https://%s' % host
+            host_url = "https://%s" % host
 
-        self.root_url = '%s/api/v%d' % (host_url, api_version)
+        self.root_url = "%s/api/v%d" % (host_url, api_version)
 
         self.headers = self._headers(token, user_agent)
 
@@ -43,28 +44,30 @@ class BaseClient(object):
     @staticmethod
     def _headers(token, user_agent):
         if user_agent:
-            user_agent_header = '%s %s/%s' % (user_agent, CLIENT_NAME, __version__)
+            user_agent_header = "%s %s/%s" % (user_agent, CLIENT_NAME, __version__)
         else:
-            user_agent_header = '%s/%s' % (CLIENT_NAME, __version__)
+            user_agent_header = "%s/%s" % (CLIENT_NAME, __version__)
 
-        return {'Content-type': 'application/json',
-                'Accept': 'application/json',
-                'Authorization': 'Token %s' % token,
-                'User-Agent': user_agent_header}
+        return {
+            "Content-type": "application/json",
+            "Accept": "application/json",
+            "Authorization": "Token %s" % token,
+            "User-Agent": user_agent_header,
+        }
 
     def _post(self, endpoint, params, payload):
         """
         POSTs to the given endpoint which must return a single item or list of items
         """
-        url = '%s/%s.json' % (self.root_url, endpoint)
-        return self._request('post', url, params=params, body=payload)
+        url = "%s/%s.json" % (self.root_url, endpoint)
+        return self._request("post", url, params=params, body=payload)
 
     def _delete(self, endpoint, params):
         """
         DELETEs to the given endpoint which won't return anything
         """
-        url = '%s/%s.json' % (self.root_url, endpoint)
-        self._request('delete', url, params=params)
+        url = "%s/%s.json" % (self.root_url, endpoint)
+        self._request("delete", url, params=params)
 
     def _request(self, method, url, params=None, body=None):
         """
@@ -74,13 +77,13 @@ class BaseClient(object):
             logger.debug("%s %s %s" % (method.upper(), url, json.dumps(params if params else body)))
 
         try:
-            kwargs = {'headers': self.headers}
+            kwargs = {"headers": self.headers}
             if body:
-                kwargs['data'] = body
+                kwargs["data"] = body
             if params:
-                kwargs['params'] = params
+                kwargs["params"] = params
 
-            kwargs['verify'] = self.verify_ssl
+            kwargs["verify"] = self.verify_ssl
 
             response = request(method, url, **kwargs)
 
@@ -88,7 +91,7 @@ class BaseClient(object):
                 try:
                     errors = response.json()
                 except ValueError:
-                    errors = {'details': [response.content]}
+                    errors = {"details": [response.content]}
                 raise TembaBadRequestError(errors)
 
             elif response.status_code == 403:
@@ -98,7 +101,7 @@ class BaseClient(object):
                 raise TembaNoSuchObjectError()
 
             elif response.status_code == 429:  # have we exceeded our allowed rate?
-                retry_after = response.headers.get('retry-after')
+                retry_after = response.headers.get("retry-after")
                 raise TembaRateExceededError(int(retry_after) if retry_after else 0)
 
             response.raise_for_status()
@@ -143,11 +146,11 @@ class BaseClient(object):
                 serialized.append(cls._serialize_value(item))
             return serialized
         elif isinstance(value, TembaObject):
-            if hasattr(value, 'uuid'):
+            if hasattr(value, "uuid"):
                 return value.uuid
-            elif hasattr(value, 'id'):  # messages, runs, etc
+            elif hasattr(value, "id"):  # messages, runs, etc
                 return value.id
-            elif hasattr(value, 'key'):  # fields
+            elif hasattr(value, "key"):  # fields
                 return value.key
         elif isinstance(value, datetime.datetime):
             return format_iso8601(value)
@@ -161,14 +164,15 @@ class Pager(object):
     """
     For iterating through page based API responses
     """
+
     def __init__(self, start_page):
         self.start_page = start_page
         self.count = None
         self.next_url = None
 
     def update(self, response):
-        self.count = response['count']
-        self.next_url = response['next']
+        self.count = response["count"]
+        self.next_url = response["next"]
 
     @property
     def total(self):
@@ -182,24 +186,25 @@ class BasePagingClient(BaseClient):
     """
     Abstract base client for page-based endpoint access
     """
+
     __metaclass__ = ABCMeta
 
     def _get_single(self, endpoint, params, from_results=True):
         """
         GETs a single result from the given endpoint. Throws an exception if there are no or multiple results.
         """
-        url = '%s/%s.json' % (self.root_url, endpoint)
-        response = self._request('get', url, params=params)
+        url = "%s/%s.json" % (self.root_url, endpoint)
+        response = self._request("get", url, params=params)
 
         if from_results:
-            num_results = len(response['results'])
+            num_results = len(response["results"])
 
             if num_results > 1:
                 raise TembaMultipleResultsError()
             elif num_results == 0:
                 raise TembaNoSuchObjectError()
             else:
-                return response['results'][0]
+                return response["results"][0]
         else:
             return response
 
@@ -220,27 +225,27 @@ class BasePagingClient(BaseClient):
             url = pager.next_url
             params = None
         else:
-            url = '%s/%s.json' % (self.root_url, endpoint)
+            url = "%s/%s.json" % (self.root_url, endpoint)
             if pager.start_page != 1:
-                params['page'] = pager.start_page
+                params["page"] = pager.start_page
 
-        response = self._request('get', url, params=params)
+        response = self._request("get", url, params=params)
 
         pager.update(response)
 
-        return response['results']
+        return response["results"]
 
     def _get_all(self, endpoint, params):
         """
         GETs all results from the given endpoint using multiple requests to fetch all pages
         """
         results = []
-        url = '%s/%s.json' % (self.root_url, endpoint)
+        url = "%s/%s.json" % (self.root_url, endpoint)
 
         while url:
-            response = self._request('get', url, params=params)
-            results += response['results']
-            url = response.get('next', None)
+            response = self._request("get", url, params=params)
+            results += response["results"]
+            url = response.get("next", None)
             params = {}
 
         return results
@@ -250,6 +255,7 @@ class CursorIterator:
     """
     For iterating through cursor based API responses
     """
+
     def __init__(self, client, url, params, clazz, retry_on_rate_exceed, resume_cursor):
         self.client = client
         self.url = url
@@ -266,15 +272,16 @@ class CursorIterator:
             raise StopIteration()
 
         if self.resume_cursor:
-            self.params['cursor'] = self.resume_cursor
+            self.params["cursor"] = self.resume_cursor
 
-        response = self.client._request('get', self.url, params=self.params,
-                                        retry_on_rate_exceed=self.retry_on_rate_exceed)
+        response = self.client._request(
+            "get", self.url, params=self.params, retry_on_rate_exceed=self.retry_on_rate_exceed
+        )
 
-        self.url = response['next']
+        self.url = response["next"]
         self.resume_cursor = None
         self.params = {}
-        results = response['results']
+        results = response["results"]
 
         if len(results) == 0:
             raise StopIteration()
@@ -286,7 +293,7 @@ class CursorIterator:
             return None
 
         query_dict = parse_qs(urlparse(self.url).query)
-        cursors = query_dict.get('cursor', None)
+        cursors = query_dict.get("cursor", None)
         return cursors[0] if cursors else None
 
 
@@ -294,6 +301,7 @@ class CursorQuery(object):
     """
     Result of a GET query which can then be iterated or fetched in its entirety
     """
+
     def __init__(self, client, url, params, clazz):
         self.client = client
         self.url = url
@@ -327,20 +335,21 @@ class BaseCursorClient(BaseClient):
     """
     Abstract base client for cursor-based endpoint access
     """
+
     __metaclass__ = ABCMeta
 
     def _get_query(self, endpoint, params, clazz):
         """
         GETs a result query for the given endpoint
         """
-        return CursorQuery(self, '%s/%s.json' % (self.root_url, endpoint), params, clazz)
+        return CursorQuery(self, "%s/%s.json" % (self.root_url, endpoint), params, clazz)
 
     def _get_raw(self, endpoint, params, retry_on_rate_exceed=False):
         """
         GETs the raw response from the given endpoint
         """
-        url = '%s/%s.json' % (self.root_url, endpoint)
-        return self._request('get', url, params, retry_on_rate_exceed=retry_on_rate_exceed)
+        url = "%s/%s.json" % (self.root_url, endpoint)
+        return self._request("get", url, params, retry_on_rate_exceed=retry_on_rate_exceed)
 
     def _request(self, method, url, params=None, body=None, retry_on_rate_exceed=False):
         if retry_on_rate_exceed:
