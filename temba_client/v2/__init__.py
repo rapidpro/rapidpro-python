@@ -1,7 +1,3 @@
-from __future__ import absolute_import, unicode_literals
-
-import six
-
 from .types import Archive, Boundary, Broadcast, Campaign, CampaignEvent, Channel, ChannelEvent, Contact, Export, Field
 from .types import FlowStart, Flow, Group, Label, Message, Org, Resthook, ResthookSubscriber, ResthookEvent, Run
 from ..clients import BaseCursorClient
@@ -407,7 +403,7 @@ class TembaClient(BaseCursorClient):
         :param list groups: list of group objects or UUIDs
         :return: the updated contact
         """
-        is_urn = isinstance(contact, six.string_types) and ':' in contact
+        is_urn = isinstance(contact, str) and ':' in contact
         params = self._build_id_param(**{'urn' if is_urn else 'uuid': contact})
         payload = self._build_params(name=name, language=language, urns=urns, fields=fields, groups=groups)
         return Contact.deserialize(self._post('contacts', params, self._build_params(**payload)))
@@ -463,7 +459,7 @@ class TembaClient(BaseCursorClient):
 
         :param * contact: contact object, UUID or URN
         """
-        is_urn = isinstance(contact, six.string_types) and ':' in contact
+        is_urn = isinstance(contact, str) and ':' in contact
         params = self._build_id_param(**{'urn' if is_urn else 'uuid': contact})
         self._delete('contacts', params)
 

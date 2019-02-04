@@ -1,11 +1,8 @@
-from __future__ import absolute_import, unicode_literals
-
 import codecs
 import datetime
 import json
 import pytz
 import requests
-import six
 import unittest
 
 from requests.structures import CaseInsensitiveDict
@@ -28,7 +25,7 @@ class TembaTest(unittest.TestCase):
         Loads JSON from the given test file
         """
         handle = codecs.open('test_files/v%d/%s.json' % (self.API_VERSION, filename), 'r', 'utf-8')
-        contents = six.text_type(handle.read())
+        contents = str(handle.read())
         handle.close()
 
         if extract_result is not None:
@@ -41,7 +38,7 @@ class TembaTest(unittest.TestCase):
             callable_obj(*args, **kwargs)
         except TembaException as exc:
             self.assertIsInstance(exc, exc_class)
-            self.assertEqual(six.text_type(exc), message)
+            self.assertEqual(str(exc), message)
 
     def assertRequestURL(self, mock, method, url, **kwargs):
         """

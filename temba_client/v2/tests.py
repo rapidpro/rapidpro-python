@@ -1,10 +1,8 @@
-from __future__ import absolute_import, unicode_literals
-
 import datetime
 import json
 import pytz
 
-from mock import patch
+from unittest.mock import patch
 from requests.exceptions import ConnectionError
 from . import TembaClient
 from .types import Campaign, CampaignEvent, Contact, Field, Flow, Group, Label, Message, ResthookSubscriber

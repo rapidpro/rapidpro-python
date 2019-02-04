@@ -1,14 +1,6 @@
-from __future__ import absolute_import, unicode_literals
-
-import six
-
-
 class TembaException(Exception):
-    def __unicode__(self):  # pragma: no cover
-        return self.message
-
     def __str__(self):
-        return six.text_type(self.__unicode__())
+        return self.message
 
 
 class TembaConnectionError(TembaException):
@@ -19,11 +11,11 @@ class TembaBadRequestError(TembaException):
     def __init__(self, errors):
         self.errors = errors
 
-    def __unicode__(self):
+    def __str__(self):
         msgs = []
         if isinstance(self.errors, dict):
-            for field, field_errors in six.iteritems(self.errors):
-                if isinstance(field_errors, six.string_types):  # e.g. {"detail": "message..."}
+            for field, field_errors in self.errors.items():
+                if isinstance(field_errors, str):  # e.g. {"detail": "message..."}
                     msgs.append(field_errors)
                 else:
                     for error in field_errors:  # e.g. {"field1": ["msg1...", "msg2..."]}
@@ -49,7 +41,7 @@ class TembaRateExceededError(TembaException):
     def __init__(self, retry_after):
         self.retry_after = retry_after
 
-    def __unicode__(self):
+    def __str__(self):
         return self.message % self.retry_after
 
 
@@ -57,8 +49,8 @@ class TembaHttpError(TembaException):
     def __init__(self, caused_by):
         self.caused_by = caused_by
 
-    def __unicode__(self):
-        return six.text_type(self.caused_by)
+    def __str__(self):
+        return str(self.caused_by)
 
 
 class TembaSerializationException(TembaException):

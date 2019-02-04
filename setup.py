@@ -42,7 +42,6 @@ setup(
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Libraries',
         'License :: OSI Approved :: BSD License',
-        'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
     ],
 

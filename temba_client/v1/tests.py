@@ -1,11 +1,8 @@
-from __future__ import absolute_import, unicode_literals
-
 import datetime
 import pytz
 import requests
-import six
 
-from mock import patch
+from unittest.mock import patch
 from . import TembaClient
 from .types import Broadcast, Group, FlowDefinition
 from ..exceptions import TembaException, TembaNoSuchObjectError, TembaMultipleResultsError, TembaBadRequestError
@@ -828,7 +825,6 @@ class TembaClientTest(TembaTest):
             self.client.update_label('12345678', "Really High Priority")
         except TembaBadRequestError as ex:
             self.assertEqual(ex.errors, {'uuid': ["No such message label with UUID: 12345678"]})
-            self.assertEqual(six.text_type(ex), "No such message label with UUID: 12345678")
             self.assertEqual(str(ex), "No such message label with UUID: 12345678")
         else:
             self.fail("Should have thrown exception")
@@ -840,7 +836,7 @@ class TembaClientTest(TembaTest):
             self.client.update_label('12345678', "Really High Priority")
         except TembaBadRequestError as ex:
             self.assertEqual(ex.errors, {'details': ['xyz']})
-            self.assertEqual(six.text_type(ex), "xyz")
+            self.assertEqual(str(ex), "xyz")
         else:
             self.fail("Should have thrown exception")
 

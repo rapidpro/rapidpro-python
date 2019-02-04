@@ -1,14 +1,11 @@
-from __future__ import absolute_import, unicode_literals
-
 import datetime
 import json
 import logging
 
 import requests
-import six
 import time
 
-from six.moves.urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, urlparse
 
 from abc import ABCMeta
 from . import __version__, CLIENT_NAME
@@ -119,7 +116,7 @@ class BaseClient(object):
         removes None values.
         """
         params = {}
-        for kwarg, value in six.iteritems(kwargs):
+        for kwarg, value in kwargs.items():
             if value is None:
                 continue
             else:
@@ -249,7 +246,7 @@ class BasePagingClient(BaseClient):
         return results
 
 
-class CursorIterator(six.Iterator):
+class CursorIterator:
     """
     For iterating through cursor based API responses
     """
