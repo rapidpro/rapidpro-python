@@ -1,3 +1,8 @@
+2.4 (2018-05-24)
+==================
+* Add input and name on run result (https://github.com/rapidpro/rapidpro-python/pull/58)
+* Fix archives test data, period values
+
 2.3 (2018-05-24)
 ==================
 * Add support for the new archives endpoint (https://github.com/rapidpro/rapidpro-python/pull/56)

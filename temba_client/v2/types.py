@@ -227,6 +227,8 @@ class Run(TembaObject):
         category = SimpleField()
         node = SimpleField()
         time = DatetimeField()
+        name = SimpleField()
+        input = SimpleField()
 
     id = IntegerField()
     flow = ObjectField(item_class=ObjectRef)

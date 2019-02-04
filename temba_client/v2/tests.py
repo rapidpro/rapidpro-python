@@ -658,6 +658,8 @@ class TembaClientTest(TembaTest):
         self.assertEqual(len(results[0].values), 2)
         self.assertEqual(results[0].values['color'].value, "blue")
         self.assertEqual(results[0].values['color'].category, "Blue")
+        self.assertEqual(results[0].values['color'].input, "it is blue")
+        self.assertEqual(results[0].values['color'].name, "color")
         self.assertEqual(results[0].values['color'].node, "fc32aeb0-ac3e-42a8-9ea7-10248fdf52a1")
         self.assertEqual(results[0].values['color'].time, datetime.datetime(2015, 11, 11, 13, 3, 51, 635662, pytz.utc))
         self.assertEqual(results[0].values['reason'].value, "Because it's the color of sky")

@@ -1,3 +1,3 @@
-__version__ = '2.3'
+__version__ = '2.5'
 
 CLIENT_NAME = 'rapidpro-python'
