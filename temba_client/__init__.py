@@ -1,5 +1,3 @@
-from __future__ import absolute_import, unicode_literals
-
-__version__ = '2.4'
+__version__ = '2.5'
 
 CLIENT_NAME = 'rapidpro-python'

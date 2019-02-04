@@ -1,5 +1,4 @@
 -r base.txt
 nose
-mock
 coverage
 flake8

@@ -1,9 +1,6 @@
-from __future__ import absolute_import, unicode_literals
-
 import json
 import pytz
 import requests
-import six
 import iso8601
 
 
@@ -24,7 +21,7 @@ def format_iso8601(value):
     if value is None:
         return None
 
-    return six.text_type(value.astimezone(pytz.UTC).strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
+    return str(value.astimezone(pytz.UTC).strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
 
 
 def request(method, url, **kwargs):  # pragma: no cover
