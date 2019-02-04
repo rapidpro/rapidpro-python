@@ -2,4 +2,3 @@
 nose
 coverage
 flake8
-black
