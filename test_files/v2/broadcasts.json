@@ -13,7 +13,6 @@
         },
         {
             "id": 2345,
-            "status": "queued",
             "urns": ["twitter:bobby"],
             "contacts": [],
             "groups": [],

@@ -49,7 +49,7 @@ class Boundary(TembaObject):
 
 class Broadcast(TembaObject):
     id = IntegerField()
-    status = SimpleField()
+    status = SimpleField(optional=True)
     urns = SimpleField()
     contacts = ObjectListField(item_class=ObjectRef)
     groups = ObjectListField(item_class=ObjectRef)
