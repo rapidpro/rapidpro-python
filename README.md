@@ -22,8 +22,9 @@ Example
 ```python
 from temba_client.v2 import TembaClient
 client = TembaClient('rapidpro.io', 'your-api-token')
-for contact in client.get_contacts(group='Reporters').iterfetches(retry_on_rate_exceed=True):
-    print(contact.name)
+for contact_batch in client.get_contacts(group='Reporters').iterfetches(retry_on_rate_exceed=True):
+    for contact in contact_batch:
+        print(contact.name)
 ```
 
 If you don't know your API token then visit the [API Explorer](http://rapidpro.io/api/v2/explorer)
