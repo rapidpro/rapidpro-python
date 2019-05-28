@@ -141,6 +141,7 @@ class Flow(TembaObject):
         key = SimpleField()
         name = SimpleField()
         categories = SimpleField()
+        node_uuids = SimpleField()
 
     uuid = SimpleField()
     name = SimpleField()

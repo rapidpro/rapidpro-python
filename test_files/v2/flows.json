@@ -16,7 +16,12 @@
                 "expired": 34
             },
             "results": [
-                {"key": "color", "name": "Color", "categories": ["Orange", "Blue", "Other", "Nothing"]}
+                {
+                    "key": "color",
+                    "name": "Color",
+                    "categories": ["Orange", "Blue", "Other", "Nothing"],
+                    "node_uuids": ["2bfbd76a-245a-473c-a296-28e4815f3a98", "d8b0ed18-a5c2-48be-98af-9b7f017fdc6c"]
+                }
             ]
 
         },
@@ -34,7 +39,12 @@
                 "expired": 0
             },
             "results": [
-                {"key": "color", "name": "Color", "categories": ["Orange", "Blue", "Other", "Nothing"]}
+                {
+                    "key": "color",
+                    "name": "Color",
+                    "categories": ["Orange", "Blue", "Other", "Nothing"],
+                    "node_uuids": ["1c57c86c-14a7-4e32-b8a7-07a5c690e9e0", "8dfc0cca-6812-4ad1-a390-39e6923be5a1"]
+                }
             ]
         }
     ]
