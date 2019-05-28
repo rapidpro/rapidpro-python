@@ -1,3 +1,7 @@
+2.6.1 (2019-05-28)
+==================
+* Make Flow.FlowResult.node_uuids optional
+
 2.6 (2019-05-28)
 ==================
 * Add support to use flow results metadata
