@@ -136,7 +136,7 @@ class Flow(TembaObject):
         completed = IntegerField()
         interrupted = IntegerField()
         expired = IntegerField()
-    
+
     class FlowResult(TembaObject):
         key = SimpleField()
         name = SimpleField()

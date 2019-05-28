@@ -462,7 +462,6 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].results[0].name, "Color")
         self.assertEqual(results[0].results[0].categories, ["Orange", "Blue", "Other", "Nothing"])
 
-
         # check with all params
         self.client.get_flows(uuid="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a").all()
 
