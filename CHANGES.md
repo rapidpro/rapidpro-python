@@ -1,3 +1,15 @@
+2.6 (2019-05-28)
+==================
+* Add support to use flow results metadata
+
+2.5.1 (2018-02-05)
+==================
+* Make broadcast.status optional
+
+2.5 (2019-02-04)
+==================
+* Remove support for python 2
+
 2.4 (2018-05-24)
 ==================
 * Add input and name on run result (https://github.com/rapidpro/rapidpro-python/pull/58)
