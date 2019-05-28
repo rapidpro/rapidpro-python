@@ -136,6 +136,11 @@ class Flow(TembaObject):
         completed = IntegerField()
         interrupted = IntegerField()
         expired = IntegerField()
+    
+    class FlowResult(TembaObject):
+        key = SimpleField()
+        name = SimpleField()
+        categories = SimpleField()
 
     uuid = SimpleField()
     name = SimpleField()
@@ -144,6 +149,7 @@ class Flow(TembaObject):
     expires = IntegerField()
     created_on = DatetimeField()
     runs = ObjectField(item_class=Runs)
+    results = ObjectListField(item_class=FlowResult)
 
 
 class FlowStart(TembaObject):

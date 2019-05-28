@@ -14,7 +14,11 @@
                 "completed": 123,
                 "interrupted": 2,
                 "expired": 34
-            }
+            },
+            "results": [
+                {"key": "color", "name": "Color", "categories": ["Orange", "Blue", "Other", "Nothing"]}
+            ]
+
         },
         {
             "uuid": "1b1add1b-6ed4-4e13-9b08-9127b2d33c74",
@@ -28,7 +32,10 @@
                 "completed": 0,
                 "interrupted": 0,
                 "expired": 0
-            }
+            },
+            "results": [
+                {"key": "color", "name": "Color", "categories": ["Orange", "Blue", "Other", "Nothing"]}
+            ]
         }
     ]
 }

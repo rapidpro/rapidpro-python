@@ -458,6 +458,10 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].runs.completed, 123)
         self.assertEqual(results[0].runs.interrupted, 2)
         self.assertEqual(results[0].runs.expired, 34)
+        self.assertEqual(results[0].results[0].key, "color")
+        self.assertEqual(results[0].results[0].name, "Color")
+        self.assertEqual(results[0].results[0].categories, ["Orange", "Blue", "Other", "Nothing"])
+
 
         # check with all params
         self.client.get_flows(uuid="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a").all()
