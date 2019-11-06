@@ -106,6 +106,12 @@ class TestType(TembaObject):
     meh = ObjectDictField(item_class=TestSubType)
 
 
+class TembaSerializationExceptionTest(TembaTest):
+    def test_str_works(self):
+        err = TembaSerializationException("boop")
+        self.assertEqual(str(err), "boop")
+
+
 class FieldsTest(TembaTest):
     def test_boolean(self):
         field = BooleanField()
