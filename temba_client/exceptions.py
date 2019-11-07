@@ -56,7 +56,8 @@ class TembaHttpError(TembaException):
 
 
 class TembaSerializationException(TembaException):
-    pass
+    def __init__(self, message):
+        self.message = message
 
 
 class TembaMultipleResultsError(TembaException):
