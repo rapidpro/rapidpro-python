@@ -33,11 +33,6 @@ class TembaObject(metaclass=ABCMeta):
         for attr_name, field in cls._get_fields().items():
             field_source = field.src if field.src else attr_name
 
-            if field_source not in item and not field.optional:
-                raise TembaSerializationException(
-                    "Serialized %s item is missing field '%s'" % (cls.__name__, field_source)
-                )
-
             field_value = item.get(field_source, None)
             attr_value = field.deserialize(field_value)
 
@@ -72,9 +67,8 @@ class TembaObject(metaclass=ABCMeta):
 
 
 class TembaField(metaclass=ABCMeta):
-    def __init__(self, src=None, optional=False):
+    def __init__(self, src=None):
         self.src = src
-        self.optional = optional
 
     @abstractmethod
     def deserialize(self, value):  # pragma: no cover

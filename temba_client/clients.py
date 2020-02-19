@@ -9,7 +9,7 @@ from urllib.parse import parse_qs, urlparse
 
 from abc import ABCMeta
 from . import __version__, CLIENT_NAME
-from .exceptions import TembaMultipleResultsError, TembaNoSuchObjectError, TembaBadRequestError, TembaConnectionError
+from .exceptions import TembaNoSuchObjectError, TembaBadRequestError, TembaConnectionError
 from .exceptions import TembaRateExceededError, TembaTokenError, TembaHttpError
 from .serialization import TembaObject
 from .utils import format_iso8601, request
@@ -158,97 +158,6 @@ class BaseClient(object):
             return 1 if value else 0
         else:
             return value
-
-
-class Pager(object):
-    """
-    For iterating through page based API responses
-    """
-
-    def __init__(self, start_page):
-        self.start_page = start_page
-        self.count = None
-        self.next_url = None
-
-    def update(self, response):
-        self.count = response["count"]
-        self.next_url = response["next"]
-
-    @property
-    def total(self):
-        return self.count
-
-    def has_more(self):
-        return bool(self.next_url)
-
-
-class BasePagingClient(BaseClient):
-    """
-    Abstract base client for page-based endpoint access
-    """
-
-    __metaclass__ = ABCMeta
-
-    def _get_single(self, endpoint, params, from_results=True):
-        """
-        GETs a single result from the given endpoint. Throws an exception if there are no or multiple results.
-        """
-        url = "%s/%s.json" % (self.root_url, endpoint)
-        response = self._request("get", url, params=params)
-
-        if from_results:
-            num_results = len(response["results"])
-
-            if num_results > 1:
-                raise TembaMultipleResultsError()
-            elif num_results == 0:
-                raise TembaNoSuchObjectError()
-            else:
-                return response["results"][0]
-        else:
-            return response
-
-    def _get_multiple(self, endpoint, params, pager):
-        """
-        GETs multiple results from the given endpoint
-        """
-        if pager:
-            return self._get_page(endpoint, params, pager)
-        else:
-            return self._get_all(endpoint, params)
-
-    def _get_page(self, endpoint, params, pager):
-        """
-        GETs a page of results from the given endpoint
-        """
-        if pager.next_url:
-            url = pager.next_url
-            params = None
-        else:
-            url = "%s/%s.json" % (self.root_url, endpoint)
-            if pager.start_page != 1:
-                params["page"] = pager.start_page
-
-        response = self._request("get", url, params=params)
-
-        pager.update(response)
-
-        return response["results"]
-
-    def _get_all(self, endpoint, params):
-        """
-        GETs all results from the given endpoint using multiple requests to fetch all pages
-        """
-        results = []
-        url = "%s/%s.json" % (self.root_url, endpoint)
-
-        while url:
-            response = self._request("get", url, params=params)
-            results += response["results"]
-            url = response.get("next", None)
-            params = {}
-
-        return results
 
 
 class CursorIterator:

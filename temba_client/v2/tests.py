@@ -7,7 +7,7 @@ from requests.exceptions import ConnectionError
 from . import TembaClient
 from .types import Campaign, CampaignEvent, Contact, Field, Flow, Group, Label, Message, ResthookSubscriber
 from ..exceptions import TembaBadRequestError, TembaTokenError, TembaRateExceededError, TembaHttpError
-from ..exceptions import TembaConnectionError
+from ..exceptions import TembaConnectionError, TembaNoSuchObjectError
 from ..tests import TembaTest, MockResponse
 
 
@@ -976,6 +976,19 @@ class TembaClientTest(TembaTest):
             data={"label": "Chat Name", "value_type": "text"},
         )
         self.assertEqual(field.key, "chat_name")
+
+        mock_request.return_value = MockResponse(404, {"detail": "Not found."})
+
+        with self.assertRaises(TembaNoSuchObjectError):
+            self.client.update_field(Field.create(key="chat_name2"), label="Chat Name", value_type="text")
+
+            self.assertRequest(
+                mock_request,
+                "post",
+                "fields",
+                params={"key": "chat_name"},
+                data={"label": "Chat Name", "value_type": "text"},
+            )
 
     def test_update_group(self, mock_request):
         mock_request.return_value = MockResponse(201, self.read_json("groups", extract_result=0))

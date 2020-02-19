@@ -49,7 +49,7 @@ class Boundary(TembaObject):
 
 class Broadcast(TembaObject):
     id = IntegerField()
-    status = SimpleField(optional=True)
+    status = SimpleField()
     urns = SimpleField()
     contacts = ObjectListField(item_class=ObjectRef)
     groups = ObjectListField(item_class=ObjectRef)
@@ -141,7 +141,7 @@ class Flow(TembaObject):
         key = SimpleField()
         name = SimpleField()
         categories = SimpleField()
-        node_uuids = SimpleField(optional=True)
+        node_uuids = SimpleField()
 
     uuid = SimpleField()
     name = SimpleField()
@@ -187,12 +187,12 @@ class Message(TembaObject):
     direction = SimpleField()
     type = SimpleField()
     status = SimpleField()
-    visibility = SimpleField(optional=True)
+    visibility = SimpleField()
     text = SimpleField()
     labels = ObjectListField(item_class=ObjectRef)
     created_on = DatetimeField()
     sent_on = DatetimeField()
-    modified_on = DatetimeField(optional=True)
+    modified_on = DatetimeField()
 
 
 class Org(TembaObject):

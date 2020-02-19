@@ -58,7 +58,3 @@ class TembaHttpError(TembaException):
 class TembaSerializationException(TembaException):
     def __init__(self, message):
         self.message = message
-
-
-class TembaMultipleResultsError(TembaException):
-    message = "Request for single object returned multiple objects"
