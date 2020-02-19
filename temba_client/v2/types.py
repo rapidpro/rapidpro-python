@@ -1,5 +1,13 @@
-from ..serialization import TembaObject, SimpleField, BooleanField, IntegerField, DatetimeField, ObjectField
-from ..serialization import ObjectListField, ObjectDictField
+from ..serialization import (
+    BooleanField,
+    DatetimeField,
+    IntegerField,
+    ObjectDictField,
+    ObjectField,
+    ObjectListField,
+    SimpleField,
+    TembaObject,
+)
 
 
 class ObjectRef(TembaObject):

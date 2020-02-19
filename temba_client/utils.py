@@ -1,7 +1,8 @@
 import json
+
+import iso8601
 import pytz
 import requests
-import iso8601
 
 
 def parse_iso8601(value):

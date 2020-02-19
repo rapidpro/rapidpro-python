@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+
 from .exceptions import TembaSerializationException
 from .utils import format_iso8601, parse_iso8601
 

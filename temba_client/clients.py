@@ -1,16 +1,21 @@
 import datetime
 import json
 import logging
-
-import requests
 import time
-
+from abc import ABCMeta
 from urllib.parse import parse_qs, urlparse
 
-from abc import ABCMeta
-from . import __version__, CLIENT_NAME
-from .exceptions import TembaNoSuchObjectError, TembaBadRequestError, TembaConnectionError
-from .exceptions import TembaRateExceededError, TembaTokenError, TembaHttpError
+import requests
+
+from . import CLIENT_NAME, __version__
+from .exceptions import (
+    TembaBadRequestError,
+    TembaConnectionError,
+    TembaHttpError,
+    TembaNoSuchObjectError,
+    TembaRateExceededError,
+    TembaTokenError,
+)
 from .serialization import TembaObject
 from .utils import format_iso8601, request
 

@@ -1,16 +1,25 @@
 import codecs
 import datetime
 import json
-import pytz
-import requests
 import unittest
 
+import pytz
+import requests
 from requests.structures import CaseInsensitiveDict
+
 from . import __version__
 from .clients import BaseClient
 from .exceptions import TembaException, TembaSerializationException
-from .serialization import TembaObject, SimpleField, BooleanField, IntegerField, DatetimeField, ObjectField
-from .serialization import ObjectListField, ObjectDictField
+from .serialization import (
+    BooleanField,
+    DatetimeField,
+    IntegerField,
+    ObjectDictField,
+    ObjectField,
+    ObjectListField,
+    SimpleField,
+    TembaObject,
+)
 from .utils import format_iso8601, parse_iso8601
 
 
