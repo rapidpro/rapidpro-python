@@ -521,7 +521,7 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].contacts[0].name, "Joe")
         self.assertEqual(results[0].restart_participants, True)
         self.assertEqual(results[0].status, "pending")
-        self.assertEqual(results[0].extra, {"day": "Monday"})
+        self.assertEqual(results[0].params, {"day": "Monday"})
         self.assertEqual(results[0].created_on, datetime.datetime(2015, 8, 26, 10, 4, 9, 737686, pytz.utc))
         self.assertEqual(results[0].modified_on, datetime.datetime(2015, 9, 26, 10, 4, 9, 737686, pytz.utc))
 
@@ -879,7 +879,7 @@ class TembaClientTest(TembaTest):
             groups=["04a4752b-0f49-480e-ae60-3a3f2bea485c"],
             urns=[],
             restart_participants=False,
-            extra={"day": "Monday"},
+            params={"day": "Monday"},
         )
 
         self.assertRequest(
@@ -892,7 +892,7 @@ class TembaClientTest(TembaTest):
                 "groups": ["04a4752b-0f49-480e-ae60-3a3f2bea485c"],
                 "urns": [],
                 "restart_participants": False,
-                "extra": {"day": "Monday"},
+                "params": {"day": "Monday"},
             },
         )
         self.assertEqual(start.uuid, "93a624ad-5440-415e-b49f-17bf42754acb")
