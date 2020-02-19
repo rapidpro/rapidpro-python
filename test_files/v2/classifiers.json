@@ -1,0 +1,20 @@
+{
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "uuid": "9a8b001e-a913-486c-80f4-1356e23f582e",
+            "name": "Booking",
+            "intents": ["book_flight", "book_car"],
+            "type": "wit",
+            "created_on": "2015-06-08T12:18:07.671000+00:00"
+        },
+        {
+            "uuid": "f6d0cc89-e195-4512-bf27-f52b40b622f3",
+            "name": "Emotions",
+            "intents": ["happy", "sad"],
+            "type": "bothub",
+            "created_on": "2013-02-27T09:06:15.456"
+        }
+    ]
+}

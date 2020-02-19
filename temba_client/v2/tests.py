@@ -307,6 +307,29 @@ class TembaClientTest(TembaTest):
             params={"uuid": "09d23a05-47fe-11e4-bfe9-b8f6b119e9ab", "address": "+250788123123"},
         )
 
+    def test_get_classifiers(self, mock_request):
+        # check no params
+        mock_request.return_value = MockResponse(200, self.read_json("classifiers"))
+
+        # check with no params
+        results = self.client.get_classifiers().all()
+
+        self.assertRequest(mock_request, "get", "classifiers")
+        self.assertEqual(len(results), 2)
+
+        self.assertEqual(results[0].uuid, "9a8b001e-a913-486c-80f4-1356e23f582e")
+        self.assertEqual(results[0].type, "wit")
+        self.assertEqual(results[0].name, "Booking")
+        self.assertEqual(results[0].intents, ["book_flight", "book_car"])
+        self.assertEqual(results[0].created_on, datetime.datetime(2015, 6, 8, 12, 18, 7, 671000, pytz.utc))
+
+        # check with all params
+        self.client.get_classifiers(uuid="09d23a05-47fe-11e4-bfe9-b8f6b119e9ab").all()
+
+        self.assertRequest(
+            mock_request, "get", "classifiers", params={"uuid": "09d23a05-47fe-11e4-bfe9-b8f6b119e9ab"}
+        )
+
     def test_get_channel_events(self, mock_request):
         # check no params
         mock_request.return_value = MockResponse(200, self.read_json("channel_events"))
@@ -499,6 +522,21 @@ class TembaClientTest(TembaTest):
         self.client.get_flow_starts(uuid="93a624ad-5440-415e-b49f-17bf42754acb").all()
 
         self.assertRequest(mock_request, "get", "flow_starts", params={"uuid": "93a624ad-5440-415e-b49f-17bf42754acb"})
+
+    def test_get_globals(self, mock_request):
+        # check no params
+        mock_request.return_value = MockResponse(200, self.read_json("globals"))
+
+        # check with no params
+        results = self.client.get_globals().all()
+
+        self.assertRequest(mock_request, "get", "globals")
+        self.assertEqual(len(results), 2)
+
+        self.assertEqual(results[0].key, "org_name")
+        self.assertEqual(results[0].name, "Org Name")
+        self.assertEqual(results[0].value, "Acme Ltd")
+        self.assertEqual(results[0].modified_on, datetime.datetime(2015, 6, 8, 12, 18, 7, 671000, pytz.utc))
 
     def test_get_groups(self, mock_request):
         # check no params

@@ -1,5 +1,5 @@
 from ..serialization import TembaObject, SimpleField, BooleanField, IntegerField, DatetimeField, ObjectField
-from ..serialization import ObjectListField, ObjectDictField
+from ..serialization import ListField, ObjectListField, ObjectDictField
 
 
 class ObjectRef(TembaObject):
@@ -43,7 +43,7 @@ class Boundary(TembaObject):
     name = SimpleField()
     level = IntegerField()
     parent = ObjectField(item_class=BoundaryRef)
-    aliases = SimpleField()
+    aliases = ListField()
     geometry = ObjectField(item_class=Geometry)
 
 
@@ -104,11 +104,19 @@ class ChannelEvent(TembaObject):
     created_on = DatetimeField()
 
 
+class Classifier(TembaObject):
+    uuid = SimpleField()
+    type = SimpleField()
+    name = SimpleField()
+    intents = ListField()
+    created_on = DatetimeField()
+
+
 class Contact(TembaObject):
     uuid = SimpleField()
     name = SimpleField()
     language = SimpleField()
-    urns = SimpleField()
+    urns = ListField()
     groups = ObjectListField(item_class=ObjectRef)
     fields = SimpleField()
     blocked = BooleanField()
@@ -119,9 +127,9 @@ class Contact(TembaObject):
 
 class Export(TembaObject):
     version = SimpleField()
-    flows = SimpleField()
-    campaigns = SimpleField()
-    triggers = SimpleField()
+    flows = ListField()
+    campaigns = ListField()
+    triggers = ListField()
 
 
 class Field(TembaObject):
@@ -165,6 +173,13 @@ class FlowStart(TembaObject):
     modified_on = DatetimeField()
 
 
+class Global(TembaObject):
+    key = SimpleField()
+    name = SimpleField()
+    value = SimpleField()
+    modified_on = DatetimeField()
+
+
 class Group(TembaObject):
     uuid = SimpleField()
     name = SimpleField()
@@ -198,7 +213,7 @@ class Message(TembaObject):
 class Org(TembaObject):
     name = SimpleField()
     country = SimpleField()
-    languages = SimpleField()
+    languages = ListField()
     primary_language = SimpleField()
     timezone = SimpleField()
     date_style = SimpleField()

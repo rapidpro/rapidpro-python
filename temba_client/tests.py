@@ -9,7 +9,7 @@ from requests.structures import CaseInsensitiveDict
 from . import __version__
 from .clients import BaseClient
 from .exceptions import TembaException, TembaSerializationException
-from .serialization import TembaObject, SimpleField, BooleanField, IntegerField, DatetimeField, ObjectField
+from .serialization import TembaObject, SimpleField, BooleanField, IntegerField, DatetimeField, ObjectField, ListField
 from .serialization import ObjectListField, ObjectDictField
 from .utils import format_iso8601, parse_iso8601
 
@@ -136,6 +136,17 @@ class FieldsTest(TembaTest):
         self.assertRaises(TembaSerializationException, field.deserialize, 1.5)
         self.assertRaises(TembaSerializationException, field.deserialize, "")
         self.assertRaises(TembaSerializationException, field.deserialize, [])
+
+    def test_list(self):
+        field = ListField()
+        self.assertEqual(field.serialize([]), [])
+        self.assertEqual(field.serialize(None), None)
+
+        self.assertEqual(field.deserialize([]), [])
+        self.assertEqual(field.deserialize(None), None)
+
+        self.assertRaises(TembaSerializationException, field.deserialize, 1.5)
+        self.assertRaises(TembaSerializationException, field.deserialize, "")
 
     def test_object_list(self):
         field = ObjectListField(item_class=TestSubType)
