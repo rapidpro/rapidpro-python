@@ -25,7 +25,7 @@ jobs:
     - name: Run tests
       run: |
         flake8
-        nosetests --with-coverage --cover-erase --cover-package=temba_client
+        nosetests --with-coverage --cover-erase --cover-package=temba_client --cover-xml
 
     - name: Upload coverage
       if: success()
