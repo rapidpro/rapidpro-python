@@ -1,3 +1,9 @@
+2.7 (2020-02-19)
+==================
+* Drop support for API v1
+* Add support for globals and classifiers (https://github.com/rapidpro/rapidpro-python/pull/68)
+* Use flow_start.params instead of .extra (https://github.com/rapidpro/rapidpro-python/pull/69)
+
 2.6.1 (2019-05-28)
 ==================
 * Make Flow.FlowResult.node_uuids optional
