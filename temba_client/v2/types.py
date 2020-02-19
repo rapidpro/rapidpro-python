@@ -177,7 +177,7 @@ class FlowStart(TembaObject):
     contacts = ObjectListField(item_class=ObjectRef)
     status = SimpleField()
     restart_participants = BooleanField()
-    extra = SimpleField()
+    params = SimpleField()
     created_on = DatetimeField()
     modified_on = DatetimeField()
 

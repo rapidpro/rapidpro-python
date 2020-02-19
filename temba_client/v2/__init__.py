@@ -360,7 +360,7 @@ class TembaClient(BaseCursorClient):
         """
         return Field.deserialize(self._post("fields", None, self._build_params(label=label, value_type=value_type)))
 
-    def create_flow_start(self, flow, urns=None, contacts=None, groups=None, restart_participants=None, extra=None):
+    def create_flow_start(self, flow, urns=None, contacts=None, groups=None, restart_participants=None, params=None):
         """
         Creates a new flow start
 
@@ -369,7 +369,7 @@ class TembaClient(BaseCursorClient):
         :param list[str] contacts: UUIDs of contacts to start
         :param list[str] groups: UUIDs of contact groups to start
         :param bool restart_participants: whether to restart participants already in this flow
-        :param * extra: a dictionary of extra parameters to pass to the flow
+        :param * params: a dictionary of parameters to pass to the flow
         :return: the new label
         """
         payload = self._build_params(
@@ -378,7 +378,7 @@ class TembaClient(BaseCursorClient):
             contacts=contacts,
             groups=groups,
             restart_participants=restart_participants,
-            extra=extra,
+            params=params,
         )
         return FlowStart.deserialize(self._post("flow_starts", None, payload))
 

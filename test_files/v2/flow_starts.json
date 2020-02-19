@@ -15,6 +15,7 @@
             "restart_participants": true,
             "status": "pending",
             "extra": {"day": "Monday"},
+            "params": {"day": "Monday"},
             "created_on": "2015-08-26T10:04:09.737686+00:00",
             "modified_on": "2015-09-26T10:04:09.737686+00:00"
         },
@@ -30,6 +31,7 @@
             "restart_participants": false,
             "status": "complete",
             "extra": null,
+            "params": null,
             "created_on": "2013-08-19T19:11:21.082+00:00",
             "modified_on": "2013-08-19T19:11:21.082+00:00"
         }
