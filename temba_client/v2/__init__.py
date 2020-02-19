@@ -7,11 +7,13 @@ from .types import (
     CampaignEvent,
     Channel,
     ChannelEvent,
+    Classifier,
     Contact,
     Export,
     Field,
     Flow,
     FlowStart,
+    Global,
     Group,
     Label,
     Message,
@@ -119,6 +121,16 @@ class TembaClient(BaseCursorClient):
         params = self._build_params(id=id, contact=contact, before=before, after=after)
         return self._get_query("channel_events", params, ChannelEvent)
 
+    def get_classifiers(self, uuid=None):
+        """
+        Gets all matching NLU classifiers
+
+        :param uuid: classifier UUID
+        :return: classifier query
+        """
+        params = self._build_params(uuid=uuid)
+        return self._get_query("classifiers", params, Classifier)
+
     def get_contacts(self, uuid=None, urn=None, group=None, deleted=None, before=None, after=None):
         """
         Gets all matching contacts
@@ -172,6 +184,14 @@ class TembaClient(BaseCursorClient):
         :return: flow start query
         """
         return self._get_query("flow_starts", self._build_params(uuid=uuid), FlowStart)
+
+    def get_globals(self):
+        """
+        Gets all globals
+
+        :return: global query
+        """
+        return self._get_query("globals", {}, Global)
 
     def get_groups(self, uuid=None, name=None):
         """

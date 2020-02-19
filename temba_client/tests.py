@@ -14,6 +14,7 @@ from .serialization import (
     BooleanField,
     DatetimeField,
     IntegerField,
+    ListField,
     ObjectDictField,
     ObjectField,
     ObjectListField,
@@ -145,6 +146,17 @@ class FieldsTest(TembaTest):
         self.assertRaises(TembaSerializationException, field.deserialize, 1.5)
         self.assertRaises(TembaSerializationException, field.deserialize, "")
         self.assertRaises(TembaSerializationException, field.deserialize, [])
+
+    def test_list(self):
+        field = ListField()
+        self.assertEqual(field.serialize([]), [])
+        self.assertEqual(field.serialize(None), None)
+
+        self.assertEqual(field.deserialize([]), [])
+        self.assertEqual(field.deserialize(None), None)
+
+        self.assertRaises(TembaSerializationException, field.deserialize, 1.5)
+        self.assertRaises(TembaSerializationException, field.deserialize, "")
 
     def test_object_list(self):
         field = ObjectListField(item_class=TestSubType)

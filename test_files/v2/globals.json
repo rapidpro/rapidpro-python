@@ -1,0 +1,18 @@
+{
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "key": "org_name",
+            "name": "Org Name",
+            "value": "Acme Ltd",
+            "modified_on": "2015-06-08T12:18:07.671000+00:00"
+        },
+        {
+            "key": "access_token",
+            "name": "Access Token",
+            "value": "35478458732",
+            "modified_on": "2015-06-08T12:18:07.671000+00:00"
+        }
+    ]
+}

@@ -102,6 +102,13 @@ class IntegerField(SimpleField):
         return value
 
 
+class ListField(SimpleField):
+    def deserialize(self, value):
+        if value is not None and type(value) != list:
+            raise TembaSerializationException("Value '%s' field is not a list" % str(value))
+        return value
+
+
 class DatetimeField(TembaField):
     def deserialize(self, value):
         return parse_iso8601(value)
