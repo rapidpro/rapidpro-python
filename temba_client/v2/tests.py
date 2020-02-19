@@ -1,14 +1,21 @@
 import datetime
 import json
-import pytz
-
 from unittest.mock import patch
+
+import pytz
 from requests.exceptions import ConnectionError
+
+from ..exceptions import (
+    TembaBadRequestError,
+    TembaConnectionError,
+    TembaHttpError,
+    TembaNoSuchObjectError,
+    TembaRateExceededError,
+    TembaTokenError,
+)
+from ..tests import MockResponse, TembaTest
 from . import TembaClient
 from .types import Campaign, CampaignEvent, Contact, Field, Flow, Group, Label, Message, ResthookSubscriber
-from ..exceptions import TembaBadRequestError, TembaTokenError, TembaRateExceededError, TembaHttpError
-from ..exceptions import TembaConnectionError, TembaNoSuchObjectError
-from ..tests import TembaTest, MockResponse
 
 
 @patch("temba_client.clients.request")

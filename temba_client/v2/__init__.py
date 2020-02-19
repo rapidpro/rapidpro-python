@@ -1,6 +1,28 @@
-from .types import Archive, Boundary, Broadcast, Campaign, CampaignEvent, Channel, ChannelEvent, Contact, Export, Field, Classifier, Global
-from .types import FlowStart, Flow, Group, Label, Message, Org, Resthook, ResthookSubscriber, ResthookEvent, Run
 from ..clients import BaseCursorClient
+from .types import (
+    Archive,
+    Boundary,
+    Broadcast,
+    Campaign,
+    CampaignEvent,
+    Channel,
+    ChannelEvent,
+    Classifier,
+    Contact,
+    Export,
+    Field,
+    Flow,
+    FlowStart,
+    Global,
+    Group,
+    Label,
+    Message,
+    Org,
+    Resthook,
+    ResthookEvent,
+    ResthookSubscriber,
+    Run,
+)
 
 
 class TembaClient(BaseCursorClient):
