@@ -18,7 +18,7 @@ from . import TembaClient
 from .types import Campaign, CampaignEvent, Contact, Field, Flow, Group, Label, Message, ResthookSubscriber
 
 
-@patch("temba_client.clients.request")
+@patch("temba_client.base.request")
 class TembaClientTest(TembaTest):
     API_VERSION = 2
 
@@ -897,6 +897,13 @@ class TembaClientTest(TembaTest):
         )
         self.assertEqual(start.uuid, "93a624ad-5440-415e-b49f-17bf42754acb")
 
+    def test_create_global(self, mock_request):
+        mock_request.return_value = MockResponse(201, self.read_json("globals", extract_result=0))
+        glbl = self.client.create_global(name="Org Name", value="Acme Ltd")
+
+        self.assertRequest(mock_request, "post", "globals", data={"name": "Org Name", "value": "Acme Ltd"})
+        self.assertEqual(glbl.key, "org_name")
+
     def test_create_group(self, mock_request):
         mock_request.return_value = MockResponse(201, self.read_json("groups", extract_result=0))
         group = self.client.create_group(name="Reporters")
@@ -1034,6 +1041,21 @@ class TembaClientTest(TembaTest):
                 params={"key": "chat_name"},
                 data={"label": "Chat Name", "value_type": "text"},
             )
+
+    def test_update_global(self, mock_request):
+        mock_request.return_value = MockResponse(201, self.read_json("globals", extract_result=0))
+
+        # check update by key
+        glbl = self.client.update_global("org_name", value="Nyaruka")
+
+        self.assertRequest(
+            mock_request,
+            "post",
+            "globals",
+            params={"key": "org_name"},
+            data={"value": "Nyaruka"},
+        )
+        self.assertEqual(glbl.key, "org_name")
 
     def test_update_group(self, mock_request):
         mock_request.return_value = MockResponse(201, self.read_json("groups", extract_result=0))
@@ -1236,7 +1258,7 @@ class TembaClientTest(TembaTest):
         )
 
 
-@patch("temba_client.clients.request")
+@patch("temba_client.base.request")
 class TembaClientVerifyTest(TembaTest):
     def test_verify_false(self, mock_request):
         client = TembaClient("example.com", "12345", verify_ssl=False)
