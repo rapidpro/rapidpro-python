@@ -8,7 +8,7 @@ import requests
 from requests.structures import CaseInsensitiveDict
 
 from . import __version__
-from .clients import BaseClient
+from .base import BaseClient
 from .exceptions import TembaException, TembaSerializationException
 from .serialization import (
     BooleanField,

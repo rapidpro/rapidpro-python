@@ -1,4 +1,4 @@
-from ..clients import BaseCursorClient
+from ..base import BaseCursorClient
 from .types import (
     Archive,
     Boundary,
@@ -382,6 +382,17 @@ class TembaClient(BaseCursorClient):
         )
         return FlowStart.deserialize(self._post("flow_starts", None, payload))
 
+    def create_global(self, name, value):
+        """
+        Creates a new global
+
+        :param str name: global name
+        :param str value: global value
+        :return: the new global
+        """
+        payload = self._build_params(name=name, value=value)
+        return Global.deserialize(self._post("globals", None, payload))
+
     def create_group(self, name):
         """
         Creates a new contact group
@@ -476,6 +487,18 @@ class TembaClient(BaseCursorClient):
         params = self._build_id_param(key=field)
         payload = self._build_params(label=label, value_type=value_type)
         return Field.deserialize(self._post("fields", params, payload))
+
+    def update_global(self, glbl, value):
+        """
+        Updates an existing global
+
+        :param * glbl: global object or key
+        :param str value: new value
+        :return: the updated global
+        """
+        params = self._build_id_param(key=glbl)
+        payload = self._build_params(value=value)
+        return Global.deserialize(self._post("globals", params, payload))
 
     def update_group(self, group, name):
         """
