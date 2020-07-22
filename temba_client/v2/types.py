@@ -220,6 +220,7 @@ class Message(TembaObject):
 
 
 class Org(TembaObject):
+    uuid = SimpleField()
     name = SimpleField()
     country = SimpleField()
     languages = ListField()
