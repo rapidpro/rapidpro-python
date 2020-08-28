@@ -1210,9 +1210,9 @@ class TembaClientTest(TembaTest):
             mock_request, "post", "contact_actions", data={"contacts": resolved_contacts, "action": "interrupt"}
         )
 
-        self.client.bulk_archive_contacts(contacts=contacts)
+        self.client.bulk_archive_contact_messages(contacts=contacts)
         self.assertRequest(
-            mock_request, "post", "contact_actions", data={"contacts": resolved_contacts, "action": "archive"}
+            mock_request, "post", "contact_actions", data={"contacts": resolved_contacts, "action": "archive_messages"}
         )
 
         self.client.bulk_delete_contacts(contacts=contacts)

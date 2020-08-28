@@ -612,13 +612,13 @@ class TembaClient(BaseCursorClient):
         """
         self._post("contact_actions", None, self._build_params(contacts=contacts, action="interrupt"))
 
-    def bulk_archive_contacts(self, contacts):
+    def bulk_archive_contact_messages(self, contacts):
         """
         Archives all messages for contacts
 
         :param list[*] contacts: contact objects, UUIDs or URNs
         """
-        self._post("contact_actions", None, self._build_params(contacts=contacts, action="archive"))
+        self._post("contact_actions", None, self._build_params(contacts=contacts, action="archive_messages"))
 
     def bulk_delete_contacts(self, contacts):
         """
