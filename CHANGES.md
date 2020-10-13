@@ -1,3 +1,7 @@
+2.8.0 (2020-08-28)
+==================
+* Update name of action for archiving messages
+
 2.7.1 (2020-07-22)
 ==================
 * Add UUID field to Org
