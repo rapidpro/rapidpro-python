@@ -7,7 +7,7 @@ from urllib.parse import parse_qs, urlparse
 
 import requests
 
-from . import CLIENT_NAME, __version__
+from . import CLIENT_NAME, CLIENT_VERSION
 from .exceptions import (
     TembaBadRequestError,
     TembaConnectionError,
@@ -49,9 +49,9 @@ class BaseClient(object):
     @staticmethod
     def _headers(token, user_agent):
         if user_agent:
-            user_agent_header = "%s %s/%s" % (user_agent, CLIENT_NAME, __version__)
+            user_agent_header = "%s %s/%s" % (user_agent, CLIENT_NAME, CLIENT_VERSION)
         else:
-            user_agent_header = "%s/%s" % (CLIENT_NAME, __version__)
+            user_agent_header = "%s/%s" % (CLIENT_NAME, CLIENT_VERSION)
 
         return {
             "Content-type": "application/json",

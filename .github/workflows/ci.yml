@@ -18,14 +18,13 @@ jobs:
 
     - name: Initialize environment
       run: |
-        pip install --upgrade pip
-        pip install -r requirements/tests.txt
-        pip install codecov
+        python -m pip install -U pip poetry
+        poetry install
 
     - name: Run tests
       run: |
-        flake8
-        nosetests --with-coverage --cover-erase --cover-package=temba_client --cover-xml
+        poetry run flake8
+        poetry run nosetests --with-coverage --cover-erase --cover-package=temba_client --cover-xml
 
     - name: Upload coverage
       if: success()

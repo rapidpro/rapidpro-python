@@ -7,7 +7,7 @@ import pytz
 import requests
 from requests.structures import CaseInsensitiveDict
 
-from . import __version__
+from . import CLIENT_VERSION
 from .base import BaseClient
 from .exceptions import TembaException, TembaSerializationException
 from .serialization import (
@@ -62,7 +62,7 @@ class TembaTest(unittest.TestCase):
                 "Content-type": "application/json",
                 "Authorization": "Token 1234567890",
                 "Accept": u"application/json",
-                "User-Agent": "test/0.1 rapidpro-python/%s" % __version__,
+                "User-Agent": "test/0.1 rapidpro-python/%s" % CLIENT_VERSION,
             },
             verify=None,
             **kwargs
@@ -270,7 +270,7 @@ class BaseClientTest(TembaTest):
                 "Content-type": "application/json",
                 "Accept": "application/json",
                 "Authorization": "Token 1234567890",
-                "User-Agent": "test/0.1 rapidpro-python/%s" % __version__,
+                "User-Agent": "test/0.1 rapidpro-python/%s" % CLIENT_VERSION,
             },
         )
 
@@ -283,7 +283,7 @@ class BaseClientTest(TembaTest):
                 "Content-type": "application/json",
                 "Accept": "application/json",
                 "Authorization": "Token 1234567890",
-                "User-Agent": "rapidpro-python/%s" % __version__,
+                "User-Agent": "rapidpro-python/%s" % CLIENT_VERSION,
             },
         )
 

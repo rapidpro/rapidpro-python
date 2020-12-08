@@ -1,4 +1,0 @@
--r base.txt
-nose
-coverage
-flake8

@@ -1,3 +1,4 @@
-__version__ = "2.8.0"
+import pkg_resources
 
 CLIENT_NAME = "rapidpro-python"
+CLIENT_VERSION = pkg_resources.get_distribution('rapidpro-python').version

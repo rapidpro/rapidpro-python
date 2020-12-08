@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "rapidpro-python"
+version = "2.8.0"
+description = "Python client library for the RapidPro API"
+authors = ["Nyaruka <code@nyaruka.com>"]
+readme = "README.md"
+license = "BSD-4-Clause"
+classifiers=[
+    'Development Status :: 5 - Production/Stable',
+    'Intended Audience :: Developers',
+    'Topic :: Software Development :: Libraries',
+    'License :: OSI Approved :: BSD License',
+    'Programming Language :: Python :: 3',
+]
+packages = [
+    { include = "temba_client" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+pytz = "^2020.4"
+requests = "^2.25.0"
+iso8601 = "^0.1.13"
+
+[tool.poetry.dev-dependencies]
+nose = "^1.3.7"
+coverage = "^5.3"
+flake8 = "^3.8.4"
+codecov = "^2.1.10"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
