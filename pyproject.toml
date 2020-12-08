@@ -16,6 +16,9 @@ packages = [
     { include = "temba_client" },
 ]
 
+[tool.poetry.urls]
+repository = "http://github.com/rapidpro/rapidpro-python"
+
 [tool.poetry.dependencies]
 python = "^3.6"
 pytz = "^2020.4"
