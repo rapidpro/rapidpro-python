@@ -1,3 +1,7 @@
+v2.8.1
+----------
+ * Switch to new release system
+
 2.8.0 (2020-08-28)
 ==================
 * Update name of action for archiving messages
