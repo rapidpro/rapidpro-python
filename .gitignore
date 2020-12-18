@@ -4,11 +4,8 @@ __pycache__/
 *~
 *.sw[po]
 
-sitestatic/
-config/
-db/
-dash
-deploy
+fabric
+fabfile.*
 
 .idea/
 .DS_Store
