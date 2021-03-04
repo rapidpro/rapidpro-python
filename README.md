@@ -2,7 +2,7 @@ RapidPro Python Client
 ======================
 
 [![Build Status](https://github.com/rapidpro/rapidpro-python/workflows/CI/badge.svg)](https://github.com/rapidpro/rapidpro-python/actions?query=workflow%3ACI)
-[![Coverage Status](https://codecov.io/gh/rapidpro/rapidpro-python/branch/master/graph/badge.svg)](https://codecov.io/gh/rapidpro/rapidpro-python) 
+[![Coverage Status](https://codecov.io/gh/rapidpro/rapidpro-python/branch/main/graph/badge.svg)](https://codecov.io/gh/rapidpro/rapidpro-python) 
 [![PyPI Release](https://img.shields.io/pypi/v/rapidpro-python.svg)](https://pypi.python.org/pypi/rapidpro-python/)
 
 Official Python client library for the [RapidPro](http://rapidpro.github.io/rapidpro/). Supports latest Python 3.
