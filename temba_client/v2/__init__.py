@@ -360,7 +360,9 @@ class TembaClient(BaseCursorClient):
         """
         return Field.deserialize(self._post("fields", None, self._build_params(label=label, value_type=value_type)))
 
-    def create_flow_start(self, flow, urns=None, contacts=None, groups=None, restart_participants=None, exclude_active=None, params=None):
+    def create_flow_start(
+        self, flow, urns=None, contacts=None, groups=None, restart_participants=None, exclude_active=None, params=None
+    ):
         """
         Creates a new flow start
 

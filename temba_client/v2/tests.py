@@ -333,9 +333,7 @@ class TembaClientTest(TembaTest):
         # check with all params
         self.client.get_classifiers(uuid="09d23a05-47fe-11e4-bfe9-b8f6b119e9ab").all()
 
-        self.assertRequest(
-            mock_request, "get", "classifiers", params={"uuid": "09d23a05-47fe-11e4-bfe9-b8f6b119e9ab"}
-        )
+        self.assertRequest(mock_request, "get", "classifiers", params={"uuid": "09d23a05-47fe-11e4-bfe9-b8f6b119e9ab"})
 
     def test_get_channel_events(self, mock_request):
         # check no params
@@ -493,7 +491,8 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].results[0].categories, ["Orange", "Blue", "Other", "Nothing"])
         self.assertEqual(
             results[0].results[0].node_uuids,
-            ["2bfbd76a-245a-473c-a296-28e4815f3a98", "d8b0ed18-a5c2-48be-98af-9b7f017fdc6c"])
+            ["2bfbd76a-245a-473c-a296-28e4815f3a98", "d8b0ed18-a5c2-48be-98af-9b7f017fdc6c"],
+        )
 
         # check with all params
         self.client.get_flows(uuid="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a").all()
@@ -1049,11 +1048,7 @@ class TembaClientTest(TembaTest):
         glbl = self.client.update_global("org_name", value="Nyaruka")
 
         self.assertRequest(
-            mock_request,
-            "post",
-            "globals",
-            params={"key": "org_name"},
-            data={"value": "Nyaruka"},
+            mock_request, "post", "globals", params={"key": "org_name"}, data={"value": "Nyaruka"},
         )
         self.assertEqual(glbl.key, "org_name")
 
