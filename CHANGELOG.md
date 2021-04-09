@@ -1,3 +1,8 @@
+v2.8.2
+----------
+ * Update deps
+ * Add exclude_active param to create_flow_start
+
 v2.8.1
 ----------
  * Switch to new release system
