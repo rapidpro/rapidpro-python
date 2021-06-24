@@ -406,6 +406,7 @@ class TembaClientTest(TembaTest):
             deleted=False,
             after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
             before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc),
+            reverse=False,
         ).all()
 
         self.assertRequest(
@@ -417,6 +418,7 @@ class TembaClientTest(TembaTest):
                 "urn": "tel:+250973635665",
                 "group": "Customers",
                 "deleted": False,
+                "reverse": False,
                 "after": "2014-12-12T22:34:36.978123Z",
                 "before": "2014-12-12T22:56:58.917123Z",
             },
@@ -757,6 +759,7 @@ class TembaClientTest(TembaTest):
             responded=True,
             after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
             before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc),
+            reverse=False,
         ).all()
 
         self.assertRequest(
@@ -768,6 +771,7 @@ class TembaClientTest(TembaTest):
                 "flow": "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
                 "contact": "d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
                 "responded": True,
+                "reverse": False,
                 "after": "2014-12-12T22:34:36.978123Z",
                 "before": "2014-12-12T22:56:58.917123Z",
             },
