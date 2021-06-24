@@ -131,7 +131,7 @@ class TembaClient(BaseCursorClient):
         params = self._build_params(uuid=uuid)
         return self._get_query("classifiers", params, Classifier)
 
-    def get_contacts(self, uuid=None, urn=None, group=None, deleted=None, reverse=None, before=None, after=None):
+    def get_contacts(self, uuid=None, urn=None, group=None, deleted=None, before=None, after=None, reverse=None):
         """
         Gets all matching contacts
 
@@ -272,7 +272,7 @@ class TembaClient(BaseCursorClient):
         params = self._build_params(id=id, resthook=resthook)
         return self._get_query("resthook_subscribers", params, ResthookSubscriber)
 
-    def get_runs(self, id=None, flow=None, contact=None, responded=None, reverse=None, before=None, after=None):
+    def get_runs(self, id=None, flow=None, contact=None, responded=None, before=None, after=None, reverse=None):
         """
         Gets all matching flow runs
 
