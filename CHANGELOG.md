@@ -1,3 +1,7 @@
+v2.8.3
+----------
+ * Add support for reverse ordering to contacts and runs
+
 v2.8.2
 ----------
  * Update deps
