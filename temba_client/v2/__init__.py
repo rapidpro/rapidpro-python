@@ -131,7 +131,7 @@ class TembaClient(BaseCursorClient):
         params = self._build_params(uuid=uuid)
         return self._get_query("classifiers", params, Classifier)
 
-    def get_contacts(self, uuid=None, urn=None, group=None, deleted=None, before=None, after=None):
+    def get_contacts(self, uuid=None, urn=None, group=None, deleted=None, reverse=None, before=None, after=None):
         """
         Gets all matching contacts
 
@@ -139,11 +139,14 @@ class TembaClient(BaseCursorClient):
         :param urn: contact URN
         :param group: contact group name or UUID
         :param deleted: return deleted contact only
+        :param reverse: whether to return contacts ordered in reverse (oldest first).
         :param datetime before: modified before
         :param datetime after: modified after
         :return: contact query
         """
-        params = self._build_params(uuid=uuid, urn=urn, group=group, deleted=deleted, before=before, after=after)
+        params = self._build_params(
+            uuid=uuid, urn=urn, group=group, deleted=deleted, reverse=reverse, before=before, after=after
+        )
         return self._get_query("contacts", params, Contact)
 
     def get_definitions(self, flows=(), campaigns=(), dependencies=None):
@@ -269,7 +272,7 @@ class TembaClient(BaseCursorClient):
         params = self._build_params(id=id, resthook=resthook)
         return self._get_query("resthook_subscribers", params, ResthookSubscriber)
 
-    def get_runs(self, id=None, flow=None, contact=None, responded=None, before=None, after=None):
+    def get_runs(self, id=None, flow=None, contact=None, responded=None, reverse=None, before=None, after=None):
         """
         Gets all matching flow runs
 
@@ -277,11 +280,14 @@ class TembaClient(BaseCursorClient):
         :param flow: flow object or UUID
         :param contact: contact object or UUID
         :param responded: whether to limit results to runs with responses
+        :param reverse: whether to return results ordered in reverse (oldest first).
         :param datetime before: modified before
         :param datetime after: modified after
         :return: flow run query
         """
-        params = self._build_params(id=id, flow=flow, contact=contact, responded=responded, before=before, after=after)
+        params = self._build_params(
+            id=id, flow=flow, contact=contact, responded=responded, reverse=reverse, before=before, after=after
+        )
         return self._get_query("runs", params, Run)
 
     # ==================================================================================================================
