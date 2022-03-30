@@ -61,7 +61,7 @@ class TembaTest(unittest.TestCase):
             headers={
                 "Content-type": "application/json",
                 "Authorization": "Token 1234567890",
-                "Accept": u"application/json",
+                "Accept": "application/json",
                 "User-Agent": "test/0.1 rapidpro-python/%s" % CLIENT_VERSION,
             },
             verify=None,
