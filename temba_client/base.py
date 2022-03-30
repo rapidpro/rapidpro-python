@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 MAX_RETRIES = 5
 
 
-class BaseClient(object):
+class BaseClient:
     """
     Abstract base client
     """
