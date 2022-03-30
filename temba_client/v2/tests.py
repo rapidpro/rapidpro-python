@@ -1054,7 +1054,11 @@ class TembaClientTest(TembaTest):
         glbl = self.client.update_global("org_name", value="Nyaruka")
 
         self.assertRequest(
-            mock_request, "post", "globals", params={"key": "org_name"}, data={"value": "Nyaruka"},
+            mock_request,
+            "post",
+            "globals",
+            params={"key": "org_name"},
+            data={"value": "Nyaruka"},
         )
         self.assertEqual(glbl.key, "org_name")
 
