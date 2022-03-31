@@ -1,3 +1,7 @@
+v2.8.5
+----------
+ * Bump urllib3 from 1.26.4 to 1.26.5
+
 v2.8.4
 ----------
  * Add paths parameter to get_runs
