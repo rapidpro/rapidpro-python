@@ -4,7 +4,7 @@ __pycache__/
 *~
 *.sw[po]
 
-fabric
+deploy
 fabfile.*
 
 .idea/
