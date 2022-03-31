@@ -1,3 +1,7 @@
+v2.8.4
+----------
+ * Add paths parameter to get_runs
+
 v2.8.3
 ----------
  * Add support for reverse ordering to contacts and runs
