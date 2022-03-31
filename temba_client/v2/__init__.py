@@ -272,7 +272,9 @@ class TembaClient(BaseCursorClient):
         params = self._build_params(id=id, resthook=resthook)
         return self._get_query("resthook_subscribers", params, ResthookSubscriber)
 
-    def get_runs(self, id=None, flow=None, contact=None, responded=None, before=None, after=None, reverse=None):
+    def get_runs(
+        self, id=None, flow=None, contact=None, responded=None, before=None, after=None, reverse=None, paths=None
+    ):
         """
         Gets all matching flow runs
 
@@ -280,13 +282,21 @@ class TembaClient(BaseCursorClient):
         :param flow: flow object or UUID
         :param contact: contact object or UUID
         :param responded: whether to limit results to runs with responses
-        :param reverse: whether to return results ordered in reverse (oldest first).
         :param datetime before: modified before
         :param datetime after: modified after
+        :param reverse: whether to return results ordered in reverse (oldest first).
+        :param paths: whether to include path data
         :return: flow run query
         """
         params = self._build_params(
-            id=id, flow=flow, contact=contact, responded=responded, reverse=reverse, before=before, after=after
+            id=id,
+            flow=flow,
+            contact=contact,
+            responded=responded,
+            reverse=reverse,
+            before=before,
+            after=after,
+            paths=paths,
         )
         return self._get_query("runs", params, Run)
 
