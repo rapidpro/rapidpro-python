@@ -189,10 +189,7 @@ class CursorIterator:
             self.params["cursor"] = self.resume_cursor
 
         response = self.client._request(
-            "get",
-            self.url,
-            params=self.params,
-            retry_on_rate_exceed=self.retry_on_rate_exceed,
+            "get", self.url, params=self.params, retry_on_rate_exceed=self.retry_on_rate_exceed
         )
 
         self.url = response["next"]
@@ -232,14 +229,7 @@ class CursorQuery(object):
         :param resume_cursor: a cursor string to use to resume a previous iteration
         :return: the iterator
         """
-        return CursorIterator(
-            self.client,
-            self.url,
-            self.params,
-            self.clazz,
-            retry_on_rate_exceed,
-            resume_cursor,
-        )
+        return CursorIterator(self.client, self.url, self.params, self.clazz, retry_on_rate_exceed, resume_cursor)
 
     def all(self, retry_on_rate_exceed=False):
         results = []

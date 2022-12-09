@@ -20,7 +20,7 @@ packages = [
 repository = "http://github.com/rapidpro/rapidpro-python"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.9"
 pytz = "*"
 requests = "^2.25.0"
 iso8601 = "^0.1.13"
@@ -41,7 +41,6 @@ line-length = 120
 select = ["E", "F", "W"]
 ignore = ["E501", "F405"]
 fix = true
-exclude = ["./.tox/*", "./env/*", "./.venv/*", "./build/*", "./dist/*", "./docs/*"]
 
 [tool.isort]
 multi_line_output = 3
