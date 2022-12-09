@@ -25,20 +25,16 @@ jobs:
       run: poetry install
 
     - name: Run black
-      run: |
-        poetry run black temba_client
+      run: poetry run black temba_client
 
     - name: Run ruff
-      run: |
-        poetry run ruff temba_client
+      run: poetry run ruff temba_client
 
     - name: Run isort
-      run: |
-        poetry run isort temba_client
+      run: poetry run isort temba_client
 
     - name: Run tests
-      run: |
-        poetry run nosetests --with-coverage --cover-erase --cover-package=temba_client --cover-xml
+      run: poetry run nosetests --with-coverage --cover-erase --cover-package=temba_client --cover-xml
 
     - name: Upload coverage
       if: success()
