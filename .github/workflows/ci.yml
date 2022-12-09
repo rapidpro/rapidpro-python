@@ -34,7 +34,7 @@ jobs:
       run: poetry run isort temba_client
 
     - name: Run tests
-      run: poetry run nosetests --with-coverage --cover-erase --cover-package=temba_client --cover-xml
+      run: poetry run nose2 -C --coverage temba_client --coverage-report term --coverage-report xml 
 
     - name: Upload coverage
       if: success()
