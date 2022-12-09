@@ -131,7 +131,16 @@ class TembaClient(BaseCursorClient):
         params = self._build_params(uuid=uuid)
         return self._get_query("classifiers", params, Classifier)
 
-    def get_contacts(self, uuid=None, urn=None, group=None, deleted=None, before=None, after=None, reverse=None):
+    def get_contacts(
+        self,
+        uuid=None,
+        urn=None,
+        group=None,
+        deleted=None,
+        before=None,
+        after=None,
+        reverse=None,
+    ):
         """
         Gets all matching contacts
 
@@ -145,7 +154,13 @@ class TembaClient(BaseCursorClient):
         :return: contact query
         """
         params = self._build_params(
-            uuid=uuid, urn=urn, group=group, deleted=deleted, reverse=reverse, before=before, after=after
+            uuid=uuid,
+            urn=urn,
+            group=group,
+            deleted=deleted,
+            reverse=reverse,
+            before=before,
+            after=after,
         )
         return self._get_query("contacts", params, Contact)
 
@@ -216,7 +231,16 @@ class TembaClient(BaseCursorClient):
         """
         return self._get_query("labels", self._build_params(uuid=uuid, name=name), Label)
 
-    def get_messages(self, id=None, broadcast=None, contact=None, folder=None, label=None, before=None, after=None):
+    def get_messages(
+        self,
+        id=None,
+        broadcast=None,
+        contact=None,
+        folder=None,
+        label=None,
+        before=None,
+        after=None,
+    ):
         """
         Gets all matching messages
 
@@ -230,7 +254,13 @@ class TembaClient(BaseCursorClient):
         :return: message query
         """
         params = self._build_params(
-            id=id, broadcast=broadcast, contact=contact, folder=folder, label=label, before=before, after=after
+            id=id,
+            broadcast=broadcast,
+            contact=contact,
+            folder=folder,
+            label=label,
+            before=before,
+            after=after,
         )
         return self._get_query("messages", params, Message)
 
@@ -273,7 +303,15 @@ class TembaClient(BaseCursorClient):
         return self._get_query("resthook_subscribers", params, ResthookSubscriber)
 
     def get_runs(
-        self, id=None, flow=None, contact=None, responded=None, before=None, after=None, reverse=None, paths=None
+        self,
+        id=None,
+        flow=None,
+        contact=None,
+        responded=None,
+        before=None,
+        after=None,
+        reverse=None,
+        paths=None,
     ):
         """
         Gets all matching flow runs
@@ -328,7 +366,16 @@ class TembaClient(BaseCursorClient):
         payload = self._build_params(name=name, group=group)
         return Campaign.deserialize(self._post("campaigns", None, payload))
 
-    def create_campaign_event(self, campaign, relative_to, offset, unit, delivery_hour, message=None, flow=None):
+    def create_campaign_event(
+        self,
+        campaign,
+        relative_to,
+        offset,
+        unit,
+        delivery_hour,
+        message=None,
+        flow=None,
+    ):
         """
         Creates a new campaign event
 
@@ -377,7 +424,14 @@ class TembaClient(BaseCursorClient):
         return Field.deserialize(self._post("fields", None, self._build_params(label=label, value_type=value_type)))
 
     def create_flow_start(
-        self, flow, urns=None, contacts=None, groups=None, restart_participants=None, exclude_active=None, params=None
+        self,
+        flow,
+        urns=None,
+        contacts=None,
+        groups=None,
+        restart_participants=None,
+        exclude_active=None,
+        params=None,
     ):
         """
         Creates a new flow start
@@ -474,7 +528,12 @@ class TembaClient(BaseCursorClient):
         """
         params = self._build_id_param(uuid=event)
         payload = self._build_params(
-            relative_to=relative_to, offset=offset, unit=unit, delivery_hour=delivery_hour, message=message, flow=flow
+            relative_to=relative_to,
+            offset=offset,
+            unit=unit,
+            delivery_hour=delivery_hour,
+            message=message,
+            flow=flow,
         )
         return CampaignEvent.deserialize(self._post("campaign_events", params, payload))
 
@@ -528,7 +587,13 @@ class TembaClient(BaseCursorClient):
         :param str name: group name
         :return: the updated group
         """
-        return Group.deserialize(self._post("groups", self._build_id_param(uuid=group), self._build_params(name=name)))
+        return Group.deserialize(
+            self._post(
+                "groups",
+                self._build_id_param(uuid=group),
+                self._build_params(name=name),
+            )
+        )
 
     def update_label(self, label, name):
         """
@@ -538,7 +603,13 @@ class TembaClient(BaseCursorClient):
         :param str name: label name
         :return: the updated label
         """
-        return Label.deserialize(self._post("labels", self._build_id_param(uuid=label), self._build_params(name=name)))
+        return Label.deserialize(
+            self._post(
+                "labels",
+                self._build_id_param(uuid=label),
+                self._build_params(name=name),
+            )
+        )
 
     # ==================================================================================================================
     # Delete object operations
@@ -597,7 +668,11 @@ class TembaClient(BaseCursorClient):
         :param list[*] contacts: contact objects, UUIDs or URNs
         :param * group: contact group object or UUID
         """
-        self._post("contact_actions", None, self._build_params(contacts=contacts, action="add", group=group))
+        self._post(
+            "contact_actions",
+            None,
+            self._build_params(contacts=contacts, action="add", group=group),
+        )
 
     def bulk_remove_contacts(self, contacts, group):
         """
@@ -606,7 +681,11 @@ class TembaClient(BaseCursorClient):
         :param list[*] contacts: contact objects, UUIDs or URNs
         :param * group: contact group object or UUID
         """
-        self._post("contact_actions", None, self._build_params(contacts=contacts, action="remove", group=group))
+        self._post(
+            "contact_actions",
+            None,
+            self._build_params(contacts=contacts, action="remove", group=group),
+        )
 
     def bulk_block_contacts(self, contacts):
         """
@@ -614,7 +693,11 @@ class TembaClient(BaseCursorClient):
 
         :param list[*] contacts: contact objects, UUIDs or URNs
         """
-        self._post("contact_actions", None, self._build_params(contacts=contacts, action="block"))
+        self._post(
+            "contact_actions",
+            None,
+            self._build_params(contacts=contacts, action="block"),
+        )
 
     def bulk_unblock_contacts(self, contacts):
         """
@@ -622,7 +705,11 @@ class TembaClient(BaseCursorClient):
 
         :param list[*] contacts: contact objects, UUIDs or URNs
         """
-        self._post("contact_actions", None, self._build_params(contacts=contacts, action="unblock"))
+        self._post(
+            "contact_actions",
+            None,
+            self._build_params(contacts=contacts, action="unblock"),
+        )
 
     def bulk_interrupt_contacts(self, contacts):
         """
@@ -630,7 +717,11 @@ class TembaClient(BaseCursorClient):
 
         :param list[*] contacts: contact objects, UUIDs or URNs
         """
-        self._post("contact_actions", None, self._build_params(contacts=contacts, action="interrupt"))
+        self._post(
+            "contact_actions",
+            None,
+            self._build_params(contacts=contacts, action="interrupt"),
+        )
 
     def bulk_archive_contact_messages(self, contacts):
         """
@@ -638,7 +729,11 @@ class TembaClient(BaseCursorClient):
 
         :param list[*] contacts: contact objects, UUIDs or URNs
         """
-        self._post("contact_actions", None, self._build_params(contacts=contacts, action="archive_messages"))
+        self._post(
+            "contact_actions",
+            None,
+            self._build_params(contacts=contacts, action="archive_messages"),
+        )
 
     def bulk_delete_contacts(self, contacts):
         """
@@ -646,7 +741,11 @@ class TembaClient(BaseCursorClient):
 
         :param list[*] contacts: contact objects, UUIDs or URNs
         """
-        self._post("contact_actions", None, self._build_params(contacts=contacts, action="delete"))
+        self._post(
+            "contact_actions",
+            None,
+            self._build_params(contacts=contacts, action="delete"),
+        )
 
     def bulk_label_messages(self, messages, label=None, label_name=None):
         """
@@ -676,7 +775,11 @@ class TembaClient(BaseCursorClient):
 
         :param list[*] messages: message objects or ids
         """
-        self._post("message_actions", None, self._build_params(messages=messages, action="archive"))
+        self._post(
+            "message_actions",
+            None,
+            self._build_params(messages=messages, action="archive"),
+        )
 
     def bulk_restore_messages(self, messages):
         """
@@ -684,7 +787,11 @@ class TembaClient(BaseCursorClient):
 
         :param list[*] messages: message objects or ids
         """
-        self._post("message_actions", None, self._build_params(messages=messages, action="restore"))
+        self._post(
+            "message_actions",
+            None,
+            self._build_params(messages=messages, action="restore"),
+        )
 
     def bulk_delete_messages(self, messages):
         """
@@ -692,4 +799,8 @@ class TembaClient(BaseCursorClient):
 
         :param list[*] messages: message objects or ids
         """
-        self._post("message_actions", None, self._build_params(messages=messages, action="delete"))
+        self._post(
+            "message_actions",
+            None,
+            self._build_params(messages=messages, action="delete"),
+        )
