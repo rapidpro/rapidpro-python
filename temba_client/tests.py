@@ -161,7 +161,8 @@ class FieldsTest(TembaTest):
     def test_object_list(self):
         field = ObjectListField(item_class=TestSubType)
         self.assertEqual(
-            field.serialize([TestSubType.create(zed="a"), TestSubType.create(zed=2)]), [{"zed": "a"}, {"zed": 2}]
+            field.serialize([TestSubType.create(zed="a"), TestSubType.create(zed=2)]),
+            [{"zed": "a"}, {"zed": 2}],
         )
 
         self.assertRaises(TembaSerializationException, field.serialize, "Not a list")
