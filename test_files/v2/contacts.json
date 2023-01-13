@@ -19,8 +19,9 @@
                 "nickname": "Jo",
                 "age": 34
             },
-            "blocked": false,
-            "stopped": false,
+            "status": "active",
+            "flow": null,
+            "last_seen_on": null,
             "created_on": "2015-11-11T08:30:24.922024+00:00",
             "modified_on": "2015-11-11T08:30:25.525936+00:00"
         },
@@ -36,8 +37,9 @@
                 "nickname": null,
                 "age": null
             },
-            "blocked": true,
-            "stopped": false,
+            "status": "blocked",
+            "flow": null,
+            "last_seen_on": null,
             "created_on": "2015-11-10T22:04:39.911870+00:00",
             "modified_on": "2015-11-10T22:04:40.052502+00:00"
         },
@@ -48,8 +50,9 @@
             "urns": [],
             "groups": [],
             "fields": {},
-            "blocked": null,
-            "stopped": null,
+            "status": "blocked",
+            "flow": null,
+            "last_seen_on": null,
             "created_on": "2014-11-04T22:00:19.554852+00:00",
             "modified_on": "2014-12-11T19:30:45.482638+00:00"
         }
