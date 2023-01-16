@@ -613,9 +613,16 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].visibility, "visible")
         self.assertEqual(results[0].text, "How are you?")
         self.assertEqual(results[0].labels, [])
+        self.assertEqual(results[0].attachments, [])
         self.assertEqual(results[0].created_on, datetime.datetime(2016, 1, 6, 15, 33, 0, 813162, pytz.utc))
         self.assertEqual(results[0].sent_on, datetime.datetime(2016, 1, 6, 15, 35, 3, 675716, pytz.utc))
         self.assertEqual(results[0].modified_on, None)
+
+        self.assertEqual(results[1].labels[0].uuid, "683c00e2-c130-4b40-9be9-e78c3370e583")
+        self.assertEqual(results[1].labels[0].name, "Important")
+
+        self.assertEqual(results[1].attachments[0].content_type, "audio/wav")
+        self.assertEqual(results[1].attachments[0].url, "http://domain.com/recording.wav")
 
         # check with all params
         self.client.get_messages(

@@ -212,6 +212,10 @@ class Label(TembaObject):
 
 
 class Message(TembaObject):
+    class AttachmentRef(TembaObject):
+        content_type = SimpleField()
+        url = SimpleField()
+
     id = IntegerField()
     broadcast = IntegerField()
     contact = ObjectField(item_class=ObjectRef)
@@ -223,6 +227,7 @@ class Message(TembaObject):
     visibility = SimpleField()
     text = SimpleField()
     labels = ObjectListField(item_class=ObjectRef)
+    attachments = ObjectListField(item_class=AttachmentRef)
     created_on = DatetimeField()
     sent_on = DatetimeField()
     modified_on = DatetimeField()
