@@ -5,15 +5,22 @@
         {
             "id": 4105423,
             "broadcast": 2690006,
-            "contact": {"uuid": "d33e9ad5-5c35-414c-abd4-e7451c69ff1d", "name": "Frank McFlow"},
+            "contact": {
+                "uuid": "d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
+                "name": "Frank McFlow"
+            },
             "urn": "twitter:franky6431",
-            "channel": {"uuid": "9a8b001e-a913-486c-80f4-1356e23f582e", "name": "Nexmo"},
+            "channel": {
+                "uuid": "9a8b001e-a913-486c-80f4-1356e23f582e",
+                "name": "Nexmo"
+            },
             "direction": "out",
             "type": "inbox",
             "status": "wired",
             "visibility": "visible",
             "text": "How are you?",
             "labels": [],
+            "attachments": [],
             "created_on": "2016-01-06T15:33:00.813162+00:00",
             "sent_on": "2016-01-06T15:35:03.675716+00:00",
             "modified_on": null
@@ -21,7 +28,10 @@
         {
             "id": 4088573,
             "broadcast": null,
-            "contact": {"uuid": "d33e9ad5-5c35-414c-abd4-e7451c69ff1d", "name": "Frank McFlow"},
+            "contact": {
+                "uuid": "d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
+                "name": "Frank McFlow"
+            },
             "urn": "twitter:franky6431",
             "channel": null,
             "direction": "in",
@@ -33,6 +43,12 @@
                 {
                     "uuid": "683c00e2-c130-4b40-9be9-e78c3370e583",
                     "name": "Important"
+                }
+            ],
+            "attachments": [
+                {
+                    "content_type": "audio/wav",
+                    "url": "http://domain.com/recording.wav"
                 }
             ],
             "created_on": "2015-11-10T12:59:10+00:00",

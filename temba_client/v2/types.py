@@ -26,7 +26,7 @@ class FieldRef(TembaObject):
     """
 
     key = SimpleField()
-    label = SimpleField()
+    name = SimpleField()
 
 
 class Archive(TembaObject):
@@ -124,14 +124,15 @@ class Classifier(TembaObject):
 class Contact(TembaObject):
     uuid = SimpleField()
     name = SimpleField()
+    status = SimpleField()
     language = SimpleField()
     urns = ListField()
     groups = ObjectListField(item_class=ObjectRef)
+    flow = ObjectField(item_class=ObjectRef)
     fields = SimpleField()
-    blocked = BooleanField()
-    stopped = BooleanField()
     created_on = DatetimeField()
     modified_on = DatetimeField()
+    last_seen_on = DatetimeField()
 
 
 class Export(TembaObject):
@@ -139,20 +140,24 @@ class Export(TembaObject):
     flows = ListField()
     campaigns = ListField()
     triggers = ListField()
+    fields = ListField()
+    groups = ListField()
 
 
 class Field(TembaObject):
     key = SimpleField()
-    label = SimpleField()
-    value_type = SimpleField()
+    name = SimpleField()
+    type = SimpleField()
 
 
 class Flow(TembaObject):
     class Runs(TembaObject):
         active = IntegerField()
+        waiting = IntegerField()
         completed = IntegerField()
         interrupted = IntegerField()
         expired = IntegerField()
+        failed = IntegerField()
 
     class FlowResult(TembaObject):
         key = SimpleField()
@@ -162,6 +167,7 @@ class Flow(TembaObject):
 
     uuid = SimpleField()
     name = SimpleField()
+    type = SimpleField()
     archived = BooleanField()
     labels = ObjectListField(item_class=ObjectRef)
     expires = IntegerField()
@@ -177,6 +183,7 @@ class FlowStart(TembaObject):
     contacts = ObjectListField(item_class=ObjectRef)
     status = SimpleField()
     restart_participants = BooleanField()
+    exclude_active = BooleanField()
     params = SimpleField()
     created_on = DatetimeField()
     modified_on = DatetimeField()
@@ -193,6 +200,8 @@ class Group(TembaObject):
     uuid = SimpleField()
     name = SimpleField()
     query = SimpleField()
+    status = SimpleField()
+    system = BooleanField()
     count = IntegerField()
 
 
@@ -203,6 +212,10 @@ class Label(TembaObject):
 
 
 class Message(TembaObject):
+    class AttachmentRef(TembaObject):
+        content_type = SimpleField()
+        url = SimpleField()
+
     id = IntegerField()
     broadcast = IntegerField()
     contact = ObjectField(item_class=ObjectRef)
@@ -214,6 +227,7 @@ class Message(TembaObject):
     visibility = SimpleField()
     text = SimpleField()
     labels = ObjectListField(item_class=ObjectRef)
+    attachments = ObjectListField(item_class=AttachmentRef)
     created_on = DatetimeField()
     sent_on = DatetimeField()
     modified_on = DatetimeField()
@@ -265,7 +279,7 @@ class Run(TembaObject):
         name = SimpleField()
         input = SimpleField()
 
-    id = IntegerField()
+    uuid = SimpleField()
     flow = ObjectField(item_class=ObjectRef)
     contact = ObjectField(item_class=ObjectRef)
     start = ObjectField(item_class=StartRef)
