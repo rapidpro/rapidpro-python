@@ -1,3 +1,8 @@
+v2.9.0 (2023-01-17)
+-------------------------
+ * Update API fields
+ * Update deps, add ruff, black and isort tools
+
 v2.8.5
 ----------
  * Bump urllib3 from 1.26.4 to 1.26.5
