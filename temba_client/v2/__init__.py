@@ -398,6 +398,16 @@ class TembaClient(BaseCursorClient):
         :return: the new label
         """
         return Label.deserialize(self._post("labels", None, self._build_params(name=name)))
+    
+    def create_message(self, contact, text, attachments):
+        """
+        Creates a new outgoing message
+        :param str contact: contact UUID
+        :param str text: message text
+        :param list[str] attachments: message attachments
+        :return: the new message
+        """
+        return Message.deserialize(self._post("messages", None, self._build_params(contact=contact, text=text, attachments=attachments)))
 
     def create_resthook_subscriber(self, resthook, target_url):
         """

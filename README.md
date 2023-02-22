@@ -37,5 +37,5 @@ For discussions about future development, see the [RapidPro Developers Group](ht
 To run the tests:
 
 ```
-nosetests --with-coverage --cover-erase --cover-package=temba_client --cover-html
+nose2 -C --coverage temba_client
 ```
