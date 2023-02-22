@@ -931,6 +931,13 @@ class TembaClientTest(TembaTest):
         self.assertRequest(mock_request, "post", "labels", data={"name": "Important"})
         self.assertEqual(label.uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
 
+    def test_create_message(self, mock_request):
+        mock_request.return_value = MockResponse(201, self.read_json("messages", extract_result=0))
+        message = self.client.create_message(contact="5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9", text="Hi there", attachments=[])
+
+        self.assertRequest(mock_request, "post", "messages", data={"contact": "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9", "text": "Hi there", "attachments": []})
+        self.assertEqual(message.id, 4105423)
+
     def test_create_resthook_subscriber(self, mock_request):
         subscriber_json = self.read_json("resthook_subscribers", extract_result=0)
 
