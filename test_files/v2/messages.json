@@ -15,12 +15,16 @@
                 "name": "Nexmo"
             },
             "direction": "out",
-            "type": "inbox",
+            "type": "text",
             "status": "wired",
             "visibility": "visible",
             "text": "How are you?",
             "labels": [],
             "attachments": [],
+            "flow": {
+                "uuid": "6ca413c7-bc3a-42cb-9744-6938f791bc36",
+                "name": "Registration"
+            },
             "created_on": "2016-01-06T15:33:00.813162+00:00",
             "sent_on": "2016-01-06T15:35:03.675716+00:00",
             "modified_on": null
@@ -35,7 +39,7 @@
             "urn": "twitter:franky6431",
             "channel": null,
             "direction": "in",
-            "type": "inbox",
+            "type": "text",
             "status": "handled",
             "visibility": "archived",
             "text": "I'm good",
@@ -51,6 +55,7 @@
                     "url": "http://domain.com/recording.wav"
                 }
             ],
+            "flow": null,
             "created_on": "2015-11-10T12:59:10+00:00",
             "sent_on": null,
             "modified_on": "2015-11-10T12:59:11.101787+00:00"
