@@ -27,7 +27,7 @@ for contact_batch in client.get_contacts(group='Reporters').iterfetches(retry_on
         print(contact.name)
 ```
 
-If you don't know your API token then visit the [API Explorer](http://rapidpro.io/api/v2/explorer)
+If you don't know your API token then visit the [API Explorer](http://app.rapidpro.io/api/v2/explorer)
 
 Development
 -----------

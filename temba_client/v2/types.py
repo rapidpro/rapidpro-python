@@ -228,6 +228,7 @@ class Message(TembaObject):
     text = SimpleField()
     labels = ObjectListField(item_class=ObjectRef)
     attachments = ObjectListField(item_class=AttachmentRef)
+    flow = ObjectField(item_class=ObjectRef)
     created_on = DatetimeField()
     sent_on = DatetimeField()
     modified_on = DatetimeField()

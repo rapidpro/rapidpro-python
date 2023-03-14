@@ -608,12 +608,14 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].channel.uuid, "9a8b001e-a913-486c-80f4-1356e23f582e")
         self.assertEqual(results[0].channel.name, "Nexmo")
         self.assertEqual(results[0].direction, "out")
-        self.assertEqual(results[0].type, "inbox")
+        self.assertEqual(results[0].type, "text")
         self.assertEqual(results[0].status, "wired")
         self.assertEqual(results[0].visibility, "visible")
         self.assertEqual(results[0].text, "How are you?")
         self.assertEqual(results[0].labels, [])
         self.assertEqual(results[0].attachments, [])
+        self.assertEqual(results[0].flow.uuid, "6ca413c7-bc3a-42cb-9744-6938f791bc36")
+        self.assertEqual(results[0].flow.name, "Registration")
         self.assertEqual(results[0].created_on, datetime.datetime(2016, 1, 6, 15, 33, 0, 813162, pytz.utc))
         self.assertEqual(results[0].sent_on, datetime.datetime(2016, 1, 6, 15, 35, 3, 675716, pytz.utc))
         self.assertEqual(results[0].modified_on, None)
@@ -933,9 +935,16 @@ class TembaClientTest(TembaTest):
 
     def test_create_message(self, mock_request):
         mock_request.return_value = MockResponse(201, self.read_json("messages", extract_result=0))
-        message = self.client.create_message(contact="5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9", text="Hi there", attachments=[])
+        message = self.client.create_message(
+            contact="5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9", text="Hi there", attachments=[]
+        )
 
-        self.assertRequest(mock_request, "post", "messages", data={"contact": "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9", "text": "Hi there", "attachments": []})
+        self.assertRequest(
+            mock_request,
+            "post",
+            "messages",
+            data={"contact": "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9", "text": "Hi there", "attachments": []},
+        )
         self.assertEqual(message.id, 4105423)
 
     def test_create_resthook_subscriber(self, mock_request):
