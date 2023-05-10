@@ -124,6 +124,43 @@ class TembaClientTest(TembaTest):
         self.assertRaises(TembaRateExceededError, self.client.get_runs().all, retry_on_rate_exceed=False)
         self.assertRaises(TembaRateExceededError, self.client.get_runs().all, retry_on_rate_exceed=True)
 
+    def test_query_with_transformer(self, mock_request):
+        mock_request.return_value = MockResponse(200, """{
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "key": "chat_name",
+            "label": "Chat Name",
+            "value_type": "text"
+        },
+        {
+            "key": "age",
+            "label": "Age",
+            "value_type": "numeric"
+        }
+    ]
+}""")
+        def convert_old_fields(clazz, item):
+            if clazz == Field:
+                item["name"] = item["label"]
+                item["type"] = "number" if item["value_type"] == "numeric" else item["value_type"]
+            return item
+
+        client = TembaClient("example.com", "1234567890", user_agent="test/0.1", transformer=convert_old_fields)                                               
+
+        results = client.get_fields().all()
+
+        self.assertRequest(mock_request, "get", "fields")
+        self.assertEqual(len(results), 2)
+
+        self.assertEqual(results[0].key, "chat_name")
+        self.assertEqual(results[0].name, "Chat Name")
+        self.assertEqual(results[0].type, "text")
+        self.assertEqual(results[1].key, "age")
+        self.assertEqual(results[1].name, "Age")
+        self.assertEqual(results[1].type, "number")
+
     # ==================================================================================================================
     # Fetch object operations
     # ==================================================================================================================

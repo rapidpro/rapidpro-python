@@ -32,7 +32,7 @@ class BaseClient:
 
     __metaclass__ = ABCMeta
 
-    def __init__(self, host, token, api_version, user_agent=None, verify_ssl=None):
+    def __init__(self, host, token, api_version, user_agent=None, verify_ssl=None, transformer=None):
         if host.startswith("http"):
             host_url = host
             if host_url.endswith("/"):  # trim a final slash
@@ -41,10 +41,9 @@ class BaseClient:
             host_url = "https://%s" % host
 
         self.root_url = "%s/api/v%d" % (host_url, api_version)
-
         self.headers = self._headers(token, user_agent)
-
         self.verify_ssl = verify_ssl
+        self.transformer = transformer
 
     @staticmethod
     def _headers(token, user_agent):
@@ -170,13 +169,14 @@ class CursorIterator:
     For iterating through cursor based API responses
     """
 
-    def __init__(self, client, url, params, clazz, retry_on_rate_exceed, resume_cursor):
+    def __init__(self, client, url, params, clazz, retry_on_rate_exceed, resume_cursor, transformer):
         self.client = client
         self.url = url
         self.params = params
         self.clazz = clazz
         self.retry_on_rate_exceed = retry_on_rate_exceed
         self.resume_cursor = resume_cursor
+        self.transformer = transformer
 
     def __iter__(self):
         return self
@@ -200,7 +200,7 @@ class CursorIterator:
         if len(results) == 0:
             raise StopIteration()
         else:
-            return self.clazz.deserialize_list(results)
+            return self.clazz.deserialize_list(results, self.transformer)
 
     def get_cursor(self):
         if not self.url:
@@ -211,16 +211,17 @@ class CursorIterator:
         return cursors[0] if cursors else None
 
 
-class CursorQuery(object):
+class CursorQuery:
     """
     Result of a GET query which can then be iterated or fetched in its entirety
     """
 
-    def __init__(self, client, url, params, clazz):
+    def __init__(self, client, url, params, clazz, transformer):
         self.client = client
         self.url = url
         self.params = params
         self.clazz = clazz
+        self.transformer = transformer
 
     def iterfetches(self, retry_on_rate_exceed=False, resume_cursor=None):
         """
@@ -229,7 +230,9 @@ class CursorQuery(object):
         :param resume_cursor: a cursor string to use to resume a previous iteration
         :return: the iterator
         """
-        return CursorIterator(self.client, self.url, self.params, self.clazz, retry_on_rate_exceed, resume_cursor)
+        return CursorIterator(
+            self.client, self.url, self.params, self.clazz, retry_on_rate_exceed, resume_cursor, self.transformer
+        )
 
     def all(self, retry_on_rate_exceed=False):
         results = []
@@ -256,7 +259,7 @@ class BaseCursorClient(BaseClient):
         """
         GETs a result query for the given endpoint
         """
-        return CursorQuery(self, "%s/%s.json" % (self.root_url, endpoint), params, clazz)
+        return CursorQuery(self, "%s/%s.json" % (self.root_url, endpoint), params, clazz, self.transformer)
 
     def _get_raw(self, endpoint, params, retry_on_rate_exceed=False):
         """

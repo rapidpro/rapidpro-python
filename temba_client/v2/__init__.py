@@ -33,8 +33,8 @@ class TembaClient(BaseCursorClient):
     :param str user_agent: string to be included in the User-Agent header
     """
 
-    def __init__(self, host, token, user_agent=None, verify_ssl=None):
-        super(TembaClient, self).__init__(host, token, 2, user_agent, verify_ssl)
+    def __init__(self, host, token, user_agent=None, verify_ssl=None, transformer=None):
+        super(TembaClient, self).__init__(host, token, 2, user_agent, verify_ssl, transformer=transformer)
 
     # ==================================================================================================================
     # Fetch object operations
@@ -398,7 +398,7 @@ class TembaClient(BaseCursorClient):
         :return: the new label
         """
         return Label.deserialize(self._post("labels", None, self._build_params(name=name)))
-    
+
     def create_message(self, contact, text, attachments):
         """
         Creates a new outgoing message
@@ -407,7 +407,9 @@ class TembaClient(BaseCursorClient):
         :param list[str] attachments: message attachments
         :return: the new message
         """
-        return Message.deserialize(self._post("messages", None, self._build_params(contact=contact, text=text, attachments=attachments)))
+        return Message.deserialize(
+            self._post("messages", None, self._build_params(contact=contact, text=text, attachments=attachments))
+        )
 
     def create_resthook_subscriber(self, resthook, target_url):
         """
