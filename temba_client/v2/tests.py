@@ -918,9 +918,9 @@ class TembaClientTest(TembaTest):
 
     def test_create_field(self, mock_request):
         mock_request.return_value = MockResponse(201, self.read_json("fields", extract_result=0))
-        field = self.client.create_field(label="Chat Name", value_type="text")
+        field = self.client.create_field(name="Chat Name", type="text")
 
-        self.assertRequest(mock_request, "post", "fields", data={"label": "Chat Name", "value_type": "text"})
+        self.assertRequest(mock_request, "post", "fields", data={"name": "Chat Name", "type": "text"})
         self.assertEqual(field.key, "chat_name")
 
     def test_create_flow_start(self, mock_request):
@@ -1084,28 +1084,28 @@ class TembaClientTest(TembaTest):
         mock_request.return_value = MockResponse(201, self.read_json("fields", extract_result=0))
 
         # check update by object
-        field = self.client.update_field(Field.create(key="chat_name"), label="Chat Name", value_type="text")
+        field = self.client.update_field(Field.create(key="chat_name"), name="Chat Name", type="text")
 
         self.assertRequest(
             mock_request,
             "post",
             "fields",
             params={"key": "chat_name"},
-            data={"label": "Chat Name", "value_type": "text"},
+            data={"name": "Chat Name", "type": "text"},
         )
         self.assertEqual(field.key, "chat_name")
 
         mock_request.return_value = MockResponse(404, {"detail": "Not found."})
 
         with self.assertRaises(TembaNoSuchObjectError):
-            self.client.update_field(Field.create(key="chat_name2"), label="Chat Name", value_type="text")
+            self.client.update_field(Field.create(key="chat_name2"), name="Chat Name", type="text")
 
             self.assertRequest(
                 mock_request,
                 "post",
                 "fields",
                 params={"key": "chat_name"},
-                data={"label": "Chat Name", "value_type": "text"},
+                data={"name": "Chat Name", "type": "text"},
             )
 
     def test_update_global(self, mock_request):
