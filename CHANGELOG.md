@@ -1,3 +1,10 @@
+v2.12.0 (2023-05-10)
+-------------------------
+ * Merge pull request #87 from rapidpro/fields-api
+ * Fields API for create and update
+ * Merge pull request #88 from rapidpro/transformers
+ * Allow client to be created with a transformer function
+
 v2.11.0 (2023-03-14)
 -------------------------
  * Add message.flow
