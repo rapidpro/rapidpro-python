@@ -42,8 +42,11 @@ class TembaObject(metaclass=ABCMeta):
         return instance
 
     @classmethod
-    def deserialize_list(cls, item_list):
-        return [cls.deserialize(item) for item in item_list]
+    def deserialize_list(cls, item_list, transformer=None):
+        if transformer:
+            return [cls.deserialize(transformer(cls, item)) for item in item_list]
+        else:
+            return [cls.deserialize(item) for item in item_list]
 
     def serialize(self):
         item = {}

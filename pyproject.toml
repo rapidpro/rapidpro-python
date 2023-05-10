@@ -27,7 +27,6 @@ iso8601 = "^0.1.13"
 
 [tool.poetry.dev-dependencies]
 coverage = "^5.3"
-codecov = "^2.1.10"
 ruff = "^0.0.171"
 isort = "^5.10.1"
 black = "^22.10.0"
