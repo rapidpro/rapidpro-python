@@ -1,8 +1,7 @@
-import datetime
 import json
+from datetime import datetime, timezone as tzone
 from unittest.mock import patch
 
-import pytz
 from requests.exceptions import ConnectionError
 
 from ..exceptions import (
@@ -125,7 +124,9 @@ class TembaClientTest(TembaTest):
         self.assertRaises(TembaRateExceededError, self.client.get_runs().all, retry_on_rate_exceed=True)
 
     def test_query_with_transformer(self, mock_request):
-        mock_request.return_value = MockResponse(200, """{
+        mock_request.return_value = MockResponse(
+            200,
+            """{
     "next": null,
     "previous": null,
     "results": [
@@ -140,14 +141,16 @@ class TembaClientTest(TembaTest):
             "value_type": "numeric"
         }
     ]
-}""")
+}""",
+        )
+
         def convert_old_fields(clazz, item):
             if clazz == Field:
                 item["name"] = item["label"]
                 item["type"] = "number" if item["value_type"] == "numeric" else item["value_type"]
             return item
 
-        client = TembaClient("example.com", "1234567890", user_agent="test/0.1", transformer=convert_old_fields)                                               
+        client = TembaClient("example.com", "1234567890", user_agent="test/0.1", transformer=convert_old_fields)
 
         results = client.get_fields().all()
 
@@ -176,7 +179,7 @@ class TembaClientTest(TembaTest):
         self.assertEqual(len(results), 4)
 
         self.assertEqual(results[1].archive_type, "message")
-        self.assertEqual(results[1].start_date, datetime.datetime(2018, 4, 1, 0, 0, tzinfo=pytz.utc))
+        self.assertEqual(results[1].start_date, datetime(2018, 4, 1, 0, 0, tzinfo=tzone.utc))
         self.assertEqual(results[1].period, "monthly")
         self.assertEqual(results[1].record_count, 10)
         self.assertEqual(results[1].size, 23)
@@ -186,8 +189,8 @@ class TembaClientTest(TembaTest):
         self.client.get_archives(
             archive_type="message",
             period="daily",
-            after=datetime.datetime(2018, 1, 1, tzinfo=pytz.utc),
-            before=datetime.datetime(2018, 5, 1, tzinfo=pytz.utc),
+            after=datetime(2018, 1, 1, tzinfo=tzone.utc),
+            before=datetime(2018, 5, 1, tzinfo=tzone.utc),
         ).all()
 
         self.assertRequest(
@@ -251,13 +254,13 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].groups[0].uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
         self.assertEqual(results[0].groups[0].name, "The A-Team")
         self.assertEqual(results[0].text, "Hello")
-        self.assertEqual(results[0].created_on, datetime.datetime(2015, 11, 11, 8, 30, 24, 922024, pytz.utc))
+        self.assertEqual(results[0].created_on, datetime(2015, 11, 11, 8, 30, 24, 922024, tzone.utc))
 
         # check with all params
         self.client.get_broadcasts(
             id=12345,
-            after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
-            before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc),
+            after=datetime(2014, 12, 12, 22, 34, 36, 978123, tzone.utc),
+            before=datetime(2014, 12, 12, 22, 56, 58, 917123, tzone.utc),
         ).all()
 
         self.assertRequest(
@@ -282,7 +285,7 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].archived, False)
         self.assertEqual(results[0].group.uuid, "04a4752b-0f49-480e-ae60-3a3f2bea485c")
         self.assertEqual(results[0].group.name, "The A-Team")
-        self.assertEqual(results[0].created_on, datetime.datetime(2014, 6, 23, 9, 34, 12, 866000, pytz.utc))
+        self.assertEqual(results[0].created_on, datetime(2014, 6, 23, 9, 34, 12, 866000, tzone.utc))
 
         # check with all params
         self.client.get_campaigns(uuid="09d23a05-47fe-11e4-bfe9-b8f6b119e9ab").all()
@@ -310,7 +313,7 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].message, None)
         self.assertEqual(results[0].flow.uuid, "70c38f94-ab42-4666-86fd-3c76139110d3")
         self.assertEqual(results[0].flow.name, "Survey Flow")
-        self.assertEqual(results[0].created_on, datetime.datetime(2015, 6, 8, 12, 18, 7, 671000, pytz.utc))
+        self.assertEqual(results[0].created_on, datetime(2015, 6, 8, 12, 18, 7, 671000, tzone.utc))
 
         # check with all params
         self.client.get_campaign_events(uuid="09d23a05-47fe-11e4-bfe9-b8f6b119e9ab").all()
@@ -338,8 +341,8 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].device.power_status, "STATUS_DISCHARGING")
         self.assertEqual(results[0].device.power_source, "BATTERY")
         self.assertEqual(results[0].device.network_type, "WIFI")
-        self.assertEqual(results[0].last_seen, datetime.datetime(2016, 3, 1, 5, 31, 27, 456000, pytz.utc))
-        self.assertEqual(results[0].created_on, datetime.datetime(2014, 6, 23, 9, 34, 12, 866000, pytz.utc))
+        self.assertEqual(results[0].last_seen, datetime(2016, 3, 1, 5, 31, 27, 456000, tzone.utc))
+        self.assertEqual(results[0].created_on, datetime(2014, 6, 23, 9, 34, 12, 866000, tzone.utc))
 
         # check with all params
         self.client.get_channels(uuid="09d23a05-47fe-11e4-bfe9-b8f6b119e9ab", address="+250788123123").all()
@@ -365,7 +368,7 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].type, "wit")
         self.assertEqual(results[0].name, "Booking")
         self.assertEqual(results[0].intents, ["book_flight", "book_car"])
-        self.assertEqual(results[0].created_on, datetime.datetime(2015, 6, 8, 12, 18, 7, 671000, pytz.utc))
+        self.assertEqual(results[0].created_on, datetime(2015, 6, 8, 12, 18, 7, 671000, tzone.utc))
 
         # check with all params
         self.client.get_classifiers(uuid="09d23a05-47fe-11e4-bfe9-b8f6b119e9ab").all()
@@ -389,15 +392,15 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].channel.uuid, "9a8b001e-a913-486c-80f4-1356e23f582e")
         self.assertEqual(results[0].channel.name, "Nexmo")
         self.assertEqual(results[0].extra, {"foo": "bar"})
-        self.assertEqual(results[0].occurred_on, datetime.datetime(2016, 1, 6, 15, 35, 3, 675716, pytz.utc))
-        self.assertEqual(results[0].created_on, datetime.datetime(2016, 1, 6, 15, 33, 0, 813162, pytz.utc))
+        self.assertEqual(results[0].occurred_on, datetime(2016, 1, 6, 15, 35, 3, 675716, tzone.utc))
+        self.assertEqual(results[0].created_on, datetime(2016, 1, 6, 15, 33, 0, 813162, tzone.utc))
 
         # check with all params
         self.client.get_channel_events(
             id=12345,
             contact="5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9",
-            after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
-            before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc),
+            after=datetime(2014, 12, 12, 22, 34, 36, 978123, tzone.utc),
+            before=datetime(2014, 12, 12, 22, 56, 58, 917123, tzone.utc),
         ).all()
 
         self.assertRequest(
@@ -433,8 +436,8 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].status, "active")
         self.assertIsNone(results[0].flow)
         self.assertIsNone(results[0].last_seen_on)
-        self.assertEqual(results[0].created_on, datetime.datetime(2015, 11, 11, 8, 30, 24, 922024, pytz.utc))
-        self.assertEqual(results[0].modified_on, datetime.datetime(2015, 11, 11, 8, 30, 25, 525936, pytz.utc))
+        self.assertEqual(results[0].created_on, datetime(2015, 11, 11, 8, 30, 24, 922024, tzone.utc))
+        self.assertEqual(results[0].modified_on, datetime(2015, 11, 11, 8, 30, 25, 525936, tzone.utc))
 
         # check with all params
         self.client.get_contacts(
@@ -442,8 +445,8 @@ class TembaClientTest(TembaTest):
             urn="tel:+250973635665",
             group="Customers",
             deleted=False,
-            after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
-            before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc),
+            after=datetime(2014, 12, 12, 22, 34, 36, 978123, tzone.utc),
+            before=datetime(2014, 12, 12, 22, 56, 58, 917123, tzone.utc),
             reverse=False,
         ).all()
 
@@ -521,7 +524,7 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].labels[0].uuid, "5a4eb79e-1b1f-4ae3-8700-09384cca385f")
         self.assertEqual(results[0].labels[0].name, "Important")
         self.assertEqual(results[0].expires, 600)
-        self.assertEqual(results[0].created_on, datetime.datetime(2014, 6, 23, 9, 34, 12, 866000, pytz.utc))
+        self.assertEqual(results[0].created_on, datetime(2014, 6, 23, 9, 34, 12, 866000, tzone.utc))
         self.assertEqual(results[0].runs.active, 56)
         self.assertEqual(results[0].runs.completed, 123)
         self.assertEqual(results[0].runs.interrupted, 2)
@@ -561,8 +564,8 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].restart_participants, True)
         self.assertEqual(results[0].status, "pending")
         self.assertEqual(results[0].params, {"day": "Monday"})
-        self.assertEqual(results[0].created_on, datetime.datetime(2015, 8, 26, 10, 4, 9, 737686, pytz.utc))
-        self.assertEqual(results[0].modified_on, datetime.datetime(2015, 9, 26, 10, 4, 9, 737686, pytz.utc))
+        self.assertEqual(results[0].created_on, datetime(2015, 8, 26, 10, 4, 9, 737686, tzone.utc))
+        self.assertEqual(results[0].modified_on, datetime(2015, 9, 26, 10, 4, 9, 737686, tzone.utc))
 
         # check with all params
         self.client.get_flow_starts(uuid="93a624ad-5440-415e-b49f-17bf42754acb").all()
@@ -582,7 +585,7 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].key, "org_name")
         self.assertEqual(results[0].name, "Org Name")
         self.assertEqual(results[0].value, "Acme Ltd")
-        self.assertEqual(results[0].modified_on, datetime.datetime(2015, 6, 8, 12, 18, 7, 671000, pytz.utc))
+        self.assertEqual(results[0].modified_on, datetime(2015, 6, 8, 12, 18, 7, 671000, tzone.utc))
 
     def test_get_groups(self, mock_request):
         # check no params
@@ -653,8 +656,8 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].attachments, [])
         self.assertEqual(results[0].flow.uuid, "6ca413c7-bc3a-42cb-9744-6938f791bc36")
         self.assertEqual(results[0].flow.name, "Registration")
-        self.assertEqual(results[0].created_on, datetime.datetime(2016, 1, 6, 15, 33, 0, 813162, pytz.utc))
-        self.assertEqual(results[0].sent_on, datetime.datetime(2016, 1, 6, 15, 35, 3, 675716, pytz.utc))
+        self.assertEqual(results[0].created_on, datetime(2016, 1, 6, 15, 33, 0, 813162, tzone.utc))
+        self.assertEqual(results[0].sent_on, datetime(2016, 1, 6, 15, 35, 3, 675716, tzone.utc))
         self.assertEqual(results[0].modified_on, None)
 
         self.assertEqual(results[1].labels[0].uuid, "683c00e2-c130-4b40-9be9-e78c3370e583")
@@ -670,8 +673,8 @@ class TembaClientTest(TembaTest):
             contact="d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
             folder="inbox",
             label="Spam",
-            after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
-            before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc),
+            after=datetime(2014, 12, 12, 22, 34, 36, 978123, tzone.utc),
+            before=datetime(2014, 12, 12, 22, 56, 58, 917123, tzone.utc),
         ).all()
 
         self.assertRequest(
@@ -714,8 +717,8 @@ class TembaClientTest(TembaTest):
         self.assertEqual(len(results), 2)
 
         self.assertEqual(results[0].resthook, "new-mother")
-        self.assertEqual(results[0].created_on, datetime.datetime(2015, 8, 26, 10, 4, 9, 737686, pytz.utc))
-        self.assertEqual(results[0].modified_on, datetime.datetime(2015, 9, 26, 10, 4, 9, 737686, pytz.utc))
+        self.assertEqual(results[0].created_on, datetime(2015, 8, 26, 10, 4, 9, 737686, tzone.utc))
+        self.assertEqual(results[0].modified_on, datetime(2015, 9, 26, 10, 4, 9, 737686, tzone.utc))
 
     def test_get_resthook_events(self, mock_request):
         # check no params
@@ -729,7 +732,7 @@ class TembaClientTest(TembaTest):
 
         self.assertEqual(results[0].resthook, "new-mother")
         self.assertEqual(results[0].data, {"foo": "bar"})
-        self.assertEqual(results[0].created_on, datetime.datetime(2015, 8, 26, 10, 4, 9, 737686, pytz.utc))
+        self.assertEqual(results[0].created_on, datetime(2015, 8, 26, 10, 4, 9, 737686, tzone.utc))
 
         # check with all params
         self.client.get_resthook_events(resthook="new-mother").all()
@@ -749,7 +752,7 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].id, 1001)
         self.assertEqual(results[0].resthook, "new-mother")
         self.assertEqual(results[0].target_url, "http://foo.bar/mothers")
-        self.assertEqual(results[0].created_on, datetime.datetime(2015, 8, 26, 10, 4, 9, 737686, pytz.utc))
+        self.assertEqual(results[0].created_on, datetime(2015, 8, 26, 10, 4, 9, 737686, tzone.utc))
 
         # check with all params
         self.client.get_resthook_subscribers(id=1001, resthook="new-mother").all()
@@ -776,23 +779,21 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].responded, True)
         self.assertEqual(len(results[0].path), 4)
         self.assertEqual(results[0].path[0].node, "27a86a1b-6cc4-4ae3-b73d-89650966a82f")
-        self.assertEqual(results[0].path[0].time, datetime.datetime(2015, 11, 11, 13, 5, 50, 457742, pytz.utc))
+        self.assertEqual(results[0].path[0].time, datetime(2015, 11, 11, 13, 5, 50, 457742, tzone.utc))
         self.assertEqual(len(results[0].values), 2)
         self.assertEqual(results[0].values["color"].value, "blue")
         self.assertEqual(results[0].values["color"].category, "Blue")
         self.assertEqual(results[0].values["color"].input, "it is blue")
         self.assertEqual(results[0].values["color"].name, "color")
         self.assertEqual(results[0].values["color"].node, "fc32aeb0-ac3e-42a8-9ea7-10248fdf52a1")
-        self.assertEqual(results[0].values["color"].time, datetime.datetime(2015, 11, 11, 13, 3, 51, 635662, pytz.utc))
+        self.assertEqual(results[0].values["color"].time, datetime(2015, 11, 11, 13, 3, 51, 635662, tzone.utc))
         self.assertEqual(results[0].values["reason"].value, "Because it's the color of sky")
         self.assertEqual(results[0].values["reason"].category, "All Responses")
         self.assertEqual(results[0].values["reason"].node, "4c9cb68d-474f-4b9a-b65e-c2aa593a3466")
-        self.assertEqual(
-            results[0].values["reason"].time, datetime.datetime(2015, 11, 11, 13, 5, 57, 576056, pytz.utc)
-        )
-        self.assertEqual(results[0].created_on, datetime.datetime(2015, 8, 26, 10, 4, 9, 737686, pytz.utc))
-        self.assertEqual(results[0].modified_on, datetime.datetime(2015, 8, 26, 10, 5, 47, 516562, pytz.utc))
-        self.assertEqual(results[0].exited_on, datetime.datetime(2015, 8, 26, 10, 5, 47, 516562, pytz.utc))
+        self.assertEqual(results[0].values["reason"].time, datetime(2015, 11, 11, 13, 5, 57, 576056, tzone.utc))
+        self.assertEqual(results[0].created_on, datetime(2015, 8, 26, 10, 4, 9, 737686, tzone.utc))
+        self.assertEqual(results[0].modified_on, datetime(2015, 8, 26, 10, 5, 47, 516562, tzone.utc))
+        self.assertEqual(results[0].exited_on, datetime(2015, 8, 26, 10, 5, 47, 516562, tzone.utc))
         self.assertEqual(results[0].exit_type, "completed")
 
         self.assertEqual(query.first().uuid, results[0].uuid)
@@ -804,8 +805,8 @@ class TembaClientTest(TembaTest):
             flow="ffce0fbb-4fe1-4052-b26a-91beb2ebae9a",
             contact="d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
             responded=True,
-            after=datetime.datetime(2014, 12, 12, 22, 34, 36, 978123, pytz.utc),
-            before=datetime.datetime(2014, 12, 12, 22, 56, 58, 917123, pytz.utc),
+            after=datetime(2014, 12, 12, 22, 34, 36, 978123, tzone.utc),
+            before=datetime(2014, 12, 12, 22, 56, 58, 917123, tzone.utc),
             reverse=False,
             paths=True,
         ).all()
