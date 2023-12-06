@@ -1,7 +1,7 @@
 import json
+from datetime import timezone as tzone
 
 import iso8601
-import pytz
 import requests
 
 
@@ -22,7 +22,7 @@ def format_iso8601(value):
     if value is None:
         return None
 
-    return str(value.astimezone(pytz.UTC).strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
+    return str(value.astimezone(tzone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
 
 
 def request(method, url, **kwargs):  # pragma: no cover
