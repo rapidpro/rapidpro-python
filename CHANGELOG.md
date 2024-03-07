@@ -1,3 +1,8 @@
+v2.13.0 (2024-03-07)
+-------------------------
+ * Replace deprecated pkg_resources
+ * Remove use of pytz
+
 v2.12.0 (2023-05-10)
 -------------------------
  * Merge pull request #87 from rapidpro/fields-api
