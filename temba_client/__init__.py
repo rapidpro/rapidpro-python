@@ -1,4 +1,4 @@
-import pkg_resources
+from importlib import metadata
 
 CLIENT_NAME = "rapidpro-python"
-CLIENT_VERSION = pkg_resources.get_distribution("rapidpro-python").version
+CLIENT_VERSION = metadata.version("rapidpro-python")
