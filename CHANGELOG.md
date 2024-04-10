@@ -1,3 +1,7 @@
+v2.14.0 (2024-04-10)
+-------------------------
+ * Remove get_channel_events and get_definitions
+
 v2.13.0 (2024-03-07)
 -------------------------
  * Replace deprecated pkg_resources
