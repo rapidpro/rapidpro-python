@@ -6,10 +6,8 @@ from .types import (
     Campaign,
     CampaignEvent,
     Channel,
-    ChannelEvent,
     Classifier,
     Contact,
-    Export,
     Field,
     Flow,
     FlowStart,
@@ -101,18 +99,6 @@ class TembaClient(BaseCursorClient):
         params = self._build_params(uuid=uuid, address=address)
         return self._get_query("channels", params, Channel)
 
-    def get_channel_events(self, id=None, contact=None, before=None, after=None):
-        """
-        Gets all matching channel events
-        :param id: event id
-        :param contact: contact object or UUID
-        :param datetime before: created before
-        :param datetime after: created after
-        :return: channel event query
-        """
-        params = self._build_params(id=id, contact=contact, before=before, after=after)
-        return self._get_query("channel_events", params, ChannelEvent)
-
     def get_classifiers(self, uuid=None):
         """
         Gets all matching NLU classifiers
@@ -138,17 +124,6 @@ class TembaClient(BaseCursorClient):
             uuid=uuid, urn=urn, group=group, deleted=deleted, reverse=reverse, before=before, after=after
         )
         return self._get_query("contacts", params, Contact)
-
-    def get_definitions(self, flows=(), campaigns=(), dependencies=None):
-        """
-        Gets an export of specified definitions
-        :param flows: flow objects or UUIDs to include
-        :param campaigns: campaign objects or UUIDs to include
-        :param dependencies: whether to include dependencies
-        :return: definitions export
-        """
-        params = self._build_params(flow=flows, campaign=campaigns, dependencies=dependencies)
-        return Export.deserialize(self._get_raw("definitions", params))
 
     def get_fields(self, key=None):
         """

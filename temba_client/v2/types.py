@@ -103,16 +103,6 @@ class Channel(TembaObject):
     created_on = DatetimeField()
 
 
-class ChannelEvent(TembaObject):
-    id = IntegerField()
-    type = SimpleField()
-    contact = ObjectField(item_class=ObjectRef)
-    channel = ObjectField(item_class=ObjectRef)
-    extra = SimpleField()
-    occurred_on = DatetimeField()
-    created_on = DatetimeField()
-
-
 class Classifier(TembaObject):
     uuid = SimpleField()
     type = SimpleField()
@@ -133,15 +123,6 @@ class Contact(TembaObject):
     created_on = DatetimeField()
     modified_on = DatetimeField()
     last_seen_on = DatetimeField()
-
-
-class Export(TembaObject):
-    version = SimpleField()
-    flows = ListField()
-    campaigns = ListField()
-    triggers = ListField()
-    fields = ListField()
-    groups = ListField()
 
 
 class Field(TembaObject):
