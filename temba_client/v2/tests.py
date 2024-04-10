@@ -375,46 +375,6 @@ class TembaClientTest(TembaTest):
 
         self.assertRequest(mock_request, "get", "classifiers", params={"uuid": "09d23a05-47fe-11e4-bfe9-b8f6b119e9ab"})
 
-    def test_get_channel_events(self, mock_request):
-        # check no params
-        mock_request.return_value = MockResponse(200, self.read_json("channel_events"))
-
-        # check with no params
-        results = self.client.get_channel_events().all()
-
-        self.assertRequest(mock_request, "get", "channel_events")
-        self.assertEqual(len(results), 2)
-
-        self.assertEqual(results[0].id, 12345)
-        self.assertEqual(results[0].type, "in")
-        self.assertEqual(results[0].contact.uuid, "d33e9ad5-5c35-414c-abd4-e7451c69ff1d")
-        self.assertEqual(results[0].contact.name, "Frank McFlow")
-        self.assertEqual(results[0].channel.uuid, "9a8b001e-a913-486c-80f4-1356e23f582e")
-        self.assertEqual(results[0].channel.name, "Nexmo")
-        self.assertEqual(results[0].extra, {"foo": "bar"})
-        self.assertEqual(results[0].occurred_on, datetime(2016, 1, 6, 15, 35, 3, 675716, tzone.utc))
-        self.assertEqual(results[0].created_on, datetime(2016, 1, 6, 15, 33, 0, 813162, tzone.utc))
-
-        # check with all params
-        self.client.get_channel_events(
-            id=12345,
-            contact="5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9",
-            after=datetime(2014, 12, 12, 22, 34, 36, 978123, tzone.utc),
-            before=datetime(2014, 12, 12, 22, 56, 58, 917123, tzone.utc),
-        ).all()
-
-        self.assertRequest(
-            mock_request,
-            "get",
-            "channel_events",
-            params={
-                "id": 12345,
-                "contact": "5079cb96-a1d8-4f47-8c87-d8c7bb6ddab9",
-                "after": "2014-12-12T22:34:36.978123Z",
-                "before": "2014-12-12T22:56:58.917123Z",
-            },
-        )
-
     def test_get_contacts(self, mock_request):
         # check no params
         mock_request.return_value = MockResponse(200, self.read_json("contacts"))
@@ -464,29 +424,6 @@ class TembaClientTest(TembaTest):
                 "before": "2014-12-12T22:56:58.917123Z",
             },
         )
-
-    def test_get_definitions(self, mock_request):
-        mock_request.return_value = MockResponse(200, self.read_json("definitions"))
-
-        # check with all params
-        definitions = self.client.get_definitions(
-            flows=["04a4752b-0f49-480e-ae60-3a3f2bea485c", "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a"],
-            campaigns=[],
-            dependencies=False,
-        )
-
-        self.assertRequest(
-            mock_request,
-            "get",
-            "definitions",
-            params={
-                "flow": ["04a4752b-0f49-480e-ae60-3a3f2bea485c", "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a"],
-                "campaign": [],
-                "dependencies": 0,
-            },
-        )
-
-        self.assertEqual(definitions.version, "10.1")
 
     def test_get_fields(self, mock_request):
         # check no params
