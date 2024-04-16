@@ -425,6 +425,29 @@ class TembaClientTest(TembaTest):
             },
         )
 
+    def test_get_definitions(self, mock_request):
+        mock_request.return_value = MockResponse(200, self.read_json("definitions"))
+
+        # check with all params
+        definitions = self.client.get_definitions(
+            flows=["04a4752b-0f49-480e-ae60-3a3f2bea485c", "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a"],
+            campaigns=[],
+            dependencies=False,
+        )
+
+        self.assertRequest(
+            mock_request,
+            "get",
+            "definitions",
+            params={
+                "flow": ["04a4752b-0f49-480e-ae60-3a3f2bea485c", "ffce0fbb-4fe1-4052-b26a-91beb2ebae9a"],
+                "campaign": [],
+                "dependencies": 0,
+            },
+        )
+
+        self.assertEqual(definitions.version, "10.1")
+
     def test_get_fields(self, mock_request):
         # check no params
         mock_request.return_value = MockResponse(200, self.read_json("fields"))
