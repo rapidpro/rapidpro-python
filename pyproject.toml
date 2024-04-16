@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "rapidpro-python"
-version = "2.14.0"
+version = "2.15.0"
 description = "Python client library for the RapidPro API"
 authors = ["Nyaruka <code@nyaruka.com>"]
 readme = "README.md"

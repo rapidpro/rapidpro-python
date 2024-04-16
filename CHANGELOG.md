@@ -1,3 +1,18 @@
+v2.15.0 (2024-04-16)
+-------------------------
+ * Merge pull request #93 from rapidpro/dependabot/pip/black-24.3.0
+ * Merge pull request #94 from rapidpro/dependabot/pip/certifi-2023.7.22
+ * Merge pull request #95 from rapidpro/dependabot/pip/urllib3-2.0.7
+ * Merge pull request #96 from rapidpro/dependabot/pip/idna-3.7
+ * Merge pull request #97 from rapidpro/dependabot/pip/requests-2.31.0
+ * Bump requests from 2.30.0 to 2.31.0
+ * Bump idna from 3.4 to 3.7
+ * Bump urllib3 from 2.0.2 to 2.0.7
+ * Bump certifi from 2023.5.7 to 2023.7.22
+ * Bump black from 22.12.0 to 24.3.0
+ * Merge pull request #92 from rapidpro/def-export
+ * Add back get definitions
+
 v2.14.0 (2024-04-10)
 -------------------------
  * Remove get_channel_events and get_definitions
