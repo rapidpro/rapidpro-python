@@ -8,6 +8,7 @@ from .types import (
     Channel,
     Classifier,
     Contact,
+    Export,
     Field,
     Flow,
     FlowStart,
@@ -124,6 +125,17 @@ class TembaClient(BaseCursorClient):
             uuid=uuid, urn=urn, group=group, deleted=deleted, reverse=reverse, before=before, after=after
         )
         return self._get_query("contacts", params, Contact)
+
+    def get_definitions(self, flows=(), campaigns=(), dependencies=None):
+        """
+        Gets an export of specified definitions
+        :param flows: flow objects or UUIDs to include
+        :param campaigns: campaign objects or UUIDs to include
+        :param dependencies: whether to include dependencies
+        :return: definitions export
+        """
+        params = self._build_params(flow=flows, campaign=campaigns, dependencies=dependencies)
+        return Export.deserialize(self._get_raw("definitions", params))
 
     def get_fields(self, key=None):
         """

@@ -125,6 +125,14 @@ class Contact(TembaObject):
     last_seen_on = DatetimeField()
 
 
+class Export(TembaObject):
+    version = SimpleField()
+    flows = ListField()
+    campaigns = ListField()
+    triggers = ListField()
+    fields = ListField()
+    groups = ListField()
+
 class Field(TembaObject):
     key = SimpleField()
     name = SimpleField()
