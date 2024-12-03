@@ -262,12 +262,11 @@ class Run(TembaObject):
         time = DatetimeField()
 
     class Value(TembaObject):
+        name = SimpleField()
         value = SimpleField()
         category = SimpleField()
         node = SimpleField()
         time = DatetimeField()
-        name = SimpleField()
-        input = SimpleField()
 
     uuid = SimpleField()
     flow = ObjectField(item_class=ObjectRef)
