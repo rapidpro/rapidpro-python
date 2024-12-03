@@ -1,3 +1,8 @@
+v2.16.0 (2024-12-03)
+-------------------------
+ * Remove input field on run values
+ * Update dependencies
+
 v2.15.0 (2024-04-16)
 -------------------------
  * Merge pull request #93 from rapidpro/dependabot/pip/black-24.3.0
