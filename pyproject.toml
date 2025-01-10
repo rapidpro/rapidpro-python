@@ -1,10 +1,12 @@
-[tool.poetry]
+[project]
 name = "rapidpro-python"
 version = "2.16.0"
 description = "Python client library for the RapidPro API"
-authors = ["Nyaruka <code@nyaruka.com>"]
+authors = [
+    {"name" = "Nyaruka", "email" = "code@nyaruka.com"}
+]
 readme = "README.md"
-license = "BSD-4-Clause"
+license = { text = "BSD-4-Clause" }
 classifiers=[
     'Development Status :: 5 - Production/Stable',
     'Intended Audience :: Developers',
@@ -12,19 +14,23 @@ classifiers=[
     'License :: OSI Approved :: BSD License',
     'Programming Language :: Python :: 3',
 ]
+requires-python = ">=3.9"
+dependencies = [
+    "requests (>=2.32.0)",
+    "iso8601 (>=0.1.13)",
+]
+
+
+
+[tool.poetry]
 packages = [
     { include = "temba_client" },
 ]
 
 [tool.poetry.urls]
-repository = "http://github.com/rapidpro/rapidpro-python"
+"Repository" = "http://github.com/rapidpro/rapidpro-python"
 
-[tool.poetry.dependencies]
-python = "^3.9"
-requests = "^2.25.0"
-iso8601 = "^0.1.13"
-
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 coverage = "^5.3"
 ruff = "^0.0.171"
 isort = "^5.10.1"
@@ -49,5 +55,5 @@ combine_as_imports = true
 sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
