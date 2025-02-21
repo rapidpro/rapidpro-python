@@ -1,3 +1,9 @@
+v2.17.0 (2025-02-21)
+-------------------------
+ * Merge pull request #103 from rapidpro/update-poetry-2
+ * Adjust dependencies config
+ * Update pyproject.toml for poetry 2
+
 v2.16.0 (2024-12-03)
 -------------------------
  * Remove input field on run values
