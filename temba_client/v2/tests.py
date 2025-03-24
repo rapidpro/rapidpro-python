@@ -178,7 +178,7 @@ class TembaClientTest(TembaTest):
         self.assertRequest(mock_request, "get", "archives")
         self.assertEqual(len(results), 4)
 
-        self.assertEqual(results[1].archive_type, "message")
+        self.assertEqual(results[1].type, "message")
         self.assertEqual(results[1].start_date, datetime(2018, 4, 1, 0, 0, tzinfo=tzone.utc))
         self.assertEqual(results[1].period, "monthly")
         self.assertEqual(results[1].record_count, 10)
@@ -187,7 +187,7 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[1].download_url, "http://s3-bucket.aws.com/my/archive.jsonl.gz")
 
         self.client.get_archives(
-            archive_type="message",
+            type="message",
             period="daily",
             after=datetime(2018, 1, 1, tzinfo=tzone.utc),
             before=datetime(2018, 5, 1, tzinfo=tzone.utc),
@@ -198,7 +198,7 @@ class TembaClientTest(TembaTest):
             "get",
             "archives",
             params={
-                "archive_type": "message",
+                "type": "message",
                 "period": "daily",
                 "after": "2018-01-01T00:00:00.000000Z",
                 "before": "2018-05-01T00:00:00.000000Z",
@@ -336,6 +336,7 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].name, "Android Phone")
         self.assertEqual(results[0].address, "+250788123123")
         self.assertEqual(results[0].country, "RW")
+        self.assertEqual(results[0].type, "android")
         self.assertEqual(results[0].device.name, "Nexus 5X")
         self.assertEqual(results[0].device.power_level, 99)
         self.assertEqual(results[0].device.power_status, "STATUS_DISCHARGING")

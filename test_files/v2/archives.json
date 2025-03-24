@@ -3,7 +3,7 @@
     "previous": null,
     "results": [
         {
-            "archive_type": "run",
+            "type": "run",
             "start_date": "2018-04-01",
             "period": "monthly",
             "record_count": 1,
@@ -12,7 +12,7 @@
             "download_url": "http://s3-bucket.aws.com/my/archive.jsonl.gz"
         },
         {
-            "archive_type": "message",
+            "type": "message",
             "start_date": "2018-04-01",
             "period": "monthly",
             "record_count": 10,
@@ -21,7 +21,7 @@
             "download_url": "http://s3-bucket.aws.com/my/archive.jsonl.gz"
         },
         {
-            "archive_type": "message",
+            "type": "message",
             "start_date": "2018-03-01",
             "period": "monthly",
             "record_count": 100,
@@ -30,7 +30,7 @@
             "download_url": "http://s3-bucket.aws.com/my/archive.jsonl.gz"
         },
         {
-            "archive_type": "run",
+            "type": "run",
             "start_date": "2018-03-01",
             "period": "monthly",
             "record_count": 1000,

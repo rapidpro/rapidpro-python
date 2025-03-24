@@ -6,6 +6,7 @@
             "uuid": "09d23a05-47fe-11e4-bfe9-b8f6b119e9ab",
             "name": "Android Phone",
             "address": "+250788123123",
+            "type": "android",
             "country": "RW",
             "device": {
                 "name": "Nexus 5X",
@@ -19,8 +20,9 @@
         },
         {
             "uuid": "9a8b001e-a913-486c-80f4-1356e23f582e",
-            "name": "Nexmo",
+            "name": "Vonage",
             "address": "+250788000001",
+            "type": "vonage",
             "country": "RW",
             "device": null,
             "last_seen": "2016-03-01T05:31:27.456000+00:00",
