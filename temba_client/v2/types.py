@@ -94,9 +94,11 @@ class Channel(TembaObject):
         power_source = SimpleField()
         network_type = SimpleField()
 
+
     uuid = SimpleField()
     name = SimpleField()
     address = SimpleField()
+    type=SimpleField()
     country = SimpleField()
     device = ObjectField(item_class=Device)
     last_seen = DatetimeField()

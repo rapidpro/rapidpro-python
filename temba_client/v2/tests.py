@@ -336,6 +336,7 @@ class TembaClientTest(TembaTest):
         self.assertEqual(results[0].name, "Android Phone")
         self.assertEqual(results[0].address, "+250788123123")
         self.assertEqual(results[0].country, "RW")
+        self.assertEqual(results[0].type, "android")
         self.assertEqual(results[0].device.name, "Nexus 5X")
         self.assertEqual(results[0].device.power_level, 99)
         self.assertEqual(results[0].device.power_status, "STATUS_DISCHARGING")
