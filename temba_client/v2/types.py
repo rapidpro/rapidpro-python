@@ -30,7 +30,7 @@ class FieldRef(TembaObject):
 
 
 class Archive(TembaObject):
-    archive_type = SimpleField()
+    type = SimpleField()
     start_date = DatetimeField()
     period = SimpleField()
     record_count = IntegerField()
