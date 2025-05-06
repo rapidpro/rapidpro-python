@@ -629,10 +629,7 @@ class TembaClientTest(TembaTest):
         # check with all params
         self.client.get_messages(
             id=123456,
-            broadcast=234567,
-            contact="d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
             folder="inbox",
-            label="Spam",
             after=datetime(2014, 12, 12, 22, 34, 36, 978123, tzone.utc),
             before=datetime(2014, 12, 12, 22, 56, 58, 917123, tzone.utc),
         ).all()
@@ -643,10 +640,7 @@ class TembaClientTest(TembaTest):
             "messages",
             params={
                 "id": 123456,
-                "broadcast": 234567,
-                "contact": "d33e9ad5-5c35-414c-abd4-e7451c69ff1d",
                 "folder": "inbox",
-                "label": "Spam",
                 "after": "2014-12-12T22:34:36.978123Z",
                 "before": "2014-12-12T22:56:58.917123Z",
             },

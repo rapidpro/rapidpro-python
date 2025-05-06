@@ -186,21 +186,16 @@ class TembaClient(BaseCursorClient):
         """
         return self._get_query("labels", self._build_params(uuid=uuid, name=name), Label)
 
-    def get_messages(self, id=None, broadcast=None, contact=None, folder=None, label=None, before=None, after=None):
+    def get_messages(self, id=None, folder=None, before=None, after=None):
         """
         Gets all matching messages
         :param id: message id
-        :param broadcast: broadcast id
-        :param contact: contact object or UUID
         :param folder: folder name
-        :param label: message label name or UUID
         :param datetime before: created before
         :param datetime after: created after
         :return: message query
         """
-        params = self._build_params(
-            id=id, broadcast=broadcast, contact=contact, folder=folder, label=label, before=before, after=after
-        )
+        params = self._build_params(id=id, folder=folder, before=before, after=after)
         return self._get_query("messages", params, Message)
 
     def get_org(self, retry_on_rate_exceed=False):
