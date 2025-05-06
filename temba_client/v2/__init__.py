@@ -39,17 +39,17 @@ class TembaClient(BaseCursorClient):
     # Fetch object operations
     # ==================================================================================================================
 
-    def get_archives(self, archive_type=None, period=None, before=None, after=None):
+    def get_archives(self, type=None, period=None, before=None, after=None):
         """
         Gets all matching archives
-        :param str archive_type: "message" or "run"
+        :param str type: "message" or "run"
         :param str period: "daily" or "monthly"
         :param datetime before: created before
         :param datetime after: created after
         :return: archive query
         """
 
-        params = self._build_params(archive_type=archive_type, period=period, before=before, after=after)
+        params = self._build_params(type=type, period=period, before=before, after=after)
         return self._get_query("archives", params, Archive)
 
     def get_boundaries(self, geometry=None):
