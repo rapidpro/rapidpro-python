@@ -1,3 +1,9 @@
+v2.18.1 (2025-05-06)
+-------------------------
+ * Merge pull request #105 from rapidpro/api-channel-type
+ * Rename archive_type to type
+ * Add support for type slug on channels endpoint
+
 v2.18.0 (2025-05-06)
 -------------------------
  * Remove fetching messages by broadcast, contact and label
