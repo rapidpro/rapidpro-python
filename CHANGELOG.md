@@ -1,3 +1,8 @@
+v2.18.0 (2025-05-06)
+-------------------------
+ * Remove fetching messages by broadcast, contact and label
+ * Bump supported python versions
+
 v2.17.0 (2025-02-21)
 -------------------------
  * Merge pull request #103 from rapidpro/update-poetry-2
