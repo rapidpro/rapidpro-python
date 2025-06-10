@@ -1,3 +1,9 @@
+v2.18.2 (2025-06-10)
+-------------------------
+ * Merge pull request #108 from rapidpro/dependabot/pip/requests-2.32.4
+ * Bump requests from 2.32.3 to 2.32.4
+ * Update CHANGELOG.md
+
 v2.18.1 (2025-05-06)
 -------------------------
  * Rename archive_type to type

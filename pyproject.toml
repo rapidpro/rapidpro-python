@@ -1,6 +1,6 @@
 [project]
 name = "rapidpro-python"
-version = "2.18.1"
+version = "2.18.2"
 description = "Python client library for the RapidPro API"
 authors = [
     {"name" = "Nyaruka", "email" = "code@nyaruka.com"}
