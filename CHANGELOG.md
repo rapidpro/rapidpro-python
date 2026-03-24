@@ -1,3 +1,10 @@
+v2.22.1 (2026-03-24)
+-------------------------
+ * Replace black with ruff for code formatting
+ * Update deps
+ * Bump urllib3 from 2.3.0 to 2.6.3
+ * Update actions/checkout and codecov-action to v5
+
 v2.22.0 (2026-01-08)
 -------------------------
  * Switch to use uv python package manager
