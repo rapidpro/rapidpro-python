@@ -23,7 +23,7 @@ jobs:
         run: uv sync --locked --all-groups
 
       - name: Run black
-        run: uv run black temba_client
+        run: uv run ruff format --check temba_client
 
       - name: Run ruff
         run: uv run ruff check temba_client
