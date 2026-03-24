@@ -22,7 +22,7 @@ jobs:
       - name: Initialize environment
         run: uv sync --locked --all-groups
 
-      - name: Run black
+      - name: Run ruff format check
         run: uv run ruff format --check temba_client
 
       - name: Run ruff
