@@ -39,9 +39,6 @@ include = ["temba_client"]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.black]
-line-length = 119
-
 [tool.ruff]
 line-length = 120
 fix = true
@@ -53,7 +50,7 @@ ignore = ["E501", "F405"]
 [tool.isort]
 multi_line_output = 3
 force_grid_wrap = 0
-line_length = 119
+line_length = 120
 include_trailing_comma = true
 combine_as_imports = true
 sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
