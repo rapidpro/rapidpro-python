@@ -1,3 +1,8 @@
+v2.22.2 (2026-03-26)
+-------------------------
+ * Merge pull request #120 from rapidpro/dependabot/uv/requests-2.33.0
+ * Bump requests from 2.32.4 to 2.33.0
+
 v2.22.1 (2026-03-24)
 -------------------------
  * Replace black with ruff for code formatting

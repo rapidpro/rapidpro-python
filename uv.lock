@@ -90,7 +90,7 @@ wheels = [
 
 [[package]]
 name = "rapidpro-python"
-version = "2.22.1"
+version = "2.22.2"
 source = { editable = "." }
 dependencies = [
     { name = "iso8601" },
