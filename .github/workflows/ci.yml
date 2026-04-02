@@ -28,9 +28,6 @@ jobs:
       - name: Run ruff
         run: uv run ruff check temba_client
 
-      - name: Run isort
-        run: uv run isort temba_client
-
       - name: Run tests
         run: uv run nose2 -C --coverage temba_client --coverage-report term --coverage-report xml
 

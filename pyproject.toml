@@ -25,7 +25,6 @@ Repository = "http://github.com/rapidpro/rapidpro-python"
 dev = [
     "coverage>=5.3,<6",
     "ruff>=0.15.7,<0.16",
-    "isort>=5.10.1,<6",
     "nose2>=0.12.0,<0.13",
 ]
 
@@ -44,13 +43,9 @@ line-length = 120
 fix = true
 
 [tool.ruff.lint]
-select = ["E", "F", "W"]
+select = ["E", "F", "W", "I"]
 ignore = ["E501", "F405"]
 
-[tool.isort]
-multi_line_output = 3
-force_grid_wrap = 0
-line_length = 120
-include_trailing_comma = true
-combine_as_imports = true
-sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+[tool.ruff.lint.isort]
+combine-as-imports = true
+known-first-party = ["temba_client"]
