@@ -64,3 +64,11 @@ target/
 
 # ruff
 .ruff_cache
+
+.devcontainer
+
+# AI
+.claude/
+CLAUDE.md
+CODEX.md
+AGENTS.md
