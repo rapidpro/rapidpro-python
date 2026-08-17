@@ -31,12 +31,6 @@ jobs:
       - name: Run tests
         run: uv run nose2 -C --coverage temba_client --coverage-report term --coverage-report xml
 
-      - name: Upload coverage
-        if: success()
-        uses: codecov/codecov-action@v6
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: true
   release:
     name: Release
     needs: [test]
