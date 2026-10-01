@@ -4,9 +4,6 @@ __pycache__/
 *~
 *.sw[po]
 
-deploy
-fabfile.*
-
 .idea/
 .DS_Store
 
